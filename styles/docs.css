@@ -1,0 +1,116 @@
+/******** General ********/
+body,html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: "Tahoma", "Geneva", "Lucida Sans Unicode", "Lucida Grande",
+		sans-serif;
+	background-color: #FFFFFF;
+	font-size: 0.9em;
+}
+
+h1 {
+	font-size: 1.3em;
+	text-align: center;
+}
+
+h2 {
+	font-size: 1.1em;
+}
+
+h3 {
+	font-size: 1.0em;
+	border-bottom: 1px solid #666666;
+}
+
+a {
+	color: #0000FF;
+}
+
+a.external {
+	color: #3366BB;
+	background: transparent url(../images/external.png) no-repeat scroll
+		right center;
+	padding-right: 13px;
+}
+
+div.back-link {
+	font-size: 0.9em;
+	padding-right: 5px;
+	float: right;
+}
+
+/******** Documentation Pages ********/
+#nav {
+	text-align: left;
+	font-size: 0.9em;
+	background-color: #cccccc;
+	padding: 5px;
+}
+
+#nav .nav-area-title {
+	font-weight: bold;
+}
+
+#nav a {
+	
+}
+
+#nav a.selected {
+	text-decoration: none;
+	color: black;
+}
+
+.code {
+	font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+		"Monaco", monospace;
+	font-size: 0.9em;
+	cursor: pointer;
+	padding: 2px;
+}
+
+.syntax {
+	font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+		"Monaco", monospace;
+	font-size: 0.9em;
+	padding: 2px;
+}
+
+.ex {
+	font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+		"Monaco", monospace;
+	font-size: 0.9em;
+	padding: 2px;
+}
+
+.hovering {
+	background-color: #ccdddd;
+}
+
+.not-hovering {
+	background-color: #cccccc;
+}
+
+#sections {
+	padding: 5px;
+}
+
+div#sections ul li {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+div.indented-section {
+	margin-left: 1.5em;
+}
+
+.paragraph-name {
+	font-weight: bold;
+	font-style: italic;
+}
+
+#content > .innertube {
+	max-width: 800px;
+}

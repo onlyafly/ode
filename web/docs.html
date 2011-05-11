@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Ode Documentation</title>
+
+<script type="text/javascript" src="../scripts/ode-compiled.js"></script>
+
+<script type="text/javascript" src="../scripts/lib/modernizr.js"></script>
+<script type="text/javascript" src="../scripts/lib/jquery.js"></script>
+
+<script type="text/javascript" src="../scripts/odeedit/controller.js"></script>
+<script type="text/javascript" src="../scripts/odeedit/miniview.js"></script>
+<script type="text/javascript" src="../scripts/odeedit/docs.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../styles/docs.frame.css" />
+<link rel="stylesheet" type="text/css" href="../styles/odeedit.css" />
+<link rel="stylesheet" type="text/css" href="../styles/docs.css" />
+
+</head>
+
+<body>
+
+  <div id="bottom-frame">
+    <div class="innertube">
+    
+      <div id="shell-area">
+        <textarea id="shell-results" class="textBox" readonly="readonly"></textarea>
+        <input type="text" name="shell-input" id="shell-input" class="textBox" />
+      </div>
+
+      <div id="button-area">
+        <button type="button" id="traceButton">Tracing On/Off</button>
+        <button type="button" id="printNamesButton">Print All Definitions</button>
+        <button type="button" id="clearButton">Clear Window</button>
+        <button type="button" id="resetButton">Reset Memory</button>
+      </div>
+
+      <div id="version"></div>
+      
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="innertube">
+
+      <h1>Ode Reference</h1>
+      
+      <div id="nav">
+        <a class="initial-item" href="#introduction">Introduction</a> |
+        <a href="#reference">Reference</a> |
+        <a href="#combinators">Combinatorial Style</a> |
+        <a href="#functional">Functional Style</a> |
+        <a href="#technical-information">Technical Information</a> |
+        <a href="#further-reading">Further Reading</a>
+      </div>
+      
+      <div id="sections">
+
+        <div id="introduction">
+          <h2>Introduction</h2>
+          
+          <h3>What is Ode?</h3>
+           
+          Ode is a concatenative/functional programming language in the tradition of
+          Forth and Joy.  Most of the ideas here are not new, but my implementation is.
+          My implementation is done in pure JavaScript.
+          
+          <h3>Names and Numbers</h3>
+          <p>
+            Create a new name, 'add', to add two numbers:<br />
+            <span class="code">add = +</span>
+          </p>
+          
+        </div>
+        
+        <div id="reference">
+          <h2>Reference</h2>
+          
+          These operations are available when the Ode Shell is first loaded.
+          
+          <h3>Number Operations</h3>
+          Is item a number: <span class="code">number?</span><br />
+          
+          <h3>Math Operations</h3>
+          Add: <span class="code">+</span><br />
+          Subtract: <span class="code">-</span><br />
+          Multiply: <span class="code">*</span><br />
+          Divide: <span class="code">/</span><br />
+          
+          <h3>Comparison Operations</h3>
+          Equal: <span class="code">eq</span><br />    
+          Less than: <span class="code">&lt;</span><br />
+          Greater than: <span class="code">&gt;</span><br />
+          Less than or equal: <span class="code">&lt;=</span><br />
+          Greater than or equal: <span class="code">&gt;=</span><br />
+          Greater than or equal: <span class="code">&gt;=</span><br />
+          Greater than or equal: <span class="code">&gt;=</span><br />
+          
+          <h3>Control</h3>
+          <p>
+            <span class="paragraph-name">If Then Else.</span>
+            Note that the if clause is not guaranteed to leave the stack in its
+            original state.
+            <br />      
+            Syntax: <span class="syntax">IF_BLOCK THEN_BLOCK ELSE_BLOCK ifte</span><br />
+            Example: <span class="code">10 dup [number?] [dup *] [drop 99] ifte .</span> => 100<br />
+          </p>
+          
+          <h3>Stack Manipulation</h3>
+          Rotate the top three elements: <span class="code">rot</span><br />
+          Swap the top two elements: <span class="code">swap</span><br />        
+          Duplicate: <span class="code">dup</span><br />
+          Duplicate an element by position: <span class="code">dup#</span><br />
+          Drop: <span class="code">drop</span><br />
+          Drop an element by position: <span class="code">drop#</span><br />
+          
+          <h3>Block Manipulation</h3>
+          Execute a block: <span class="code">apply</span><br />
+          Is item a block?: <span class="code">block?</span><br />    
+          Create a block out of the top element: <span class="code">block</span><br />
+          Create a block out of the top X elements: <span class="code">block#</span><br />
+          Concatenate the top two blocks into a single block: <span class="code">cat</span><br />
+          <p>
+            <span class="paragraph-name">Empty?.</span>
+            Is the block empty?
+            <br />
+            Syntax: <span class="syntax">BLOCK empty?</span><br />
+            Example: <span class="code">[A B] empty?</span> => 0 (on stack)<br />
+          </p>
+          <p>
+            <span class="paragraph-name">Cons.</span>
+            Prepends the second top-most element to the beginning of the block on the
+            top of the stack.
+            <br />
+            Syntax: <span class="syntax">ITEM BLOCK cons</span><br />
+            Example: <span class="code">[A] [B] cons</span> => [[A] B] (on stack)<br />
+          </p>
+          <p>
+            <span class="paragraph-name">Uncons.</span>
+            The reverse of "cons". Separates the first item from the block on top
+            of the stack.
+            <br />
+            Syntax: <span class="syntax">BLOCK uncons</span><br />   
+            Example: <span class="code">[[A] B] uncons</span> => [A] [B] (on stack)<br />      
+          </p>
+          <p>
+            <span class="paragraph-name">Stack.</span>
+            Copies the entire stack and puts the copy in a block on top of the stack.
+            <br />      
+            Example:<br />
+            <span class="code">1 2 3 stack .</span> => [1 2 3]<br />  
+          </p>
+          <p>
+            <span class="paragraph-name">Unstack.</span>
+            Replaces the stack with the contents of a block.
+            <br />      
+            Example:<br />
+            <span class="code">[1 2 3] unstack .</span> => 3<br />  
+          </p>
+          <p>
+            <span class="paragraph-name">length</span>
+            Replaces the stack with the contents of a block.
+            <br />      
+            Example:<br />
+            <span class="code">[x y z] length .</span> => 3<br />  
+          </p>
+          
+          <h3>Functional Programming</h3>
+          <p>
+            <span class="paragraph-name">Map.</span>
+            Create a new list by executing a block on each element of an existing
+            list.  Map prevents the block from interfering with the stack by creating
+            a temporary stack to store the results in.  This example doubles the value
+            of every number in the list, then prints the result.
+            <br />      
+            Syntax: <span class="syntax">LIST BLOCK map</span><br />
+            Example: <span class="code">[1 2 3 4] [dup *] map .</span><br />
+          </p>    
+          <p>
+            <span class="paragraph-name">Fold.</span>
+            Fold prevents the block from interfering with the stack by creating
+            a temporary stack to store the results in.  This example adds together
+            every number in the list, then prints the result:
+            <br />      
+            Syntax: <span class="syntax">LIST INITIAL_VALUE BLOCK fold</span><br />
+            Example: <span class="code">[1 2 3 4 5] 0 [+] fold .</span><br />
+          </p>  
+          
+          <h3>Tail Recursion</h3>
+          <p>
+            <span class="paragraph-name">Self.</span>
+            Can only be used within a definition. Calls the definition again in a way that
+            prevents the stack from growing. This should be the last last thing called in
+            a definition, because things that occur after it will not be executed.
+            <br />      
+            Example:<br />
+            <span class="code">range = dup [0 >] [dup 1 - self] [] ifte</span><br />
+            <span class="code">5 range</span> => 5 4 3 2 1 0 (on stack)<br />      
+          </p>
+          
+          <h3>Advanced</h3>
+          Executes a block in its own stack and puts the resulting stack in a block: <span class="code">$eval</span><br />
+          Gets type information about object: <span class="code">$type</span><br />
+          Gets definition of name: <span class="code">$def</span><br />
+          <p>
+            <span class="paragraph-name">Def.</span>
+            Creates a new definition. The top block on the stack should contain the name
+            of the definition to create, and the next block should contain the body of the
+            definition.
+            <br />      
+            Example:<br />
+            <span class="code">[dup +] [double] def</span><br />
+            <span class="code">5 double .</span> => 10<br />      
+          </p>
+          <p>
+            <span class="paragraph-name">Undef.</span>
+            Removes an existing definition. The top block on the stack should contain the name
+            of the definition to remove.
+            <br />      
+            Example:<br />
+            <span class="code">+ = 7; [+] undef</span><br />
+            <span class="code">1 2 + .</span> => 3<br />      
+          </p>
+          <p>
+            <span class="paragraph-name">newstack</span>
+            Empties the stack.
+            <br />      
+            Example:<br />
+            <span class="code">1 2 3 newstack</span> => (empty stack)<br />  
+          </p>
+          <p>
+            <span class="paragraph-name">throw-error</span>
+            Throws an error, terminating execution.
+            <br />      
+            Example:<br />
+            <span class="code">throw-error</span> => (Error occurs.)<br />  
+          </p>
+        </div>
+        
+        <div id="combinators">
+          <h2>Combinators</h2>
+          
+          <h3>Fundamental Combinators</h3>
+          <ul>
+            <li>
+              Swap the top element on stack.  This is a pre-defined core operation.<br />
+              <span class="code">[B] [A] swap</span><span class="ex"> => [A] [B]</span><br />
+            </li>
+            <li>
+              Duplicate the top element on stack.  This is a pre-defined core operation.<br />
+              <span class="code">[A] dup</span><span class="ex"> => [A] [A]</span><br />
+            </li>
+            <li>
+              Remove the top element on stack.  This is a pre-defined core operation.<br />
+              <span class="code">[A] drop</span><span class="ex"> => NOTHING</span><br />
+            </li>
+            <li>
+              Concatenate the top two blocks into a single block.  This is a pre-defined core operation.<br />
+              <span class="code">[B] [A] cat</span><span class="ex"> => [B A]</span><br />
+            </li>
+            <li>
+              Concatenate two blocks, leaving the first one, '[B]', as a block.<br />
+              Definition: <span class="code">cons = swap 1 block# swap cat</span><br />
+              Example: <span class="code">[B] [A] cons</span><span class="ex"> => [[B] A]</span><br />
+            </li>      
+            <li>
+              Create a block out of the top element.<br />
+              Definition: <span class="code">unit = 1 block#</span><br />
+              Example: <span class="code">[A] unit</span><span class="ex"> => [[A]]</span><br />
+            </li>
+            <li>
+              Execute a block.<br />
+              Definition: <span class="code">i = apply</span><br />
+              Example: <span class="code">[42] i</span><span class="ex"> => 42</span><br />
+            </li>
+            <li>
+              Execute a block.<br />
+              Definition: <span class="code">dip = swap 1 block# cat apply</span><br />
+              Example 1: <span class="code">[B] [A] dip</span><span class="ex"> => A [B]</span><br />
+              Example 2: <span class="code">[1 2 3] [4 5 6] dip</span><span class="ex"> => 4 5 6 [1 2 3]</span><br />
+            </li>      
+            
+          </ul>
+          
+          <h3>Further Reading</h3>
+          
+          <ul>
+            <li>
+              <a class="external" target="_top" href="http://tunes.org/~iepos/joy.html">The Theory of Concatenative Combinators</a> by Brent Kerby<br />
+              A comprehensive study of combinatory logic
+            </li>
+            <li>
+              <a class="external" target="_top" href="http://debasishg.blogspot.com/2008/12/what-is-special-about-combinators-in.html">What Is Special About Combinators in Joy</a> by Debashish Ghosh<br />
+            </li>
+            <li>
+              <a class="external" target="_top" href="http://debasishg.blogspot.com/2008/12/combinators-for-fun-and-profit.html">Combinators for Fun and Profit</a> by Debashish Ghosh<br />
+            </li>
+          </ul>
+          
+        </div>
+        
+        <div id="functional">
+          <h2>Functional Programming in Ode</h2>
+          
+          <h3>Using Fold</h3>
+          
+          <p>
+            Many basic functions on arrays of numbers can be expressed simply using a fold:
+          </p>
+            
+          <p>
+            <b>Sum</b><br />
+            Definition: <span class="code">sum = 0 [+] fold</span><br />
+            Example: <span class="code">[1 2 3 4 5] sum .</span> => 15
+          </p>
+            
+          <p>
+            <b>Product</b><br />
+            Definition: <span class="code">product = 1 [*] fold</span><br />
+            Example: <span class="code">[1 2 3 4 5] product .</span> => 120
+          </p>
+          
+          <p>
+            More generally, fold can be used to create a number of interesting functions
+            on arrays:
+          </p>
+          
+          <p>
+            <b>Length</b><br />
+            Definition: <span class="code">length = 0 [drop 1 +] fold</span><br />
+            Example: <span class="code">[4 8 15 16 23 42] length .</span> => 6
+          </p>
+          
+          <p>
+            <b>Reverse</b><br />
+            Definition: <span class="code">reverse = [] [block swap cat] fold</span><br />
+            Example: <span class="code">[1 2 3 4] reverse .</span> => [4 3 2 1]
+          </p>
+          
+          <p>
+            <b>Map</b><br />
+            Definition: <span class="code">myMap = [] swap [block cat] cat fold</span><br />
+            Example: <span class="code">[1 2 3 4] [2 *] myMap .</span> => [2 4 6 8]
+          </p>
+          
+          <p>
+            <b>Filter</b><br />
+            Definition: <span class="code">filter = [] swap [dup] swap block cat [[block cat] [drop] ifte] cat fold</span><br />
+            Example: <span class="code">[1 [2] 3 [4 5]] [number?] filter .</span> => [1 3]
+          </p>
+          
+          <h3>Further Reading</h3>
+          
+          <ul>
+            <li>
+              <a class="external" target="_top" href="http://www.cs.nott.ac.uk/~gmh/fold.pdf">A Tutorial on the Universality and Expressiveness of Fold</a> by Graham Hutton
+            </li>
+            <li>
+              <a class="external" target="_top" href="http://www.latrobe.edu.au/philosophy/phimvt/joy/j05cmp.html">Theory of Recursion</a>
+            </li>
+          </ul>
+          
+        </div>  
+        
+        <div id="technical-information">
+          <h2>Technical Information</h2>
+          
+          <h3>Compatibility</h3>
+          
+          Ode uses features of HTML 5, which means it will only work on newer browsers
+          (as of Spring 2011). I have tested the current version of Ode on the following browsers:
+          <ul>
+            <li>Firefox 4</li>
+            <li>Chrome 10</li>
+            <li>Internet Explorer 9</li>
+          </ul>
+          
+          <h3>Unit Tests</h3>
+                   
+          <p>
+            <a class="external" href="../tests/tests-ode.html" target="_top">Run the unit test suite for the current version of Ode Shell</a>
+          </p>
+          
+          <h3>Future Additions</h3>
+          <ul>
+            <li>More functional operations: filter, etc.</li>
+            <li>Metacircular interpreter</li>
+            <li>
+              Iterative operations like those described here:
+              <a class="external" target="_top" href="http://tunes.org/~iepos/joy.html">The Theory of Concatenative Combinators</a>
+            </li>
+            <li>
+              Lambdas like those described here:
+              <a class="external" target="_top" href="http://tunes.org/~iepos/joy.html">The Theory of Concatenative Combinators</a>
+            </li>
+            <li>Ability to rerun previous commands by pressing up arrow.</li>
+            <li>Support for strings.</li>
+            <li>Consider changing ifte's if clause to be non-destructive to the stack</li>
+          </ul>
+          
+          <h3>Known Issues</h3>
+          <ul>
+            <li>
+              Numbers can reach values of "1.157920892373162e+77" or "Infinity", but
+              the parser does not recognize them.
+            </li>
+          </ul>
+        
+          <h3>Version History</h3>
+      
+          <h4>0.3 (2011/05/10)</h4>
+          <ul>
+            <li>Renamed the language from "Fika" to "Ode".</li>
+            <li>Heavy refactoring to improve future extensibility.</li>
+            <li>Added automatic saving of shell state on the client side via the HTML 5 Local Storage API.</li>
+            <li>Added these advanced operations: def, undef, newstack, throw-error</li>
+            <li>Added these block operations: cons, uncons, stack, unstack, length</li>
+            <li>Added these other operations: empty?</li>
+          </ul>
+      
+          <h4>0.2 (2011/04/10)</h4>
+          <ul>
+            <li>Implemented tail-call optimization via the 'self' name.</li>
+            <li>Added these advanced operations: $eval, $type, $def</li>
+            <li>Added these other operations: number?, block?</li>
+            <li>Added these functional operations: map, fold</li>
+            <li>Fixed compatibility problems with Internet Explorer.</li>
+            <li>Increased maximum stack size to 5000.</li>
+          </ul>
+          
+          <h4>0.1 (2008/12/14)</h4>
+          <ul>
+            <li>First released version.</li>
+          </ul>
+          
+        </div>
+        
+        <div id="further-reading">
+          <h2>Further Reading</h2>
+          
+          <h3>Inspirations and Similar Languages</h3>
+          
+          <div class="indented-section">
+          
+            <h4>Enchilada, by Robbert van Dalen</h4>
+            
+            This is where I found inspiration for the interactive web-based environment
+            of Ode.
+          
+            <h4>Forth</h4>
+            
+            <h4>Joy, by Manfred von Thun</h4>
+            
+            This is the original concatenative/functional hybrid.  Although Ode is
+            not modeled on it, it is inspired by it.
+            
+            <ul>
+              <li><a class="external" href="http://www.latrobe.edu.au/philosophy/phimvt/joy.html">Joy Homepage</a></li>
+              <li><a class="external" href="http://www.latrobe.edu.au/philosophy/phimvt/joy/forth-joy.html">Philosophy of Joy</a></li>
+              <li><a class="external" href="http://tunes.org/~iepos/joy.html">The Theory of Concatenative Combinators</a></li>
+            </ul>
+            
+            <h4>Cat</h4>
+            
+            <ul>
+              <li><a href="http://www.cat-language.com/">Cat Homepage</a></li>
+            </ul>
+            
+            <h4>Factor</h4>
+              
+          </div>
+          
+        </div>  
+      
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

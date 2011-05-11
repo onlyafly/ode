@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="scripts/jstests"/>
+	<classpathentry kind="src" path="scripts/odeedit"/>
+	<classpathentry kind="src" path="scripts/ode"/>
+	<classpathentry kind="src" path="scripts/odetests"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.WebProject">
+		<attributes>
+			<attribute name="hide" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.USER_LIBRARY/jquery"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.USER_LIBRARY/qunit"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Ode Script Tag Test</title>
+
+<script type="text/javascript" src="../scripts/ode-compiled.js"></script>
+<script type="text/javascript" src="../scripts/ode-script.js"></script>
+
+<script type="application/ode" output="#outputDiv">
+  init = [1 2 3 4] [inc];
+  over = swap dup rot rot;
+  inc = 1 +;
+  process = block cons over swap apply rot rot uncons swap rot apply block rot swap cat;
+  kmap = swap [] kmap-helper;
+  kmap-helper = swap [dup empty?] [drop swap drop] [swap process kmap-helper] ifte;
+  safe-kmap = 2 block# [kmap] cat $eval apply;
+  cons = swap 1 block# swap cat;
+  double = dup +;
+  mel = dup +;
+
+  last = [] swap last-rec;
+  last-rec = [dup length 1 eq] [uncons drop] [uncons rot rot block cat swap self] ifte;
+  check = last rot swap block apply;
+  params = [dup empty?] [drop] [check [1 eq] [] [0 0 /] ifte self] ifte;
+
+  7 mel .;
+</script>
+
+</head>
+<body>
+  <div id="outputDiv"></div>
+</body>
+</html>

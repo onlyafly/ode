@@ -1,0 +1,17 @@
+    ===============================================================================
+    
+    Ode
+    
+    A concatenative, functional programming language.
+    
+    ===============================================================================
+    
+    License:
+        MIT (see included LICENSE file)
+
+    Author:
+        Kevin P. Albrecht
+        http://www.kevinalbrecht.com
+        
+    Web Site:
+        http://www.kevinalbrecht.com/code/ode

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Ode Development Environment</title>
+
+<script type="text/javascript" src="../scripts/ode/extras.js"></script>
+<script type="text/javascript" src="../scripts/ode/base.js"></script>
+<script type="text/javascript" src="../scripts/ode/exceptions.js"></script>
+<script type="text/javascript" src="../scripts/ode/lexer.js"></script>
+<script type="text/javascript" src="../scripts/ode/nodes.js"></script>
+<script type="text/javascript" src="../scripts/ode/parser.js"></script>
+<script type="text/javascript" src="../scripts/ode/symboltable.js"></script>
+<script type="text/javascript" src="../scripts/ode/stacks.js"></script>
+<script type="text/javascript" src="../scripts/ode/interpreter.js"></script>
+<script type="text/javascript" src="../scripts/ode/natives.js"></script>
+<script type="text/javascript" src="../scripts/ode/controller.js"></script>
+
+<script type="text/javascript" src="../scripts/lib/modernizr.js"></script>
+<script type="text/javascript" src="../scripts/lib/jquery.js"></script>
+
+<script type="text/javascript" src="../scripts/odeedit/controller.js"></script>
+<script type="text/javascript" src="../scripts/odeedit/fullview.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../styles/ode.css" />
+<link rel="stylesheet" type="text/css" href="../styles/ode.frame.css" />
+<link rel="stylesheet" type="text/css" href="../styles/odeedit.css" />
+
+</head>
+
+<body>
+
+  <div id="top-frame">
+    <div class="innertube">
+
+      <h1>Ode (Online Development Environment)</h1>
+
+      <div class="button-area">
+        <button type="button" id="execEditorButton">Execute Editor</button>
+        
+        <button type="button" id="saveBufferAsButton">Save As:</button>
+        <input type="text" name="fileNameTextBox" id="fileNameTextBox" />
+        
+        <button type="button" id="saveBufferButton">Save:</button>
+        <button type="button" id="loadBufferButton">Load:</button> 
+        <button type="button" id="deleteBufferButton">Delete:</button> 
+        <select id="bufferNameList"></select>               
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-frame">
+    <div class="innertube">
+
+      <div id="shell-area">
+        <input type="text" name="shell-input" id="shell-input" class="textBox" />
+      </div>
+
+      <div id="button-area">
+        <button type="button" id="traceButton">Tracing On/Off</button>
+        <button type="button" id="printNamesButton">Print All Definitions</button>
+        <button type="button" id="clearButton">Clear Window</button>
+        <button type="button" id="resetButton">Reset Memory</button>
+      </div>
+
+      <div id="version"></div>
+
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="innertube">
+
+      <div class="colmask doublepage">
+        <div class="colleft">
+          <div class="col1">
+            <textarea id="dev-editor" class="textBox"></textarea>
+          </div>
+          <div class="col2">
+            <textarea id="dev-results" class="textBox" readonly="readonly"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

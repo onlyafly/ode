@@ -1,0 +1,11 @@
+body {
+  font-family: "Tahoma", "Geneva", "Lucida Sans Unicode", "Lucida Grande",
+    sans-serif;
+  background-color: #FFFFFF;
+  font-size: 0.9em;
+}
+
+#dev-editor, #dev-results {
+  height: 100%;
+  width: 100%;
+}
