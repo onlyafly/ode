@@ -104,7 +104,7 @@
             original state.
             <br />      
             Syntax: <span class="syntax">IF_BLOCK THEN_BLOCK ELSE_BLOCK ifte</span><br />
-            Example: <span class="code">10 dup [number?] [dup *] [drop 99] ifte .</span> => 100<br />
+            Example: <span class="code">10 dup [number?] [dup *] [drop 99] ifte .</span> =&gt; 100<br />
           </p>
           
           <h3>Stack Manipulation</h3>
@@ -126,7 +126,7 @@
             Is the block empty?
             <br />
             Syntax: <span class="syntax">BLOCK empty?</span><br />
-            Example: <span class="code">[A B] empty?</span> => 0 (on stack)<br />
+            Example: <span class="code">[A B] empty?</span> =&gt; 0 (on stack)<br />
           </p>
           <p>
             <span class="paragraph-name">Cons.</span>
@@ -134,7 +134,7 @@
             top of the stack.
             <br />
             Syntax: <span class="syntax">ITEM BLOCK cons</span><br />
-            Example: <span class="code">[A] [B] cons</span> => [[A] B] (on stack)<br />
+            Example: <span class="code">[A] [B] cons</span> =&gt; [[A] B] (on stack)<br />
           </p>
           <p>
             <span class="paragraph-name">Uncons.</span>
@@ -142,28 +142,28 @@
             of the stack.
             <br />
             Syntax: <span class="syntax">BLOCK uncons</span><br />   
-            Example: <span class="code">[[A] B] uncons</span> => [A] [B] (on stack)<br />      
+            Example: <span class="code">[[A] B] uncons</span> =&gt; [A] [B] (on stack)<br />      
           </p>
           <p>
             <span class="paragraph-name">Stack.</span>
             Copies the entire stack and puts the copy in a block on top of the stack.
             <br />      
             Example:<br />
-            <span class="code">1 2 3 stack .</span> => [1 2 3]<br />  
+            <span class="code">1 2 3 stack .</span> =&gt; [1 2 3]<br />  
           </p>
           <p>
             <span class="paragraph-name">Unstack.</span>
             Replaces the stack with the contents of a block.
             <br />      
             Example:<br />
-            <span class="code">[1 2 3] unstack .</span> => 3<br />  
+            <span class="code">[1 2 3] unstack .</span> =&gt; 3<br />  
           </p>
           <p>
             <span class="paragraph-name">length</span>
             Replaces the stack with the contents of a block.
             <br />      
             Example:<br />
-            <span class="code">[x y z] length .</span> => 3<br />  
+            <span class="code">[x y z] length .</span> =&gt; 3<br />  
           </p>
           
           <h3>Functional Programming</h3>
@@ -196,7 +196,7 @@
             <br />      
             Example:<br />
             <span class="code">range = dup [0 >] [dup 1 - self] [] ifte</span><br />
-            <span class="code">5 range</span> => 5 4 3 2 1 0 (on stack)<br />      
+            <span class="code">5 range</span> =&gt; 5 4 3 2 1 0 (on stack)<br />      
           </p>
           
           <h3>Advanced</h3>
@@ -211,7 +211,7 @@
             <br />      
             Example:<br />
             <span class="code">[dup +] [double] def</span><br />
-            <span class="code">5 double .</span> => 10<br />      
+            <span class="code">5 double .</span> =&gt; 10<br />      
           </p>
           <p>
             <span class="paragraph-name">Undef.</span>
@@ -220,21 +220,21 @@
             <br />      
             Example:<br />
             <span class="code">+ = 7; [+] undef</span><br />
-            <span class="code">1 2 + .</span> => 3<br />      
+            <span class="code">1 2 + .</span> =&gt; 3<br />      
           </p>
           <p>
             <span class="paragraph-name">newstack</span>
             Empties the stack.
             <br />      
             Example:<br />
-            <span class="code">1 2 3 newstack</span> => (empty stack)<br />  
+            <span class="code">1 2 3 newstack</span> =&gt; (empty stack)<br />  
           </p>
           <p>
             <span class="paragraph-name">throw-error</span>
             Throws an error, terminating execution.
             <br />      
             Example:<br />
-            <span class="code">throw-error</span> => (Error occurs.)<br />  
+            <span class="code">throw-error</span> =&gt; (Error occurs.)<br />  
           </p>
         </div>
         
@@ -245,40 +245,40 @@
           <ul>
             <li>
               Swap the top element on stack.  This is a pre-defined core operation.<br />
-              <span class="code">[B] [A] swap</span><span class="ex"> => [A] [B]</span><br />
+              <span class="code">[B] [A] swap</span><span class="ex"> =&gt; [A] [B]</span><br />
             </li>
             <li>
               Duplicate the top element on stack.  This is a pre-defined core operation.<br />
-              <span class="code">[A] dup</span><span class="ex"> => [A] [A]</span><br />
+              <span class="code">[A] dup</span><span class="ex"> =&gt; [A] [A]</span><br />
             </li>
             <li>
               Remove the top element on stack.  This is a pre-defined core operation.<br />
-              <span class="code">[A] drop</span><span class="ex"> => NOTHING</span><br />
+              <span class="code">[A] drop</span><span class="ex"> =&gt; NOTHING</span><br />
             </li>
             <li>
               Concatenate the top two blocks into a single block.  This is a pre-defined core operation.<br />
-              <span class="code">[B] [A] cat</span><span class="ex"> => [B A]</span><br />
+              <span class="code">[B] [A] cat</span><span class="ex"> =&gt; [B A]</span><br />
             </li>
             <li>
               Concatenate two blocks, leaving the first one, '[B]', as a block.<br />
               Definition: <span class="code">cons = swap 1 block# swap cat</span><br />
-              Example: <span class="code">[B] [A] cons</span><span class="ex"> => [[B] A]</span><br />
+              Example: <span class="code">[B] [A] cons</span><span class="ex"> =&gt; [[B] A]</span><br />
             </li>      
             <li>
               Create a block out of the top element.<br />
               Definition: <span class="code">unit = 1 block#</span><br />
-              Example: <span class="code">[A] unit</span><span class="ex"> => [[A]]</span><br />
+              Example: <span class="code">[A] unit</span><span class="ex"> =&gt; [[A]]</span><br />
             </li>
             <li>
               Execute a block.<br />
               Definition: <span class="code">i = apply</span><br />
-              Example: <span class="code">[42] i</span><span class="ex"> => 42</span><br />
+              Example: <span class="code">[42] i</span><span class="ex"> =&gt; 42</span><br />
             </li>
             <li>
               Execute a block.<br />
               Definition: <span class="code">dip = swap 1 block# cat apply</span><br />
-              Example 1: <span class="code">[B] [A] dip</span><span class="ex"> => A [B]</span><br />
-              Example 2: <span class="code">[1 2 3] [4 5 6] dip</span><span class="ex"> => 4 5 6 [1 2 3]</span><br />
+              Example 1: <span class="code">[B] [A] dip</span><span class="ex"> =&gt; A [B]</span><br />
+              Example 2: <span class="code">[1 2 3] [4 5 6] dip</span><span class="ex"> =&gt; 4 5 6 [1 2 3]</span><br />
             </li>      
             
           </ul>
@@ -312,13 +312,13 @@
           <p>
             <b>Sum</b><br />
             Definition: <span class="code">sum = 0 [+] fold</span><br />
-            Example: <span class="code">[1 2 3 4 5] sum .</span> => 15
+            Example: <span class="code">[1 2 3 4 5] sum .</span> =&gt; 15
           </p>
             
           <p>
             <b>Product</b><br />
             Definition: <span class="code">product = 1 [*] fold</span><br />
-            Example: <span class="code">[1 2 3 4 5] product .</span> => 120
+            Example: <span class="code">[1 2 3 4 5] product .</span> =&gt; 120
           </p>
           
           <p>
@@ -329,25 +329,25 @@
           <p>
             <b>Length</b><br />
             Definition: <span class="code">length = 0 [drop 1 +] fold</span><br />
-            Example: <span class="code">[4 8 15 16 23 42] length .</span> => 6
+            Example: <span class="code">[4 8 15 16 23 42] length .</span> =&gt; 6
           </p>
           
           <p>
             <b>Reverse</b><br />
             Definition: <span class="code">reverse = [] [block swap cat] fold</span><br />
-            Example: <span class="code">[1 2 3 4] reverse .</span> => [4 3 2 1]
+            Example: <span class="code">[1 2 3 4] reverse .</span> =&gt; [4 3 2 1]
           </p>
           
           <p>
             <b>Map</b><br />
             Definition: <span class="code">myMap = [] swap [block cat] cat fold</span><br />
-            Example: <span class="code">[1 2 3 4] [2 *] myMap .</span> => [2 4 6 8]
+            Example: <span class="code">[1 2 3 4] [2 *] myMap .</span> =&gt; [2 4 6 8]
           </p>
           
           <p>
             <b>Filter</b><br />
             Definition: <span class="code">filter = [] swap [dup] swap block cat [[block cat] [drop] ifte] cat fold</span><br />
-            Example: <span class="code">[1 [2] 3 [4 5]] [number?] filter .</span> => [1 3]
+            Example: <span class="code">[1 [2] 3 [4 5]] [number?] filter .</span> =&gt; [1 3]
           </p>
           
           <h3>Further Reading</h3>

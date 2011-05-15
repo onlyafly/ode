@@ -1,6 +1,4 @@
-//////// FTEST NAMESPACE
-
-var FT = {};
+var Is = {};
 
 $(function(){
 
@@ -9,11 +7,25 @@ var stack = new ode.RuntimeStack();
 var symbolTable = new ode.SymbolTable();
 var controller = new ode.Controller(function(s) { result += s; }, stack, symbolTable);
 
-FT.clearResult = function() {
+Is.clearResult = function() {
   result = '';
 };
 
-FT.check = function(input, output, retainState) {
+Is.stack = function(input, stackOutput, retainState) {
+  controller.exec(input);
+  same(stack.toString(), stackOutput);
+  
+  if (retainState) {
+    // nothing
+  }
+  else {
+    result = '';
+    stack.empty();
+    symbolTable.emptyCustomDefinitions();
+  }
+};
+
+Is.output = function(input, output, retainState) {
   controller.exec(input);
   same(result, output);
   
@@ -27,8 +39,7 @@ FT.check = function(input, output, retainState) {
   }
 };
 
-// Run ode for its side effect
-FT.checkException = function(input, exception, retainState) {
+Is.exception = function(input, exception, retainState) {
   try {
     controller.execNoErrorHandling(input);
     ok(false, "No expected exception occured in: <" + input + ">");

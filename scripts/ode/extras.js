@@ -5,7 +5,10 @@
  * @author <a href="mailto:kevin@albrecht.net">Kevin Albrecht</a>
  */
 
-/** @type {Object} */
+/**
+ * @namespace
+ * @type {Object}
+ */
 var extras = extras || {};
 
 /**
@@ -120,11 +123,7 @@ extras.range = function(low, high, step) {
  * @return {boolean} True if the value is between low and high, inclusive.
  */
 extras.isBetween = function(low, value, high) {
-  if (low <= value && value <= high) {
-    return true;
-  } else {
-    return false;
-  }
+  return low <= value && value <= high;
 };
 
 /**
@@ -169,7 +168,7 @@ extras.hasInstances = function(classFunction, var_args) {
 };
 
 /**
- * @param {Array.<Object>} array Array of objects to map this method over.
+ * @param {Array} array Array of objects to map this method over.
  * @param {string} methodName The name of the method to map over the array.
  * @return {Array} A new array resulting from calling the method name on all the
  * elements of the array.
@@ -233,7 +232,7 @@ extras.containsAny = function(array, arrayOfPossibleElements) {
  * https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
  *
  * @param {Object} o Object to get array of keys for.
- * @return {Array.<Object>} The array of keys for the object.
+ * @return {Array} The array of keys for the object.
  */
 extras.keys = function(o) {
 

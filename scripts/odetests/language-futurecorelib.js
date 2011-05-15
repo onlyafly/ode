@@ -3,37 +3,37 @@ $(document).ready(function(){
 module("Language - future core library");
 
 test("recip", function() {
-  FT.check("recip = dup [0 eq] [0] [1 swap /] ifte; 0.2 recip .", "5");
+  Is.output("recip = dup [0 eq] [0] [1 swap /] ifte; 0.2 recip .", "5");
 });
 
 test("abs", function() {
-  FT.check("abs = dup [0 <] [0 swap -] [] ifte; -42 abs .","42");
-  FT.check("abs2 = 0 swap [dup [0 >=] [+] [-] ifte] apply; -33 abs2 .","33");
+  Is.output("abs = dup [0 <] [0 swap -] [] ifte; -42 abs .","42");
+  Is.output("abs2 = 0 swap [dup [0 >=] [+] [-] ifte] apply; -33 abs2 .","33");
 });
 
 test("fibonacci", function() {
-  FT.check("fib = dup [1 <=] [] [dup 1 - fib swap 2 - fib +] ifte; 10 fib .", "55");
+  Is.output("fib = dup [1 <=] [] [dup 1 - fib swap 2 - fib +] ifte; 10 fib .", "55");
 });
 
 test("factorial", function() {
-  FT.check("factorial = dup [0 eq] [drop 1] [dup 1 - factorial *] ifte; 5 factorial .", "120");
+  Is.output("factorial = dup [0 eq] [drop 1] [dup 1 - factorial *] ifte; 5 factorial .", "120");
   
   /* COMPARE
    * Joy saves the state of the stack before running the if clause
-  FT.check("factorial = [0 eq] [drop 1] [dup 1 - factorial *] ifte; 5 factorial .", "120");
+  Is.output("factorial = [0 eq] [drop 1] [dup 1 - factorial *] ifte; 5 factorial .", "120");
    */
 });
 
 test("boolean or", function() {
   // retain state on these
-  FT.check("or = swap block [drop 1] [block [1] [0] ifte] ifte", "", true);
-  FT.check("0 0 or .; 1 0 or .; 0 1 or .; 1 1 or .", "0111");
+  Is.output("or = swap block [drop 1] [block [1] [0] ifte] ifte", "", true);
+  Is.output("0 0 or .; 1 0 or .; 0 1 or .; 1 1 or .", "0111");
 });
 
 test("boolean and", function() {
   // retain state on these
-  FT.check("and = swap block [block [1] [0] ifte] [drop 0] ifte", "", true);
-  FT.check("0 0 and .; 1 0 and .; 0 1 and .; 1 1 and .", "0001");
+  Is.output("and = swap block [block [1] [0] ifte] [drop 0] ifte", "", true);
+  Is.output("0 0 and .; 1 0 and .; 0 1 and .; 1 1 and .", "0001");
 });
 
 /*

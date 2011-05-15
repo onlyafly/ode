@@ -16,7 +16,8 @@ ode.Controller = function(otherOutputFun, otherStack, otherSymbolTable,
   this.interpreter = otherInterpreter ||
     new ode.Interpreter(this.stack, this.symbolTable, this.outputFun);
 
-  ode.natives.initialize(this.interpreter);
+  ode.joynatives.initialize(this.interpreter);
+  // FIXME ode.natives.initialize(this.interpreter);
 };
 
 /**

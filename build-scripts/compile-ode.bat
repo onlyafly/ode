@@ -8,6 +8,7 @@ java -jar ../external-tools/compiler.jar ^
   --js ../scripts/ode/symboltable.js ^
   --js ../scripts/ode/stacks.js ^
   --js ../scripts/ode/interpreter.js ^
+  --js ../scripts/ode/joynatives.js ^
   --js ../scripts/ode/natives.js ^
   --js ../scripts/ode/controller.js ^
   --js_output_file ../scripts/ode-compiled.js ^
