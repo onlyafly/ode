@@ -43,6 +43,40 @@ ode.NameNode = function(val) {
 };
 extras.inherits(ode.NameNode, ode.AtomicNode);
 
+// Boolean
+
+/**
+ * @constructor
+ * @extends {ode.AtomicNode}
+ * @param {!boolean} val Value for this node.
+ */
+ode.BooleanNode = function(val) {
+  extras.base(this, val);
+};
+extras.inherits(ode.BooleanNode, ode.AtomicNode);
+
+/** @inheritDoc */
+ode.BooleanNode.prototype.toString = function() {
+  return this.val ? 'true' : 'false';
+};
+
+// Character
+
+/**
+ * @constructor
+ * @extends {ode.AtomicNode}
+ * @param {!string} val Value for this node.
+ */
+ode.CharacterNode = function(val) {
+  extras.base(this, val);
+};
+extras.inherits(ode.CharacterNode, ode.AtomicNode);
+
+/** @inheritDoc */
+ode.CharacterNode.prototype.toString = function() {
+  return "'" + this.val;
+};
+
 // Number
 
 /**

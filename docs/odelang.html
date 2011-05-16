@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ode Language Documentation</title>
+
+<link rel="stylesheet" type="text/css" href="../styles/reset.css">
+<link rel="stylesheet" type="text/css" href="../styles/documentation.css">
+
+</head>
+<body>
+
+<div class="content">
+
+<h1>Ode Language Documentation</h1><h2>Literals</h2><h3>Boolean Literals</h3>
+
+<p>The logical type, or the type of truth values. It has just two
+literals: true and false.</p>
+
+<p><code>false</code> => false</p><h3>Character Literals</h3>
+
+<p>The type of characters. Literals are written with a single quote.
+Examples: 'A '7 '; and so on. Unix style escapes are allowed.</p><h3>Integer Literals</h3>
+
+<p>The type of negative, zero or positive integers. Literals are
+written in decimal notation. Examples: -123 0 42.</p><h3>Set Literals</h3>
+
+<p>The type of sets of small non-negative integers. The maximum is
+platform dependent, typically the range is 0..31. Literals are
+written inside curly braces.</p>
+
+<p>Examples:</p>
+
+<ul>
+<li><code>{}</code></li>
+<li><code>{0}</code></li>
+<li><code>{1 3 5}</code></li>
+<li><code>{19 18 17}</code></li>
+</ul><h3>String Literals</h3>
+
+<p>The type of strings of characters. Literals are written inside
+double quotes. Examples: "" "A" "hello world" "123". Unix style
+escapes are accepted.</p><h3>List Literals</h3>
+
+<p>The type of lists of values of any type (including lists), or the
+type of quoted programs which may contain operators or combinators.
+Literals of this type are written inside square brackets.</p>
+
+<p>Examples:</p>
+
+<ul>
+<li><code>[]</code></li>
+<li><code>[3 512 -7]</code></li>
+<li><code>[john mary]</code></li>
+<li><code>['A 'C ['B]]</code></li>
+<li><code>[dup *]</code></li>
+</ul><h3>Float Literals</h3>
+
+<p>The type of floating-point numbers. Literals of this type are
+written with embedded decimal points (like 1.2) and optional
+exponent specifiers (like 1.5E2).</p><h3>File Literals</h3>
+
+<p>The type of references to open I/O streams, typically but not
+necessarily files. The only literals of this type are stdin,
+stdout, and stderr.</p><h2>Definitions</h2><h2>Math</h2><h3>maxint : -> N</h3>
+
+<p>Pushes largest integer (platform dependent). Typically it is
+32 bits.</p><h3>setsize : -> N</h3>
+
+<p>Pushes the maximum number of elements in a set (platform
+dependent). Typically it is 32, and set members are in the
+range 0..31.</p><h3>+ : M I -> N</h3>
+
+<p>Numeric N is the result of adding integer I to numeric M. Also
+supports float.</p><h3>- : M I -> N</h3>
+
+<p>Numeric N is the result of subtracting integer I from numeric M.
+Also supports float.</p><h3>* : I J -> K</h3>
+
+<p>Integer K is the product of integers I and J. Also supports float.</p><h3>/ : I J -> K</h3>
+
+<p>Integer K is the (rounded) ratio of integers I and J. Also
+supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
+
+<p>If B is true, then X = T else X = F.</p><h2>Boolean/Set Operations</h2><h3>or : X Y -> Z</h3>
+
+<p>Z is the union of sets X and Y, logical disjunction for truth
+values.</p><h3>xor : X Y -> Z</h3>
+
+<p>Z is the symmetric difference of sets X and Y, logical exclusive
+disjunction for truth values.</p><h3>and : X Y -> Z</h3>
+
+<p>Z is the intersection of sets X and Y, logical conjunction for
+truth values.</p><h3>not : X -> Y</h3>
+
+<p>Y is the complement of set X, logical negation for truth values.</p><h2>first (list -- element)</h2><p>rand : -> I</p>
+
+<p>I is a random integer.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
+
+<p>Push a list of all undefined symbols in the current symbol table.</p><h2>Basic Stack</h2><h3>id : -></h3>
+
+<p>Identity function, does nothing. Any program of the form P id Q
+is equivalent to just P Q.</p><h3>dup : X -> X X</h3>
+
+<p>Pushes an extra copy of X onto stack.</p><h3>swap : X Y -> Y X</h3>
+
+<p>Interchanges X and Y on top of the stack.</p><h3>rollup : X Y Z -> Z X Y</h3>
+
+<p>Moves X and Y up, moves Z down</p><h3>rolldown : X Y Z -> Y Z X</h3>
+
+<p>Moves Y and Z down, moves X up.</p><h3>rotate : X Y Z -> Z Y X</h3>
+
+<p>Interchanges X and Z.</p><h3>pop : X -></h3>
+
+<p>Removes X from top of the stack.</p><h2>Advanced Stack</h2><h3>stack : .. X Y Z -> .. X Y Z [Z Y X ..]</h3>
+
+<p>Pushes the stack as a list.</p><h3>unstack (list -- *)</h3>
+
+<p>Replaces the current stack with the contents of a list.</p><h3>infra (list quote -- list)</h3>
+
+<p>A list on the stack, such as [1 2 3 4] can be treated temporarily as the
+stack by a quotation, say [+ *] and the combinator infra, with the result
+[9 4].</p><h2>???</h2><h3>conts : -> [[P] [Q] ..]</h3>
+
+<p>Pushes current continuations. Buggy, do not use.</p><h3>autoput : -> I</h3>
+
+<p>Pushes current value of flag for automatic output, I = 0..2.</p><h3>undeferror : -> I</h3>
+
+<p>Pushes current value of undefined-is-error flag.</p><h3>echo : -> I</h3>
+
+<p>Pushes value of echo flag, I = 0..3.</p><h3>clock : -> I</h3>
+
+<p>Pushes the integer value of current CPU usage in hundreds
+of a second.</p><h3>time : -> I</h3>
+
+<p>Pushes the current time (in seconds since the Epoch).</p></div> <!-- #content -->
+
+</body>
+</html>

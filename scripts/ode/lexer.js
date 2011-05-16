@@ -1,11 +1,28 @@
 /**
+ * Enum for token types.
+ * @enum {string}
+ */
+ode.TokenType = {
+  OPEN_BLOCK: 'open block',
+  CLOSE_BLOCK: 'close block',
+  SEMICOLON: 'semicolon',
+  EQUALS: 'equals',
+  NAME: 'name',
+  NUMBER: 'number',
+  CHARACTER: 'character'
+};
+
+/**
  * @constructor
- * @param {string} type Name of this token type.
+ * @param {ode.TokenType} type Type of this token.
  * @param {string} repr Representation of this token as a string.
  * @param {*=} val The optional value of this token, if a literal.
  */
 ode.Token = function(type, repr, val) {
 
+  /**
+   * @return {ode.TokenType} The type of this node.
+   */
   this.getType = function() {
     return type;
   };
@@ -78,12 +95,20 @@ ode.Lexer = function(input) {
     return (isNumeric(c));
   }
 
+  function isNumeric(c) {
+    return extras.contains(extras.range('0', '9'), c);
+  }
+  
   function isNumberContinue(c) {
     return (isNumeric(c) || extras.contains(['.'], c));
   }
 
-  function isNumeric(c) {
-    return extras.contains(extras.range('0', '9'), c);
+  function isCharacterBegin(c) {
+    return c === "'";
+  }
+  
+  function isCharacterContinue(c) {
+    return !isWhitespace(c);
   }
 
   function isWhitespace(c) {
@@ -105,6 +130,10 @@ ode.Lexer = function(input) {
         }
       }
 
+      else if (isCharacterBegin(c)) {
+        return getCharacter();
+      }
+      
       else if (isNameBegin(c)) {
         return getName();
       }
@@ -121,13 +150,13 @@ ode.Lexer = function(input) {
       else {
         switch (c) {
           case ('['):
-            return getOperator(new ode.Token('openBlock', '['));
+            return getOperator(new ode.Token(ode.TokenType.OPEN_BLOCK, '['));
           case (']'):
-            return getOperator(new ode.Token('closeBlock', ']'));
+            return getOperator(new ode.Token(ode.TokenType.CLOSE_BLOCK, ']'));
           case ('='):
-            return getOperator(new ode.Token('equals', '='));
+            return getOperator(new ode.Token(ode.TokenType.EQUALS, '='));
           case (';'):
-            return getOperator(new ode.Token('semiColon', ';'));
+            return getOperator(new ode.Token(ode.TokenType.SEMICOLON, ';'));
           default:
             throw new ode.LexingException(c);
         }
@@ -141,6 +170,19 @@ ode.Lexer = function(input) {
 
   }
 
+  function getCharacter() {
+    var output = '';
+
+    pos++;
+
+    while (pos < input.length && isCharacterContinue(input.charAt(pos))) {
+      output += input.charAt(pos);
+      pos += 1;
+    }
+
+    return new ode.Token(ode.TokenType.CHARACTER, "'" + output, output);
+  }
+  
   function getNumber() {
     var output = '';
 
@@ -154,7 +196,7 @@ ode.Lexer = function(input) {
       pos += 1;
     }
 
-    return new ode.Token('number', output, parseFloat(output));
+    return new ode.Token(ode.TokenType.NUMBER, output, parseFloat(output));
   }
 
   function getName() {
@@ -165,7 +207,7 @@ ode.Lexer = function(input) {
       pos += 1;
     }
 
-    return new ode.Token('name', output);
+    return new ode.Token(ode.TokenType.NAME, output);
   }
 
   function getOperator(token) {

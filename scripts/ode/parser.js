@@ -18,11 +18,11 @@ ode.Parser = function() {
 
     var first = lexer.getCurrent();
 
-    if (first && first.getType() === 'name') {
+    if (first && first.getType() === ode.TokenType.NAME) {
       lexer.moveNext();
       var second = lexer.getCurrent();
 
-      if (second && second.getType() === 'equals') {
+      if (second && second.getType() === ode.TokenType.EQUALS) {
         lexer.movePrev();
         return parseDefinitionStatement(lexer);
       } else {
@@ -43,7 +43,7 @@ ode.Parser = function() {
 
       var first = lexer.getCurrent();
 
-      if (first && first.getType() === 'semiColon') {
+      if (first && first.getType() === ode.TokenType.SEMICOLON) {
         lexer.moveNext();
         shouldContinuePhrase = false;
       } else {
@@ -59,10 +59,10 @@ ode.Parser = function() {
 
     var first = lexer.getCurrent();
 
-    if (first && first.getType() === 'name') {
+    if (first && first.getType() === ode.TokenType.NAME) {
       var definitionName = lexer.getCurrent().getRepr();
       lexer.moveNext();
-      ensureAndSkip(lexer, 'equals', '=');
+      ensureAndSkip(lexer, ode.TokenType.EQUALS, '=');
       return new ode.DefinitionStatementNode(
         definitionName,
         parsePhraseStatement(lexer));
@@ -80,24 +80,48 @@ ode.Parser = function() {
 
     var first = lexer.getCurrent();
 
-    if (first && first.getType() === 'openBlock') {
-      return parseBlock(lexer);
-    } else if (first && first.getType() === 'name') {
-      return new ode.NameNode(lexer.getCurrent().getRepr());
-    } else if (first && first.getType() === 'number') {
-      return new ode.NumberNode(lexer.getCurrent().getVal());
-    } else if (first && first.getType() === 'closeBlock') {
-      throw new ode.ParsingException('Unbalanced brackets');
-    } else if (first && first.getType() === 'semiColon') {
-      throw new ode.ParsingException('Unexpected end of statement');
-    } else if (first && first.getType() === 'equals') {
-      throw new ode.ParsingException(
-        "Only a name can appear before '=' in a definition");
-    } else {
-      throw new ode.ParsingException('Unexpected token: ' +
-        lexer.getCurrent().getRepr());
+    if (first) {
+      switch (first.getType()) {
+
+        case ode.TokenType.OPEN_BLOCK:
+          return parseBlock(lexer);
+
+        case ode.TokenType.NAME:
+          return parseNameLike(lexer);
+
+        case ode.TokenType.NUMBER:
+          return new ode.NumberNode(lexer.getCurrent().getVal());
+          
+        case ode.TokenType.CHARACTER:
+          return new ode.CharacterNode(lexer.getCurrent().getVal());
+
+        case ode.TokenType.CLOSE_BLOCK:
+          throw new ode.ParsingException('Unbalanced brackets');
+
+        case ode.TokenType.SEMICOLON:
+          throw new ode.ParsingException('Unexpected end of statement');
+
+        case ode.TokenType.EQUALS:
+          throw new ode.ParsingException(
+            "Only a name can appear before '=' in a definition");
+      }
     }
 
+    throw new ode.ParsingException('Unexpected token: ' +
+      lexer.getCurrent().getRepr());
+  }
+
+  function parseNameLike(lexer) {
+
+    var token = lexer.getCurrent();
+
+    if (token.getRepr() === 'true') {
+      return new ode.BooleanNode(true);
+    } else if (token.getRepr() === 'false') {
+      return new ode.BooleanNode(false);
+    } else {
+      return new ode.NameNode(lexer.getCurrent().getRepr());
+    }
   }
 
   function parseBlock(lexer) {
@@ -110,7 +134,7 @@ ode.Parser = function() {
     while (lexer.getCurrent() !== null && continueParsingBlock) {
       var first = lexer.getCurrent();
 
-      if (first && first.getType() === 'closeBlock') {
+      if (first && first.getType() === ode.TokenType.CLOSE_BLOCK) {
         continueParsingBlock = false;
       } else {
         nestableNodes.push(parseNestableNode(lexer));
@@ -121,6 +145,11 @@ ode.Parser = function() {
     return new ode.BlockNode(nestableNodes);
   }
 
+  /**
+   * @param {ode.Lexer} lexer The lexer.
+   * @param {ode.TokenType} expectedType The type of the token to expect.
+   * @param {string} expectedRepr The expected representation.
+   */
   function ensureAndSkip(lexer, expectedType, expectedRepr) {
 
     var first = lexer.getCurrent();

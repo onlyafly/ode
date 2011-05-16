@@ -1,15 +1,18 @@
 /**
  * @constructor
  * @param {function(string)} otherOutputFun Function used to print results.
+ * @param {function(string)=} otherErrorFun Function used to print error
+ * messages.
  * @param {ode.RuntimeStack=} otherStack Optional top-level runtime stack.
  * @param {ode.SymbolTable=} otherSymbolTable Optional symbol table.
  * @param {ode.Parser=} otherParser Optional parser.
  * @param {ode.Interpreter=} otherInterpreter Optional interpreter.
  */
-ode.Controller = function(otherOutputFun, otherStack, otherSymbolTable,
-  otherParser, otherInterpreter) {
+ode.Controller = function(otherOutputFun, otherErrorFun, otherStack,
+  otherSymbolTable, otherParser, otherInterpreter) {
 
   this.outputFun = otherOutputFun;
+  this.errorFun = otherErrorFun || otherOutputFun;
   this.stack = otherStack || new ode.RuntimeStack();
   this.symbolTable = otherSymbolTable || new ode.SymbolTable();
   this.parser = otherParser || new ode.Parser();
@@ -28,13 +31,13 @@ ode.Controller.prototype.exec = function(input) {
     this.execNoErrorHandling(input);
   } catch (e) {
     if (e instanceof ode.LexingException) {
-      this.outputFun('Lexing error: ' + e.toString());
+      this.errorFun('Lexing error: ' + e.toString());
     } else if (e instanceof ode.ParsingException) {
-      this.outputFun('Parsing error: ' + e.toString());
+      this.errorFun('Parsing error: ' + e.toString());
     } else if (e instanceof ode.RuntimeException) {
-      this.outputFun('Runtime error: ' + e.toString());
+      this.errorFun('Runtime error: ' + e.toString());
     } else if (e instanceof ode.TailCallbackException) {
-      this.outputFun("Runtime error: 'self' used outside of definition");
+      this.errorFun("Runtime error: 'self' used outside of definition");
     } else {
       var err = 'Error';
 
@@ -58,7 +61,7 @@ ode.Controller.prototype.exec = function(input) {
         err = 'Unrecognized Error:' + e.toString();
       }
 
-      this.outputFun(err);
+      this.errorFun(err);
     }
   }
 };
@@ -112,5 +115,5 @@ ode.Controller.prototype.getAuthorInfo = function() {
  * @return {string} The current version information.
  */
 ode.Controller.prototype.getVersionInfo = function() {
-  return 'OdeJS; Version 0.3; Build 20110510';
+  return 'Ode v0.4.0dev';
 };

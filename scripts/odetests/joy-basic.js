@@ -1,13 +1,166 @@
 $(function() {
 
-  module("Joy - definitions");
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Literals
+   */
+  module("Joy - Literals");
+  
+  /***
+   * ### Boolean Literals
+   * 
+   * The logical type, or the type of truth values. It has just two
+   * literals: true and false.
+   * 
+   * `false` => false
+   */
+  test("Boolean Literals", function() {
+    Is.stack("true", "true");
+    Is.stack("false", "false");
+  });
+  
+  /***
+   * ### Character Literals
+   * 
+   * The type of characters. Literals are written with a single quote.
+   * Examples: 'A '7 '; and so on. Unix style escapes are allowed.
+   */
+  test("Character Literals", function() {
+    Is.stack("'A '7", "'A '7");
+  });
+  
+  /***
+   * ### Integer Literals
+   * 
+   * The type of negative, zero or positive integers. Literals are
+   * written in decimal notation. Examples: -123 0 42.
+   */
+  test("Integer Literals", function() {
+    Is.stack("1 5 -","-4");
+    Is.stack("-1 -5 +","-6");
+  });
+  
+  /***
+   * ### Set Literals
+   * 
+   * The type of sets of small non-negative integers. The maximum is
+   * platform dependent, typically the range is 0..31. Literals are 
+   * written inside curly braces.
+   * 
+   * Examples:
+   * 
+   * - `{}`
+   * - `{0}`
+   * - `{1 3 5}` 
+   * - `{19 18 17}`
+   */
+  test("Set Literals", function() {
+    Is.stack("{} {0} {1 3 5} {19 18 17}","{} {0} {1 3 5} {19 18 17}");
+  });
+  
+  /***
+   * ### String Literals
+   * 
+   * The type of strings of characters. Literals are written inside 
+   * double quotes. Examples: "" "A" "hello world" "123". Unix style 
+   * escapes are accepted.
+   */
+  test("String Literals", function() {
+    Is.stack('"" "A" "hello world" "123"','"" "A" "hello world" "123"');
+  });
+  
+  /***
+   * ### List Literals
+   * 
+   * The type of lists of values of any type (including lists), or the 
+   * type of quoted programs which may contain operators or combinators. 
+   * Literals of this type are written inside square brackets. 
+   * 
+   * Examples:
+   * 
+   * - `[]`
+   * - `[3 512 -7]`
+   * - `[john mary]`
+   * - `['A 'C ['B]]`
+   * - `[dup *]`
+   */
+  test("List Literals", function() {
+    Is.stack("[] [3 512 -7] [john mary] ['A 'C ['B]] [dup *]","[] [3 512 -7] [john mary] ['A 'C ['B]] [dup *]");
+  });
+  
+  /***
+   * ### Float Literals
+   * 
+   * The type of floating-point numbers. Literals of this type are 
+   * written with embedded decimal points (like 1.2) and optional 
+   * exponent specifiers (like 1.5E2).
+   */
+  test("Float Literals", function() {
+    Is.stack("1.0 5.0 -","-4.0");
+    Is.stack("-1.0 -5.0 +","-6.0");
+    Is.stack("1.5E2","1.5E2");
+  });
+  
+  /***
+   * ### File Literals
+   * 
+   * The type of references to open I/O streams, typically but not 
+   * necessarily files. The only literals of this type are stdin, 
+   * stdout, and stderr.
+   */
+  test("File Literals", function() {
+    Is.stack("stdin stdout stderr","stdin stdout stderr");
+    
+    // TODO: what are file literals exactly?
+    ok(false);
+  });
+  
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Definitions
+   */
+  module("Joy - Definitions");
 
   test("native name redefinition", function() {
     Is.output("1 2 +; + == .; +", "3");
   });
 
-  module("Joy - math operations");
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Math
+   */
+  module("Joy - Math");
 
+  /***
+   * ### maxint : -> N
+   * 
+   * Pushes largest integer (platform dependent). Typically it is
+   * 32 bits.
+   */
+  test("maxint", function() {
+    Is.stack("maxint", "4294967295"); // 2 ^ 32 - 1
+  });
+  
+  /***
+   * ### setsize : -> N
+   * 
+   * Pushes the maximum number of elements in a set (platform
+   * dependent). Typically it is 32, and set members are in the 
+   * range 0..31.
+   */
+  test("setsize", function() {
+    Is.stack("setsize", "32");
+  });
+  
+  /***
+   * ### + : M I -> N
+   * 
+   * Numeric N is the result of adding integer I to numeric M. Also 
+   * supports float.
+   */
   test("add", function() {
     Is.stack("3 4 +", "7");
   });
@@ -20,6 +173,30 @@ $(function() {
     Is.stack("3 succ", "4");
   });
 
+  /***
+   * ### div : I J -> K L
+   * 
+   * Integers K and L are the quotient and remainder of dividing I by J.
+   */
+  test("div", function() {
+    Is.stack("5 2 div", "2 1");
+  });
+  
+  /***
+   * ### rem : I J -> K
+   * 
+   * Integer K is the remainder of dividing I by J. Also supports float.
+   */
+  test("rem", function() {
+    Is.stack("5 2 rem", "1");
+  });
+  
+  /***
+   * ### - : M I -> N
+   * 
+   * Numeric N is the result of subtracting integer I from numeric M. 
+   * Also supports float.
+   */
   test("subtract", function() {
     Is.stack("10 -5 -", "15");
     Is.stack("-10 5 -", "-15");
@@ -29,19 +206,184 @@ $(function() {
     Is.stack("1.5 0.6 -", "0.9");
   });
 
+  /***
+   * ### * : I J -> K
+   * 
+   * Integer K is the product of integers I and J. Also supports float.
+   */
   test("multiply", function() {
     Is.stack("2 3 *", "6");
   });
 
-  test("divide", function() {
+  /***
+   * ### / : I J -> K
+   * 
+   * Integer K is the (rounded) ratio of integers I and J. Also 
+   * supports float.
+   */
+  test("/", function() {
     Is.stack("5 2.5 /", "2");
   });
-
-  module("Joy - boolean operations");
-
-  test("and", function() {
-    // TODO: how is true and false represented in Joy?
+  
+  /***
+   * ### sign : N1 -> N2
+   * 
+   * Integer N2 is the sign (-1 or 0 or +1) of integer N1, or float N2 is the sign (-1.0 or 0.0 or 1.0) of float N1.
+   */
+  test("sign", function() {
+    Is.stack("-94563 sign", "-1");
+  });
+  
+  /*** TODO
+  neg : I -> J
+  Integer J is the negative of integer I. Also supports float.
+  ord : C -> I
+  Integer I is the Ascii value of character C (or logical or integer).
+  chr : I -> C
+  C is the character whose Ascii value is integer I (or logical or character).
+  abs : N1 -> N2
+  Integer N2 is the absolute value (0,1,2..) of integer N1, or float N2 is the absolute value (0.0 ..) of float N1
+  acos : F -> G
+  G is the arc cosine of F.
+  asin : F -> G
+  G is the arc sine of F.
+  atan : F -> G
+  G is the arc tangent of F.
+  atan2 : F G -> H
+  H is the arc tangent of F / G.
+  ceil : F -> G
+  G is the float ceiling of F.
+  cos : F -> G
+  G is the cosine of F.
+  cosh : F -> G
+  G is the hyperbolic cosine of F.
+  exp : F -> G
+  G is e (2.718281828...) raised to the Fth power.
+  floor : F -> G
+  G is the floor of F.
+  frexp : F -> G I
+  G is the mantissa and I is the exponent of F. Unless F = 0, 0.5 <= abs(G) < 1.0.
+  ldexp : F I -> G
+  G is F times 2 to the Ith power.
+  log : F -> G
+  G is the natural logarithm of F.
+  log10 : F -> G
+  G is the common logarithm of F.
+  modf : F -> G H
+  G is the fractional part and H is the integer part (but expressed as a float) of F.
+  pow : F G -> H
+  H is F raised to the Gth power.
+  sin : F -> G
+  G is the sine of F.
+  sinh : F -> G
+  G is the hyperbolic sine of F.
+  sqrt : F -> G
+  G is the square root of F.
+  tan : F -> G
+  G is the tangent of F.
+  tanh : F -> G
+  G is the hyperbolic tangent of F.
+  trunc : F -> I
+  I is an integer equal to the float F truncated toward zero.
+  */
+  test("random math operations", function() {
     ok(false);
+  });
+
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Boolean Operations
+   */
+  module("Joy - Boolean Operations");
+
+  /***
+   * ### choice : B T F -> X
+   * 
+   * If B is true, then X = T else X = F.
+   */
+  test("choice", function() {
+    Is.stack('true 1 2 choice', '1');
+    Is.stack('false 1 2 choice', '2');
+  });
+  
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Boolean/Set Operations
+   */
+  module("Joy - Boolean/Set Operations");
+  
+  /***
+   * ### or : X Y -> Z
+   * 
+   * Z is the union of sets X and Y, logical disjunction for truth 
+   * values.
+   */
+  test("or", function() {
+    
+    // Booleans
+    Is.stack('true true or', 'true');
+    Is.stack('false true or', 'true');
+    Is.stack('true false or', 'true');
+    Is.stack('false false or', 'false');
+    
+    // Sets
+    Is.stack('{1 2 3} {0 2 4} or', '{0 1 2 3 4}');
+    
+  });
+  
+  /***
+   * ### xor : X Y -> Z
+   * 
+   * Z is the symmetric difference of sets X and Y, logical exclusive 
+   * disjunction for truth values.
+   */
+  test("xor", function() {
+    
+    // Booleans
+    Is.stack('true true xor', 'false');
+    Is.stack('false true xor', 'true');
+    Is.stack('true false xor', 'true');
+    Is.stack('false false xor', 'false');
+    
+    // Sets
+    Is.stack('{1 2 3} {0 2 4} xor', '{0 1 3 4}');
+    
+  });
+  
+  /***
+   * ### and : X Y -> Z
+   * 
+   * Z is the intersection of sets X and Y, logical conjunction for 
+   * truth values.
+   */
+  test("and", function() {
+    
+    // Booleans
+    Is.stack('true true and', 'true');
+    Is.stack('false true and', 'false');
+    Is.stack('true false and', 'false');
+    Is.stack('false false and', 'false');
+    
+    // Sets
+    Is.stack('{1 2 3} {0 2 4} and', '{2}');
+    
+  });
+  
+  /***
+   * ### not : X -> Y
+   * 
+   * Y is the complement of set X, logical negation for truth values.
+   */
+  test("not", function() {
+    
+    // Booleans
+    Is.stack('true not', 'false');
+    
+    // Sets
+    ok(false); // TODO: how can we create a non-infinite set complement?
+    
   });
 
   test("less than", function() {
@@ -82,6 +424,8 @@ $(function() {
     Is.output("[x] small", "true");
     Is.output("[x x] small", "false");
   });
+  
+  /////////////////////////////////////////////////////////////////////////////
 
   module("Joy - list operations");
 
@@ -120,29 +464,16 @@ $(function() {
     Is.stack("[1 2 +] rest", "[2 +]");
   });
 
+  /***
+   * ## first (list -- element)
+   * 
+   * 
+   */
   test("first", function() {
-    Is.stack("[1 2 +] first", "[1]");
+    Is.stack("[1 2 +] first", "1");
   });
-
-  module("Joy - stack operations");
-
-  test("dup", function() {
-    Is.output("1 dup + .", "2");
-    Is.output("1 2 3 4 0 dup# . .", "44");
-    Is.output("1 2 3 4 1 dup# . .", "34");
-    Is.output("1 2 3 4 2 dup# . . .", "243");
-  });
-
-  test("swap", function() {
-    Is.output("2 1 swap / .", "0.5");
-  });
-
-  test("pop", function() {
-    Is.output("2 1 pop .", "2");
-    Is.output("1 2 3 4 0 pop# . .", "32");
-    Is.output("1 2 3 4 1 pop# . .", "42");
-    Is.output("1 2 3 4 2 pop# . . .", "431");
-  });
+  
+  /////////////////////////////////////////////////////////////////////////////
 
   module("Joy - functional");
 
@@ -177,6 +508,8 @@ $(function() {
     Is.output("[1 2 3 4 5] 0 [+] fold .", "15");
   });
 
+  /////////////////////////////////////////////////////////////////////////////  
+  
   module("Joy - recursion operations");
 
   /*
@@ -274,6 +607,8 @@ $(function() {
       "[1 2 3 6]");
   });
 
+  /////////////////////////////////////////////////////////////////////////////
+  
   module("Joy - input/output");
 
   test("get", function() {
@@ -294,7 +629,18 @@ $(function() {
     Is.output("[] .", "[]");
     Is.output("[1] .", "[1]");
   });
+  
+  /***
+   * rand : -> I
+   *
+   * I is a random integer.
+   */
+  test("rand", function() {
+    Is.output("rand", ""); // TODO
+  });
 
+  /////////////////////////////////////////////////////////////////////////////
+  
   module("Joy - control flow");
 
   test("ifte", function() {
@@ -302,30 +648,461 @@ $(function() {
     Is.output("[1] [1 .] [2 .] ifte", "1");
   });
 
-  module("Joy - definitions");
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Definitions and Symbols
+   */
+  module("Joy - Definitions and Symbols");
 
+  /***
+   * ### undefs : -> [...]
+   * 
+   * Push a list of all undefined symbols in the current symbol table.
+   */
+  test("undefs", function() {
+    Is.output("undefs", "[]"); // TODO
+  });
+  
   test("body", function() {
     Is.output("double == 2 *; [double] first body .", "[2 *]");
   });
 
-  module("Joy - stack");
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Basic Stack
+   */
+  module("Joy - Basic Stack");
 
-  test("stack", function() {
-    Is.stack("1 2 3 stack", "1 2 3 [1 2 3]");
+  /***
+   * ### id : ->
+   * 
+   * Identity function, does nothing. Any program of the form P id Q
+   * is equivalent to just P Q.
+   */
+  test("id", function() {
+    Is.output("id", "");
+  });
+  
+  /***
+   * ### dup : X -> X X
+   * 
+   * Pushes an extra copy of X onto stack.
+   */
+  test("dup", function() {
+    Is.output("1 dup + .", "2");
+    Is.output("1 2 3 4 0 dup# . .", "44");
+    Is.output("1 2 3 4 1 dup# . .", "34");
+    Is.output("1 2 3 4 2 dup# . . .", "243");
   });
 
+  /***
+   * ### swap : X Y -> Y X
+   * 
+   * Interchanges X and Y on top of the stack.
+   */
+  test("swap", function() {
+    Is.stack("2 1 swap", "1 2");
+  });
+  
+  /***
+   * ### rollup : X Y Z -> Z X Y
+   * 
+   * Moves X and Y up, moves Z down
+   */
+  test("rollup", function() {
+    Is.stack("3 2 1 rollup", "1 3 2");
+  });
+  
+  /***
+   * ### rolldown : X Y Z -> Y Z X
+   * 
+   * Moves Y and Z down, moves X up.
+   */
+  test("rolldown", function() {
+    Is.stack("3 2 1 rolldown", "2 1 3");
+  });
+  
+  /***
+   * ### rotate : X Y Z -> Z Y X
+   * 
+   * Interchanges X and Z.
+   */
+  test("rotate", function() {
+    Is.stack("3 2 1 rotate", "1 2 3");
+  });
+  
+  /**
+   * ### popd : Y Z -> Z
+   * 
+   * As if defined by: popd == [pop] dip
+   */
+  test("popd", function() {
+    Is.stack("2 1 popd", "1");
+  });
+  
+  /**
+   * ### dupd : Y Z -> Y Y Z
+   * 
+   * As if defined by: dupd == [dup] dip
+   */
+  test("dupd", function() {
+    Is.stack("2 1 dupd", "2 2 1");
+  });
+  
+  /**
+   * ### swapd : X Y Z -> Y X Z
+   * 
+   * As if defined by: swapd == [swap] dip
+   */
+  test("swapd", function() {
+    Is.stack("3 2 1 swapd", "2 3 1");
+  });
+  
+  /**
+   * ### rollupd : X Y Z W -> Z X Y W
+   * 
+   * As if defined by: rollupd == [rollup] dip
+   */
+  test("rollupd", function() {
+    Is.stack("1 2 3 4 rollupd", "3 1 2 4");
+  });
+  
+  /**
+   * ### rolldownd : X Y Z W -> Y Z X W
+   * 
+   * As if defined by: rolldownd == [rolldown] dip
+   */
+  test("rolldownd", function() {
+    Is.stack("1 2 3 4 rolldownd", "2 3 1 4");
+  });
+  
+  /**
+   * ### rotated : X Y Z W -> Z Y X W
+   * 
+   * As if defined by: rotated == [rotate] dip
+   */
+  test("rotated", function() {
+    Is.stack("1 2 3 4 rotated", "3 2 1 4");
+  });
+  
+  /***
+   * ### pop : X ->
+   * 
+   * Removes X from top of the stack.
+   */
+  test("pop", function() {
+    Is.stack("2 1 pop", "2");
+  });
+  
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## Advanced Stack
+   */
+  module("Joy - Advanced Stack");
+
+  /***
+   * ### stack : .. X Y Z -> .. X Y Z [Z Y X ..] 
+   * 
+   * Pushes the stack as a list.
+   */
+  test("stack", function() {
+    Is.stack("1 2 3 stack", "1 2 3 [3 2 1]");
+  });
+  
+  /***
+   * ### unstack (list -- *)
+   * 
+   * Replaces the current stack with the contents of a list.
+   */
   test("unstack", function() {
     Is.stack("[1 2 3 x] unstack", "1 2 3 x");
     Is.stack("[] unstack", "");
   });
 
-  /*
+  /***
+   * ### infra (list quote -- list)
+   * 
    * A list on the stack, such as [1 2 3 4] can be treated temporarily as the
    * stack by a quotation, say [+ *] and the combinator infra, with the result
    * [9 4].
    */
   test("infra", function() {
     Is.output("[1 2 3 4] [+ *] infra", "[9 4]");
+  });
+  
+  /* TODO
+  strtol : S I -> J
+  String S is converted to the integer J using base I. If I = 0, assumes base 10, but leading "0" means base 8 and leading "0x" means base 16.
+  strtod : S -> R
+  String S is converted to the float R.
+  format : N C I J -> S
+  S is the formatted version of N in mode C ('d or 'i = decimal, 'o = octal, 'x or 'X = hex with lower or upper case letters) with maximum width I and minimum width J.
+  formatf : F C I J -> S
+  S is the formatted version of F in mode C ('e or 'E = exponential, 'f = fractional, 'g or G = general with lower or upper case letters) with maximum width I and precision J.
+  srand : I ->
+  Sets the random integer seed to integer I.
+  pred : M -> N
+  Numeric N is the predecessor of numeric M.
+  succ : M -> N
+  Numeric N is the successor of numeric M.
+  max : N1 N2 -> N
+  N is the maximum of numeric values N1 and N2. Also supports float.
+  min : N1 N2 -> N
+  N is the minimum of numeric values N1 and N2. Also supports float.
+  fclose : S ->
+  Stream S is closed and removed from the stack.
+  feof : S -> S B
+  B is the end-of-file status of stream S.
+  ferror : S -> S B
+  B is the error status of stream S.
+  fflush : S -> S
+  Flush stream S, forcing all buffered output to be written.
+  fgetch : S -> S C
+  C is the next available character from stream S.
+  fgets : S -> S L
+  L is the next available line (as a string) from stream S.
+  fopen : P M -> S
+  The file system object with pathname P is opened with mode M (r, w, a, etc.) and stream object S is pushed; if the open fails, file:NULL is pushed.
+  fread : S I -> S L
+  I bytes are read from the current position of stream S and returned as a list of I integers.
+  fwrite : S L -> S
+  A list of integers are written as bytes to the current position of stream S.
+  fremove : P -> B
+  The file system object with pathname P is removed from the file system. is a boolean indicating success or failure.
+  frename : P1 P2 -> B
+  The file system object with pathname P1 is renamed to P2. B is a boolean indicating success or failure.
+  fput : S X -> S
+  Writes X to stream S, pops X off stack.
+  fputch : S C -> S
+  The character C is written to the current position of stream S.
+  fputchars : S "abc.." -> S
+  The string abc.. (no quotes) is written to the current position of stream S.
+  fputstring : S "abc.." -> S
+  == fputchars, as a temporary alternative.
+  fseek : S P W -> S
+  Stream S is repositioned to position P relative to whence-point W, where W = 0, 1, 2 for beginning, current position, end respectively.
+  ftell : S -> S I
+  I is the current position of stream S.
+  unstack : [X Y ..] -> ..Y X
+  The list [X Y ..] becomes the new stack.
+  cons : X A -> B
+  Aggregate B is A with a new member X (first member for sequences).
+  swons : A X -> B
+  Aggregate B is A with a new member X (first member for sequences).
+  first : A -> F
+  F is the first member of the non-empty aggregate A.
+  rest : A -> R
+  R is the non-empty aggregate A with its first member removed.
+  compare : A B -> I
+  I (=-1,0,+1) is the comparison of aggregates A and B. The values correspond to the predicates <=, =, >=.
+  at : A I -> X
+  X (= A[I]) is the member of A at position I.
+  of : I A -> X
+  X (= A[I]) is the I-th member of aggregate A.
+  size : A -> I
+  Integer I is the number of elements of aggregate A.
+  opcase : X [..[X Xs]..] -> [Xs]
+  Indexing on type of X, returns the list [Xs].
+  case : X [..[X Y]..] -> Y i
+  Indexing on the value of X, execute the matching Y.
+  uncons : A -> F R
+  F and R are the first and the rest of non-empty aggregate A.
+  unswons : A -> R F
+  R and F are the rest and the first of non-empty aggregate A.
+  drop : A N -> B
+  Aggregate B is the result of deleting the first N elements of A.
+  take : A N -> B
+  Aggregate B is the result of retaining just the first N elements of A.
+  concat : S T -> U
+  Sequence U is the concatenation of sequences S and T.
+  enconcat : X S T -> U
+  Sequence U is the concatenation of sequences S and T with X inserted between S and T (== swapd cons concat)
+  name : sym -> "sym"
+  For operators and combinators, the string "sym" is the name of item sym, for literals sym the result string is its type.
+  intern : "sym" -> sym
+  Pushes the item whose name is "sym".
+  body : U -> [P]
+  Quotation [P] is the body of user-defined symbol U. predicate
+  null : X -> B
+  Tests for empty aggregate X or zero numeric.
+  small : X -> B
+  Tests whether aggregate X has 0 or 1 members, or numeric 0 or 1.
+  >= : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than or equal to Y. Also supports float.
+  > : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than Y. Also supports float.
+  <= : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X less than or equal to Y. Also supports float.
+  < : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X less than Y. Also supports float.
+  != : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X not equal to Y. Also supports float.
+  = : X Y -> B
+  Either both X and Y are numeric or both are strings or symbols. Tests whether X equal to Y. Also supports float.
+  equal : T U -> B
+  (Recursively) tests whether trees T and U are identical.
+  has : A X -> B
+  Tests whether aggregate A has X as a member.
+  in : X A -> B
+  Tests whether X is a member of aggregate A.
+  integer : X -> B
+  Tests whether X is an integer.
+  char : X -> B
+  Tests whether X is a character.
+  logical : X -> B
+  Tests whether X is a logical.
+  set : X -> B
+  Tests whether X is a set.
+  string : X -> B
+  Tests whether X is a string.
+  list : X -> B
+  Tests whether X is a list.
+  leaf : X -> B
+  Tests whether X is not a list.
+  user : X -> B
+  Tests whether X is a user-defined symbol.
+  float : R -> B
+  Tests whether R is a float.
+  file : F -> B
+  Tests whether F is a file. combinator
+  i : [P] -> ...
+  Executes P. So, [P] i == P.
+  x : [P]i -> ...
+  Executes P without popping [P]. So, [P] x == [P] P.
+  dip : X [P] -> ... X
+  Saves X, executes P, pushes X back.
+  app1 : X [P] -> R
+  Executes P, pushes result R on stack without X.
+  app11 : X Y [P] -> R
+  Executes P, pushes result R on stack.
+  app12 : X Y1 Y2 [P] -> R1 R2
+  Executes P twice, with Y1 and Y2, returns R1 and R2.
+  construct : [P] [[P1] [P2] ..] -> R1 R2 ..
+  Saves state of stack and then executes [P]. Then executes each [Pi] to give Ri pushed onto saved stack.
+  nullary : [P] -> R
+  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, none are removed from the stack.
+  unary : X [P] -> R
+  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly one is removed from the stack.
+  unary2 : X1 X2 [P] -> R1 R2
+  Executes P twice, with X1 and X2 on top of the stack. Returns the two values R1 and R2.
+  unary3 : X1 X2 X3 [P] -> R1 R2 R3
+  Executes P three times, with Xi, returns Ri (i = 1..3).
+  unary4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
+  Executes P four times, with Xi, returns Ri (i = 1..4).
+  app2 : X1 X2 [P] -> R1 R2
+  Obsolescent. == unary2
+  app3 : X1 X2 X3 [P] -> R1 R2 R3
+  Obsolescent. == unary3
+  app4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
+  Obsolescent. == unary4
+  binary : X Y [P] -> R
+  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly two are removed from the stack.
+  ternary : X Y Z [P] -> R
+  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly three are removed from the stack.
+  cleave : X [P1] [P2] -> R1 R2
+  Executes P1 and P2, each with X on top, producing two results.
+  branch : B [T] [F] -> ...
+  If B is true, then executes T else executes F.
+  ifte : [B] [T] [F] -> ...
+  Executes B. If that yields true, then executes T else executes F.
+  ifinteger : X [T] [E] -> ...
+  If X is an integer, executes T else executes E.
+  ifchar : X [T] [E] -> ...
+  If X is a character, executes T else executes E.
+  iflogical : X [T] [E] -> ...
+  If X is a logical or truth value, executes T else executes E.
+  ifset : X [T] [E] -> ...
+  If X is a set, executes T else executes E.
+  ifstring : X [T] [E] -> ...
+  If X is a string, executes T else executes E.
+  iflist : X [T] [E] -> ...
+  If X is a list, executes T else executes E.
+  iffloat : X [T] [E] -> ...
+  If X is a float, executes T else executes E.
+  iffile : X [T] [E] -> ...
+  If X is a file, executes T else executes E.
+  cond : [..[[Bi] Ti]..[D]] -> ...
+  Tries each Bi. If that yields true, then executes Ti and exits. If no Bi yields true, executes default D.
+  while : [B] [D] -> ...
+  While executing B yields true executes D.
+  linrec : [P] [T] [R1] [R2] -> ...
+  Executes P. If that yields true, executes T. Else executes R1, recurses, executes R2.
+  tailrec : [P] [T] [R1] -> ...
+  Executes P. If that yields true, executes T. Else executes R1, recurses.
+  binrec : [B] [T] [R1] [R2] -> ...
+  Executes P. If that yields true, executes T. Else uses R1 to produce two intermediates, recurses on both, then executes R2 to combines their results.
+  genrec : [B] [T] [R1] [R2] -> ...
+  Executes B, if that yields true executes T. Else executes R1 and then [[B] [T] [R1] [R2] genrec] R2.
+  condlinrec : [ [C1] [C2] .. [D] ] -> ...
+  Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If that yields true and there is just a [T], executes T and exit. If there are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case are ignored. If no B yields true, then [D] is used. It is then of the forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter executes R1, recurses, executes R2.
+  step : A [P] -> ...
+  Sequentially putting members of aggregate A onto stack, executes P for each member of A.
+  fold : A V0 [P] -> V
+  Starting with value V0, sequentially pushes members of aggregate A and combines with binary operator P to produce value V.
+  map : A [P] -> B
+  Executes P on each member of aggregate A, collects results in sametype aggregate B.
+  times : N [P] -> ...
+  N times executes P.
+  infra : L1 [P] -> L2
+  Using list L1 as stack, executes P and returns a new list L2. The first element of L1 is used as the top of stack, and after execution of P the top of stack becomes the first element of L2.
+  primrec : X [I] [C] -> R
+  Executes I to obtain an initial value R0. For integer X uses increasing positive integers to X, combines by C for new R. For aggregate X uses successive members and combines by C for new R.
+  filter : A [B] -> A1
+  Uses test B to filter aggregate A producing sametype aggregate A1.
+  split : A [B] -> A1 A2
+  Uses test B to split aggregate A into sametype aggregates A1 and A2 .
+  some : A [B] -> X
+  Applies test B to members of aggregate A, X = true if some pass.
+  all : A [B] -> X
+  Applies test B to members of aggregate A, X = true if all pass.
+  treestep : T [P] -> ...
+  Recursively traverses leaves of tree T, executes P for each leaf.
+  treerec : T [O] [C] -> ...
+  T is a tree. If T is a leaf, executes O. Else executes [[O] [C] treerec] C.
+  treegenrec : T [O1] [O2] [C] -> ...
+  T is a tree. If T is a leaf, executes O1. Else executes O2 and then [[O1] [O2] [C] treegenrec] C. miscellaneous commands
+  help : ->
+  Lists all defined symbols, including those from library files. Then lists all primitives of raw Joy (There is a variant: "_help" which lists hidden symbols).
+  helpdetail : [ S1 S2 .. ]
+  Gives brief help on each symbol S in the list.
+  manual : ->
+  Writes this manual of all Joy primitives to output file.
+  setautoput : I ->
+  Sets value of flag for automatic put to I (if I = 0, none; if I = 1, put; if I = 2, stack.
+  setundeferror : I ->
+  Sets flag that controls behavior of undefined functions (0 = no error, 1 = error).
+  setecho : I ->
+  Sets value of echo flag for listing. I = 0: no echo, 1: echo, 2: with tab, 3: and linenumber.
+  gc : ->
+  Initiates garbage collection.
+  system : "command" ->
+  Escapes to shell, executes string "command". The string may cause execution of another program. When that has finished, the process returns to Joy.
+  getenv : "variable" -> "value"
+  Retrieves the value of the environment variable "variable".
+  argv : -> A
+  Creates an aggregate A containing the interpreter's command line arguments.
+  argc : -> I
+  Pushes the number of command line arguments. This is quivalent to 'argv size'.
+  get : -> F
+  Reads a factor from input and pushes it onto stack.
+  put : X ->
+  Writes X to output, pops X off stack.
+  putch : N ->
+  N : numeric, writes character whose ASCII is N.
+  putchars : "abc.." ->
+  Writes abc.. (without quotes)
+  include : "filnam.ext" ->
+  Transfers input to file whose name is "filnam.ext". On end-of-file returns to previous input file.
+  abort : ->
+  Aborts execution of current Joy program, returns to Joy main cycle.
+  quit : ->
+  Exit from Joy.
+  */
+  test('unimplemented/undocumented functions', function() {
+    ok(false);
   });
 
 });

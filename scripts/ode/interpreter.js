@@ -167,6 +167,10 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
       that.runName(nestableNode.val, recursionCount);
     } else if (nestableNode instanceof ode.NumberNode) {
       that.runNumber(nestableNode.val);
+    } else if (nestableNode instanceof ode.BooleanNode) {
+      that.runBoolean(nestableNode.val);
+    } else if (nestableNode instanceof ode.CharacterNode) {
+      that.runCharacter(nestableNode.val);      
     } else {
       throw new ode.RuntimeException('Unrecognized nested node: <' +
         nestableNode.toString() + '>');
@@ -195,6 +199,20 @@ ode.Interpreter.prototype.runBlock = function(blockNode) {
  */
 ode.Interpreter.prototype.runNumber = function(numberValue) {
   this.e.stack.push(new ode.NumberNode(numberValue));
+};
+
+/**
+ * @param {boolean} booleanValue The value to execute.
+ */
+ode.Interpreter.prototype.runBoolean = function(booleanValue) {
+  this.e.stack.push(new ode.BooleanNode(booleanValue));
+};
+
+/**
+ * @param {string} characterValue The value to execute.
+ */
+ode.Interpreter.prototype.runCharacter = function(characterValue) {
+  this.e.stack.push(new ode.CharacterNode(characterValue));
 };
 
 /**

@@ -13,7 +13,7 @@ var outputFun = function(s) {
 
 var interpreter = new ode.Interpreter(stack, symbolTable, outputFun);
 
-var controller = new ode.Controller(outputFun, stack, symbolTable, parser, interpreter);
+var controller = new ode.Controller(outputFun, outputFun, stack, symbolTable, parser, interpreter);
 
 var expected = "";
 var actual = "";

@@ -6,7 +6,6 @@
  */
 
 /**
- * @namespace
  * @type {Object}
  */
 var extras = extras || {};

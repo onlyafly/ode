@@ -3,9 +3,14 @@ var Is = {};
 $(function(){
 
 var result = '';
+var errors = '';
 var stack = new ode.RuntimeStack();
 var symbolTable = new ode.SymbolTable();
-var controller = new ode.Controller(function(s) { result += s; }, stack, symbolTable);
+var controller = new ode.Controller(
+  function(s) { result += s; },
+  function(e) { errors += e; }, 
+  stack, 
+  symbolTable);
 
 Is.clearResult = function() {
   result = '';
@@ -13,7 +18,13 @@ Is.clearResult = function() {
 
 Is.stack = function(input, stackOutput, retainState) {
   controller.exec(input);
-  same(stack.toString(), stackOutput);
+  
+  if (errors.length !== 0) {
+    ok(false, errors);
+    errors = '';
+  } else {
+    same(stack.toString(), stackOutput);
+  }
   
   if (retainState) {
     // nothing
@@ -27,7 +38,13 @@ Is.stack = function(input, stackOutput, retainState) {
 
 Is.output = function(input, output, retainState) {
   controller.exec(input);
-  same(result, output);
+  
+  if (errors.length !== 0) {
+    ok(false, errors);
+    errors = '';
+  } else {
+    same(result, output);
+  }  
   
   if (retainState) {
     // nothing
