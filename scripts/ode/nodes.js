@@ -118,22 +118,31 @@ ode.NumberNode.prototype.toNumberValue = function() {
   return parseFloat(this.val.toString());
 };
 
-// Block
+// Aggregate
 
 /**
  * @constructor
  * @extends {ode.NestableNode}
+ * @param {Array} nodes The nodes in the aggregate.
+ */
+ode.AggregateNode = function(nodes) {
+  extras.base(this);
+
+  this.nodes = nodes;
+};
+extras.inherits(ode.AggregateNode, ode.NestableNode);
+
+// Block
+
+/**
+ * @constructor
+ * @extends {ode.AggregateNode}
  * @param {Array.<ode.NestableNode>} nodes The nodes in the block.
  */
 ode.BlockNode = function(nodes) {
-  extras.base(this);
-
-  /**
-   * @type {Array.<ode.NestableNode>}
-   */
-  this.nodes = nodes;
+  extras.base(this, nodes);
 };
-extras.inherits(ode.BlockNode, ode.NestableNode);
+extras.inherits(ode.BlockNode, ode.AggregateNode);
 
 /** @inheritDoc */
 ode.BlockNode.prototype.toString = function() {
@@ -160,6 +169,53 @@ ode.BlockNode.prototype.concatenate = function(otherBlockNode) {
 ode.BlockNode.prototype.prepend = function(otherNode) {
   return new ode.BlockNode([otherNode].concat(this.nodes));
 };
+
+// Set
+
+/**
+ * @constructor
+ * @extends {ode.AggregateNode}
+ * @param {Array.<ode.AtomicNode>} nodes The atomic nodes in the set.
+ */
+ode.SetNode = function(nodes) {
+  extras.base(this, nodes);
+};
+extras.inherits(ode.SetNode, ode.AggregateNode);
+
+/** @inheritDoc */
+ode.SetNode.prototype.toString = function() {
+  if (this.nodes.length > 0) {
+    var stringList = extras.mapMethod(this.nodes, 'toString');
+    return '{' + stringList.join(' ') + '}';
+  } else {
+    return '{}';
+  }
+};
+
+// String
+
+/**
+ * @constructor
+ * @extends {ode.AggregateNode}
+ * @param {string} val The value in this string node.
+ */
+ode.StringNode = function(val) {
+  extras.base(this, null);
+
+  this.val = val;
+};
+extras.inherits(ode.StringNode, ode.AggregateNode);
+
+/** @inheritDoc */
+ode.StringNode.prototype.toString = function() {
+  if (this.val.length > 0) {
+    return '"' + this.val + '"';
+  } else {
+    return '""';
+  }
+};
+
+// Statement
 
 /**
  * @constructor

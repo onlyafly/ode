@@ -5,6 +5,9 @@
 ode.TokenType = {
   OPEN_BLOCK: 'open block',
   CLOSE_BLOCK: 'close block',
+  OPEN_SET: 'open set',
+  CLOSE_SET: 'close set',
+  STRING: 'string',
   SEMICOLON: 'semicolon',
   EQUALS: 'equals',
   NAME: 'name',
@@ -43,7 +46,7 @@ ode.Token = function(type, repr, val) {
 
 /**
  * @constructor
- * @param {string} input Source code to lex.
+ * @param {string} input Source code to process.
  */
 ode.Lexer = function(input) {
 
@@ -55,6 +58,9 @@ ode.Lexer = function(input) {
     return input;
   };
 
+  /**
+   * @return {ode.Token} The current token.
+   */
   this.getCurrent = function() {
     if (currentTokenIndex >= scannedTokens.length) {
       scannedTokens.push(getNext());
@@ -98,17 +104,21 @@ ode.Lexer = function(input) {
   function isNumeric(c) {
     return extras.contains(extras.range('0', '9'), c);
   }
-  
+
   function isNumberContinue(c) {
-    return (isNumeric(c) || extras.contains(['.'], c));
+    return (isNumeric(c) || extras.contains(['e', 'E', '.'], c));
   }
 
   function isCharacterBegin(c) {
     return c === "'";
   }
-  
-  function isCharacterContinue(c) {
-    return !isWhitespace(c);
+
+  function isStringBegin(c) {
+    return c === '"';
+  }
+
+  function isStringEnd(c) {
+    return c === '"';
   }
 
   function isWhitespace(c) {
@@ -129,11 +139,24 @@ ode.Lexer = function(input) {
           return getName();
         }
       }
+      
+      if (c === '=') {
+        if (input.charAt(pos + 1) === '=') {
+          pos += 2;
+          return new ode.Token(ode.TokenType.EQUALS, '==');
+        } else {
+          return getName();
+        }
+      }
 
       else if (isCharacterBegin(c)) {
         return getCharacter();
       }
-      
+
+      else if (isStringBegin(c)) {
+        return getString();
+      }
+
       else if (isNameBegin(c)) {
         return getName();
       }
@@ -153,8 +176,10 @@ ode.Lexer = function(input) {
             return getOperator(new ode.Token(ode.TokenType.OPEN_BLOCK, '['));
           case (']'):
             return getOperator(new ode.Token(ode.TokenType.CLOSE_BLOCK, ']'));
-          case ('='):
-            return getOperator(new ode.Token(ode.TokenType.EQUALS, '='));
+          case ('{'):
+            return getOperator(new ode.Token(ode.TokenType.OPEN_SET, '{'));
+          case ('}'):
+            return getOperator(new ode.Token(ode.TokenType.CLOSE_SET, '}'));
           case (';'):
             return getOperator(new ode.Token(ode.TokenType.SEMICOLON, ';'));
           default:
@@ -173,16 +198,14 @@ ode.Lexer = function(input) {
   function getCharacter() {
     var output = '';
 
+    pos++; // skip initial single quote
+    
+    output = input.charAt(pos);
     pos++;
-
-    while (pos < input.length && isCharacterContinue(input.charAt(pos))) {
-      output += input.charAt(pos);
-      pos += 1;
-    }
 
     return new ode.Token(ode.TokenType.CHARACTER, "'" + output, output);
   }
-  
+
   function getNumber() {
     var output = '';
 
@@ -197,6 +220,21 @@ ode.Lexer = function(input) {
     }
 
     return new ode.Token(ode.TokenType.NUMBER, output, parseFloat(output));
+  }
+
+  function getString() {
+    var output = '';
+
+    pos++; // skip the first double quote
+
+    while (pos < input.length && !isStringEnd(input.charAt(pos))) {
+      output += input.charAt(pos);
+      pos += 1;
+    }
+
+    pos++; // skip the last double quote
+
+    return new ode.Token(ode.TokenType.STRING, '"' + output + '"', output);
   }
 
   function getName() {

@@ -6,25 +6,30 @@ ode.joynatives = ode.joynatives || {};
  */
 ode.joynatives.initialize = function(i) {
 
-  // IO
-  i.addNativeOperation('.', ode.joynatives.print);
+  // // // // // In Joy
 
-  // Math and Logic
+  // Math
+  i.addNativeOperation('pred', ode.joynatives.pred);
+  i.addNativeOperation('succ', ode.joynatives.succ);
+  i.addNativeOperation('div', ode.joynatives.div);
+  i.addNativeOperation('rem', ode.joynatives.rem);
   i.addNativeOperation('+', ode.joynatives.makeMathOperator('+', '+'));
   i.addNativeOperation('-', ode.joynatives.makeMathOperator('-', '-'));
   i.addNativeOperation('*', ode.joynatives.makeMathOperator('*', '*'));
   i.addNativeOperation('/', ode.joynatives.makeMathOperator('/', '/'));
-  i.addNativeOperation('<', ode.joynatives.makeComparisonOperator('<', '<'));
-  i.addNativeOperation('>', ode.joynatives.makeComparisonOperator('>', '>'));
-  i
-    .addNativeOperation('<=', ode.joynatives
-      .makeComparisonOperator('<=', '<='));
-  i
-    .addNativeOperation('>=', ode.joynatives
-      .makeComparisonOperator('>=', '>='));
-  i.addNativeOperation('eq', ode.joynatives
-    .makeComparisonOperator('===', 'eq'));
+  
+  // // // // // Maybe in Joy???
 
+  i.addNativeOperation('choice', ode.joynatives.choice);
+  i.addNativeOperation('<', ode.joynatives.makeComparisonOp('<', '<'));
+  i.addNativeOperation('>', ode.joynatives.makeComparisonOp('>', '>'));
+  i.addNativeOperation('<=', ode.joynatives.makeComparisonOp('<=', '<='));
+  i.addNativeOperation('>=', ode.joynatives.makeComparisonOp('>=', '>='));
+  i.addNativeOperation('eq', ode.joynatives.makeComparisonOp('===', 'eq'));
+
+  // IO
+  i.addNativeOperation('.', ode.joynatives.print);
+  
   // Control
   i.addNativeOperation('ifte', ode.joynatives.ifte);
 
@@ -67,11 +72,100 @@ ode.joynatives.initialize = function(i) {
 };
 
 /**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.pred = function(e) {
+  var x = e.stack.pop();
+
+  if (x.toNumberValue) {
+    e.stack.push(new ode.NumberNode(x.toNumberValue() - 1));
+  } else {
+    e.parameterError('pred', 'number', x.toString());
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.succ = function(e) {
+  var x = e.stack.pop();
+
+  if (x.toNumberValue) {
+    e.stack.push(new ode.NumberNode(x.toNumberValue() + 1));
+  } else {
+    e.parameterError('succ', 'number', x.toString());
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.div =  function(e) {
+  var y = e.stack.pop();
+  var x = e.stack.pop();
+
+  if (x.toNumberValue && y.toNumberValue) {
+
+    var quotient = parseInt(x.toNumberValue() / y.toNumberValue());
+    var remainder = x.toNumberValue() % y.toNumberValue();
+
+    e.stack.push(new ode.NumberNode(quotient));
+    e.stack.push(new ode.NumberNode(remainder));
+    
+  } else {  
+    e.parameterError(
+      operationName,
+      'number, number',
+      [x.toString(), y.toString()]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.rem =  function(e) {
+  var y = e.stack.pop();
+  var x = e.stack.pop();
+
+  if (x.toNumberValue && y.toNumberValue) {
+    var remainder = x.toNumberValue() % y.toNumberValue();
+    e.stack.push(new ode.NumberNode(remainder));
+  } else {  
+    e.parameterError(
+      operationName,
+      'number, number',
+      [x.toString(), y.toString()]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.choice = function(e) {
+  var pelse = e.stack.pop();
+  var pthen = e.stack.pop();
+  var pif = e.stack.pop();
+
+  if (pif instanceof ode.BooleanNode) {
+    if (pif.val) {
+      e.stack.push(pthen);
+    } else {
+      e.stack.push(pelse);
+    }
+  } else {
+    e.parameterError(
+      'choice',
+      'boolean, node, node',
+      [pif.toString(), pthen.toString(), pelse.toString()]);
+  }
+};
+
+/**
  * @param {string} javaScriptOperatorString The operator in JavaScript.
  * @param {string} operationName The name of the operation in Ode.
  * @return {function(ode.Environment)} The native definition.
  */
-ode.joynatives.makeComparisonOperator = function(javaScriptOperatorString,
+ode.joynatives.makeComparisonOp = function(javaScriptOperatorString,
   operationName) {
   /**
    * @param {ode.Environment} e Current environment.

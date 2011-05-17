@@ -74,7 +74,7 @@ ode.Parser = function() {
 
   /**
    * @param {ode.Lexer} lexer The lexer.
-   * @return {ode.AtomicNode} The resulting node.
+   * @return {ode.NestableNode} The resulting node.
    */
   function parseNestableNode(lexer) {
 
@@ -84,18 +84,17 @@ ode.Parser = function() {
       switch (first.getType()) {
 
         case ode.TokenType.OPEN_BLOCK:
-          return parseBlock(lexer);
+        case ode.TokenType.OPEN_SET:
+        case ode.TokenType.STRING:
+          return parseAggregateNode(lexer);
 
         case ode.TokenType.NAME:
-          return parseNameLike(lexer);
-
         case ode.TokenType.NUMBER:
-          return new ode.NumberNode(lexer.getCurrent().getVal());
-          
         case ode.TokenType.CHARACTER:
-          return new ode.CharacterNode(lexer.getCurrent().getVal());
+          return parseAtomicNode(lexer);
 
         case ode.TokenType.CLOSE_BLOCK:
+        case ode.TokenType.CLOSE_SET:
           throw new ode.ParsingException('Unbalanced brackets');
 
         case ode.TokenType.SEMICOLON:
@@ -110,6 +109,59 @@ ode.Parser = function() {
     throw new ode.ParsingException('Unexpected token: ' +
       lexer.getCurrent().getRepr());
   }
+
+  /**
+   * @param {ode.Lexer} lexer The lexer.
+   * @return {ode.AggregateNode} The resulting node.
+   */
+  function parseAggregateNode(lexer) {
+
+    var first = lexer.getCurrent();
+
+    if (first) {
+      switch (first.getType()) {
+
+        case ode.TokenType.OPEN_BLOCK:
+          return parseBlock(lexer);
+
+        case ode.TokenType.OPEN_SET:
+          return parseSet(lexer);
+
+        case ode.TokenType.STRING:
+          return parseString(lexer);
+      }
+    }
+
+    throw new ode.ParsingException('Unexpected token: ' +
+      lexer.getCurrent().getRepr());
+  }
+
+  /**
+   * @param {ode.Lexer} lexer The lexer.
+   * @return {ode.AtomicNode} The resulting node.
+   */
+  function parseAtomicNode(lexer) {
+
+    var first = lexer.getCurrent();
+
+    if (first) {
+      switch (first.getType()) {
+
+        case ode.TokenType.NAME:
+          return parseNameLike(lexer);
+
+        case ode.TokenType.NUMBER:
+          return new ode.NumberNode(lexer.getCurrent().getVal());
+
+        case ode.TokenType.CHARACTER:
+          return new ode.CharacterNode(lexer.getCurrent().getVal());
+      }
+    }
+
+    throw new ode.ParsingException('Unexpected token: ' +
+      lexer.getCurrent().getRepr());
+  }
+
 
   function parseNameLike(lexer) {
 
@@ -143,6 +195,35 @@ ode.Parser = function() {
     }
 
     return new ode.BlockNode(nestableNodes);
+  }
+
+  function parseSet(lexer) {
+
+    lexer.moveNext();
+
+    var atomicNodes = [];
+    var continueParsingBlock = true;
+
+    while (lexer.getCurrent() !== null && continueParsingBlock) {
+      var first = lexer.getCurrent();
+
+      if (first && first.getType() === ode.TokenType.CLOSE_SET) {
+        continueParsingBlock = false;
+      } else {
+        atomicNodes.push(parseAtomicNode(lexer));
+        lexer.moveNext();
+      }
+    }
+
+    return new ode.SetNode(atomicNodes);
+  }
+
+  function parseString(lexer) {
+    
+    /** @type {ode.Token} */
+    var stringToken = lexer.getCurrent();
+    
+    return new ode.StringNode(stringToken.getVal());
   }
 
   /**

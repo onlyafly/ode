@@ -86,7 +86,12 @@ $(function() {
    * - `[dup *]`
    */
   test("List Literals", function() {
-    Is.stack("[] [3 512 -7] [john mary] ['A 'C ['B]] [dup *]","[] [3 512 -7] [john mary] ['A 'C ['B]] [dup *]");
+    Is.stack("[3 512 -7]","[3 512 -7]");
+    Is.stack("[john mary]","[john mary]");
+    Is.stack("['A]","['A]");
+    Is.stack("['A 'C ['B]]","['A 'C ['B]]");
+    Is.stack("[dup *]","[dup *]");
+    Is.stack("[]","[]");
   });
   
   /***
@@ -97,23 +102,9 @@ $(function() {
    * exponent specifiers (like 1.5E2).
    */
   test("Float Literals", function() {
-    Is.stack("1.0 5.0 -","-4.0");
-    Is.stack("-1.0 -5.0 +","-6.0");
-    Is.stack("1.5E2","1.5E2");
-  });
-  
-  /***
-   * ### File Literals
-   * 
-   * The type of references to open I/O streams, typically but not 
-   * necessarily files. The only literals of this type are stdin, 
-   * stdout, and stderr.
-   */
-  test("File Literals", function() {
-    Is.stack("stdin stdout stderr","stdin stdout stderr");
-    
-    // TODO: what are file literals exactly?
-    ok(false);
+    Is.stack("1.0 5.0 -","-4");
+    Is.stack("-1.0 -5.0 +","-6");
+    Is.stack("1.5E2","150");
   });
   
   /////////////////////////////////////////////////////////////////////////////
@@ -133,27 +124,6 @@ $(function() {
    * ## Math
    */
   module("Joy - Math");
-
-  /***
-   * ### maxint : -> N
-   * 
-   * Pushes largest integer (platform dependent). Typically it is
-   * 32 bits.
-   */
-  test("maxint", function() {
-    Is.stack("maxint", "4294967295"); // 2 ^ 32 - 1
-  });
-  
-  /***
-   * ### setsize : -> N
-   * 
-   * Pushes the maximum number of elements in a set (platform
-   * dependent). Typically it is 32, and set members are in the 
-   * range 0..31.
-   */
-  test("setsize", function() {
-    Is.stack("setsize", "32");
-  });
   
   /***
    * ### + : M I -> N
@@ -165,10 +135,20 @@ $(function() {
     Is.stack("3 4 +", "7");
   });
 
+  /**
+   * ### pred : M -> N
+   * 
+   * Numeric N is the predecessor of numeric M.  
+   */
   test("pred", function() {
     Is.stack("4 pred", "3");
   });
 
+  /***
+   * ### succ : M -> N
+   * 
+   * Numeric N is the successor of numeric M.
+   */
   test("succ", function() {
     Is.stack("3 succ", "4");
   });
@@ -223,71 +203,6 @@ $(function() {
    */
   test("/", function() {
     Is.stack("5 2.5 /", "2");
-  });
-  
-  /***
-   * ### sign : N1 -> N2
-   * 
-   * Integer N2 is the sign (-1 or 0 or +1) of integer N1, or float N2 is the sign (-1.0 or 0.0 or 1.0) of float N1.
-   */
-  test("sign", function() {
-    Is.stack("-94563 sign", "-1");
-  });
-  
-  /*** TODO
-  neg : I -> J
-  Integer J is the negative of integer I. Also supports float.
-  ord : C -> I
-  Integer I is the Ascii value of character C (or logical or integer).
-  chr : I -> C
-  C is the character whose Ascii value is integer I (or logical or character).
-  abs : N1 -> N2
-  Integer N2 is the absolute value (0,1,2..) of integer N1, or float N2 is the absolute value (0.0 ..) of float N1
-  acos : F -> G
-  G is the arc cosine of F.
-  asin : F -> G
-  G is the arc sine of F.
-  atan : F -> G
-  G is the arc tangent of F.
-  atan2 : F G -> H
-  H is the arc tangent of F / G.
-  ceil : F -> G
-  G is the float ceiling of F.
-  cos : F -> G
-  G is the cosine of F.
-  cosh : F -> G
-  G is the hyperbolic cosine of F.
-  exp : F -> G
-  G is e (2.718281828...) raised to the Fth power.
-  floor : F -> G
-  G is the floor of F.
-  frexp : F -> G I
-  G is the mantissa and I is the exponent of F. Unless F = 0, 0.5 <= abs(G) < 1.0.
-  ldexp : F I -> G
-  G is F times 2 to the Ith power.
-  log : F -> G
-  G is the natural logarithm of F.
-  log10 : F -> G
-  G is the common logarithm of F.
-  modf : F -> G H
-  G is the fractional part and H is the integer part (but expressed as a float) of F.
-  pow : F G -> H
-  H is F raised to the Gth power.
-  sin : F -> G
-  G is the sine of F.
-  sinh : F -> G
-  G is the hyperbolic sine of F.
-  sqrt : F -> G
-  G is the square root of F.
-  tan : F -> G
-  G is the tangent of F.
-  tanh : F -> G
-  G is the hyperbolic tangent of F.
-  trunc : F -> I
-  I is an integer equal to the float F truncated toward zero.
-  */
-  test("random math operations", function() {
-    ok(false);
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -844,10 +759,6 @@ $(function() {
   S is the formatted version of F in mode C ('e or 'E = exponential, 'f = fractional, 'g or G = general with lower or upper case letters) with maximum width I and precision J.
   srand : I ->
   Sets the random integer seed to integer I.
-  pred : M -> N
-  Numeric N is the predecessor of numeric M.
-  succ : M -> N
-  Numeric N is the successor of numeric M.
   max : N1 N2 -> N
   N is the maximum of numeric values N1 and N2. Also supports float.
   min : N1 N2 -> N

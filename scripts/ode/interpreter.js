@@ -163,6 +163,10 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
   extras.each(nestableNodesArray, function(nestableNode) {
     if (nestableNode instanceof ode.BlockNode) {
       that.runBlock(nestableNode);
+    } else if (nestableNode instanceof ode.SetNode) {
+      that.runSet(nestableNode);
+    } else if (nestableNode instanceof ode.StringNode) {
+      that.runString(nestableNode.val);
     } else if (nestableNode instanceof ode.NameNode) {
       that.runName(nestableNode.val, recursionCount);
     } else if (nestableNode instanceof ode.NumberNode) {
@@ -170,7 +174,7 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
     } else if (nestableNode instanceof ode.BooleanNode) {
       that.runBoolean(nestableNode.val);
     } else if (nestableNode instanceof ode.CharacterNode) {
-      that.runCharacter(nestableNode.val);      
+      that.runCharacter(nestableNode.val);
     } else {
       throw new ode.RuntimeException('Unrecognized nested node: <' +
         nestableNode.toString() + '>');
@@ -192,6 +196,20 @@ ode.Interpreter.prototype.runDefinition = function(definitionNode) {
  */
 ode.Interpreter.prototype.runBlock = function(blockNode) {
   this.e.stack.push(blockNode);
+};
+
+/**
+ * @param {ode.SetNode} setNode Set node to execute.
+ */
+ode.Interpreter.prototype.runSet = function(setNode) {
+  this.e.stack.push(setNode);
+};
+
+/**
+ * @param {string} stringValue The string to execute.
+ */
+ode.Interpreter.prototype.runString = function(stringValue) {
+  this.e.stack.push(new ode.StringNode(stringValue));
 };
 
 /**
