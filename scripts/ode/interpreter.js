@@ -59,17 +59,6 @@ ode.Environment.prototype.getStackNodes = function() {
 
 /**
  * @param {string} operation The name of the operation.
- * @param {string} expected The expected value on the stack.
- * @param {string} actual The actual value on the stack.
- */
-ode.Environment.prototype.parameterError = function(operation, expected,
-  actual) {
-  throw new ode.RuntimeException('Operation <' + operation + '> expected <' +
-    expected + '> but got <' + actual + '>');
-};
-
-/**
- * @param {string} operation The name of the operation.
  * @param {Array.<string>|string} expected The expected value on the stack.
  * @param {Array.<ode.Node>} actual The actual value on the stack.
  */
@@ -146,7 +135,7 @@ ode.Interpreter.prototype.runPhrase = function(phraseNode, recursionCount) {
     throw new ode.RuntimeException(
       'Possible infinite recursion detected; Operation terminated');
   }
-  this.runNestableNodes(phraseNode.nodes, recursionCount);
+  this.runNestableNodes(phraseNode.getNodes(), recursionCount);
 };
 
 /**

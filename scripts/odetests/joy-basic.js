@@ -222,153 +222,188 @@ $(function() {
     Is.stack('false 1 2 choice', '2');
   });
   
-  /////////////////////////////////////////////////////////////////////////////
-  
-  /***
-   * ## Boolean/Set Operations
-   */
-  module("Joy - Boolean/Set Operations");
-  
   /***
    * ### or : X Y -> Z
    * 
-   * Z is the union of sets X and Y, logical disjunction for truth 
-   * values.
+   * Z is the logical disjunction for truth values.
    */
   test("or", function() {
-    
-    // Booleans
+
     Is.stack('true true or', 'true');
     Is.stack('false true or', 'true');
     Is.stack('true false or', 'true');
     Is.stack('false false or', 'false');
-    
-    // Sets
-    Is.stack('{1 2 3} {0 2 4} or', '{0 1 2 3 4}');
     
   });
   
   /***
    * ### xor : X Y -> Z
    * 
-   * Z is the symmetric difference of sets X and Y, logical exclusive 
-   * disjunction for truth values.
+   * Z is the logical exclusive disjunction for truth values.
    */
-  test("xor", function() {
-    
-    // Booleans
+  test("xor", function() {    
     Is.stack('true true xor', 'false');
     Is.stack('false true xor', 'true');
     Is.stack('true false xor', 'true');
-    Is.stack('false false xor', 'false');
-    
-    // Sets
-    Is.stack('{1 2 3} {0 2 4} xor', '{0 1 3 4}');
-    
+    Is.stack('false false xor', 'false');    
   });
   
   /***
    * ### and : X Y -> Z
    * 
-   * Z is the intersection of sets X and Y, logical conjunction for 
-   * truth values.
+   * Z is the logical conjunction for truth values.
    */
   test("and", function() {
-    
-    // Booleans
     Is.stack('true true and', 'true');
     Is.stack('false true and', 'false');
     Is.stack('true false and', 'false');
     Is.stack('false false and', 'false');
-    
-    // Sets
-    Is.stack('{1 2 3} {0 2 4} and', '{2}');
-    
   });
   
   /***
    * ### not : X -> Y
    * 
-   * Y is the complement of set X, logical negation for truth values.
+   * Y is the logical negation for truth values.
    */
   test("not", function() {
-    
-    // Booleans
     Is.stack('true not', 'false');
-    
-    // Sets
-    ok(false); // TODO: how can we create a non-infinite set complement?
-    
   });
 
-  test("less than", function() {
-    Is.output("1 2 < .", "true");
-    Is.output("1 1 < .", "false");
-    Is.output("1 2 <= .", "true");
-    Is.output("1 1 <= .", "true");
-    Is.output("1 0 <= .", "false");
-  });
-
-  test("greater than", function() {
-    Is.output("2 1 > .", "true");
-    Is.output("1 1 > .", "false");
-    Is.output("2 1 >= .", "true");
-    Is.output("1 1 >= .", "true");
-    Is.output("0 1 >= .", "false");
+  /***
+   * ### >= : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than or equal to Y. Also supports float.
+   */
+  test(">=", function() {
+    Is.stack("2 1 >=", "true");
+    Is.stack("1 1 >=", "true");
+    Is.stack("0 1 >=", "false");
   });
   
-  /*
-   * Returns true for 0 and empty aggregates.
+  /***
+   * ### > : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than Y. Also supports float.
+   */
+  test(">", function() {
+    Is.stack("2 1 >", "true");
+    Is.stack("1 1 >", "false");
+  });
+  
+  /***
+   * ### != : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X not equal to Y. Also supports float.
+   */
+  test("!=", function() {
+    Is.stack("1 0 !=", "true");
+    Is.stack("1 1 !=", "false");
+  });
+  
+  /***
+   * ### = : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X equal to Y. Also supports float.
+   */
+  test("=", function() {
+    Is.stack("1 0 =", "false");
+    Is.stack("1 1 =", "true");
+  });
+  
+  /***
+   * ### < : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X less than Y. Also supports float.
+   */
+  test("<", function() {
+    Is.stack("1 2 <", "true");
+    Is.stack("1 1 <", "false");
+  });
+
+  /***
+   * ### <= : X Y -> B
+   * 
+   * Either both X and Y are numeric or both are strings or symbols. Tests whether X less than or equal to Y. Also supports float.
+   */
+  test("<=", function() {
+    Is.stack("1 2 <=", "true");
+    Is.stack("1 1 <=", "true");
+    Is.stack("1 0 <=", "false");
+  });
+  
+  /***
+   * ### null : X -> B
+   * 
+   * Tests for empty aggregate X or zero numeric.
    */
   test("null", function() {
-    Is.output("0 null", "true");
-    Is.output("[] null", "true");
-    Is.output("42 null", "false");
-    Is.output("[42] null", "false");
+    Is.stack("0 null", "true");
+    Is.stack("[] null", "true");
+    Is.stack("42 null", "false");
+    Is.stack("[42] null", "false");
   });
   
-  /*
-   * Returns true for integers less than 2 and for aggregates of less than two members.
+  /***
+   * ### small : X -> B
+   * 
+   * Tests whether aggregate X has 0 or 1 members, or numeric 0 or 1.
    */
   test("small", function() {
-    Is.output("0 small", "true");
-    Is.output("1 small", "true");
-    Is.output("2 small", "false");
+    Is.stack("0 small", "true");
+    Is.stack("1 small", "true");
+    Is.stack("2 small", "false");
     
-    Is.output("[] small", "true");
-    Is.output("[x] small", "true");
-    Is.output("[x x] small", "false");
+    Is.stack("[] small", "true");
+    Is.stack("[x] small", "true");
+    Is.stack("[x x] small", "false");
   });
   
   /////////////////////////////////////////////////////////////////////////////
 
-  module("Joy - list operations");
+  module("Joy - Aggregate Operations");
 
+  /***
+   * ### concat : S T -> U
+   * 
+   * Sequence U is the concatenation of sequences S and T.
+   */
   test("concat", function() {
     Is.stack("[B] [A] concat", "[B A]");
+    Is.stack('"hello, " "world" concat', '"hello, world"');
   });
 
+  /***
+   * ### size : A -> I
+   * 
+   * Integer I is the number of elements of aggregate A.
+   */
   test("size", function() {
     Is.stack("[A] size", "1");
     Is.stack("[1 2 3 4] size", "4");
     Is.stack("[] size", "0");
-    Is.exception("1 size", ode.RuntimeTypeException);
+    Is.stack('"abcde" size', "5");
+    Is.exception("1 size", ode.RuntimeException);
   });
 
-  test("reverse", function() {
-    Is.stack("[1 2 3] reverse", "[3 2 1]");
-    Is.stack("[1] reverse", "[1]");
-    Is.stack("[] reverse", "[]");
-    Is.exception("1 reverse", ode.RuntimeTypeException);
-  });
-
+  /***
+   * ### cons : X A -> B
+   * 
+   * Aggregate B is A with a new member X (first member for sequences).
+   */
   test("cons", function() {
-    Is.output("[B] [A] cons .", "[[B] A]");
+    Is.stack("[B] [A] cons", "[[B] A]");
+    Is.stack('\'a "bcd" cons', '"abcd"');
   });
 
+  /***
+   * ### uncons : A -> F R
+   * 
+   * F and R are the first and the rest of non-empty aggregate A.
+   */
   test("uncons", function() {
-    Is.output("[[B] A] uncons . .", "[A][B]");
-    Is.output("[B A] uncons . .", "[A]B");
+    Is.stack("[[B] A] uncons", "[B] [A]");
+    Is.stack("[B A] uncons", "B [A]");
+    Is.stack('"abc" uncons', '\'a "bc"');
   });
 
   test("i", function() {
@@ -799,8 +834,7 @@ $(function() {
   I is the current position of stream S.
   unstack : [X Y ..] -> ..Y X
   The list [X Y ..] becomes the new stack.
-  cons : X A -> B
-  Aggregate B is A with a new member X (first member for sequences).
+  
   swons : A X -> B
   Aggregate B is A with a new member X (first member for sequences).
   first : A -> F
@@ -813,22 +847,19 @@ $(function() {
   X (= A[I]) is the member of A at position I.
   of : I A -> X
   X (= A[I]) is the I-th member of aggregate A.
-  size : A -> I
-  Integer I is the number of elements of aggregate A.
+  
   opcase : X [..[X Xs]..] -> [Xs]
   Indexing on type of X, returns the list [Xs].
   case : X [..[X Y]..] -> Y i
   Indexing on the value of X, execute the matching Y.
-  uncons : A -> F R
-  F and R are the first and the rest of non-empty aggregate A.
+  
   unswons : A -> R F
   R and F are the rest and the first of non-empty aggregate A.
   drop : A N -> B
   Aggregate B is the result of deleting the first N elements of A.
   take : A N -> B
   Aggregate B is the result of retaining just the first N elements of A.
-  concat : S T -> U
-  Sequence U is the concatenation of sequences S and T.
+  
   enconcat : X S T -> U
   Sequence U is the concatenation of sequences S and T with X inserted between S and T (== swapd cons concat)
   name : sym -> "sym"
@@ -837,22 +868,8 @@ $(function() {
   Pushes the item whose name is "sym".
   body : U -> [P]
   Quotation [P] is the body of user-defined symbol U. predicate
-  null : X -> B
-  Tests for empty aggregate X or zero numeric.
-  small : X -> B
-  Tests whether aggregate X has 0 or 1 members, or numeric 0 or 1.
-  >= : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than or equal to Y. Also supports float.
-  > : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X greater than Y. Also supports float.
-  <= : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X less than or equal to Y. Also supports float.
-  < : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X less than Y. Also supports float.
-  != : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X not equal to Y. Also supports float.
-  = : X Y -> B
-  Either both X and Y are numeric or both are strings or symbols. Tests whether X equal to Y. Also supports float.
+  
+  
   equal : T U -> B
   (Recursively) tests whether trees T and U are identical.
   has : A X -> B

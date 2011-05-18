@@ -70,7 +70,7 @@ Is.exception = function(input, exception, retainState) {
         throw e;
       }
     } else {
-      ok(true, "An expected exception caught in: <" + input + ">");
+      ok(false, "No type specified for expected exception in: <" + input + ">");
     }  
   }
   

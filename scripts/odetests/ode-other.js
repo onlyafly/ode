@@ -16,10 +16,7 @@ test("number?", function() {
 
 module("Language - math (boolean operations)");
 
-test("equality", function() {
- Is.output("1 0 eq .", "0");
- Is.output("1 1 eq .", "1");
-});
+
 
 module("Language - optimizations");
 

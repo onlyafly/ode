@@ -1,5 +1,6 @@
 /**
  * Enum for token types.
+ *
  * @enum {string}
  */
 ode.TokenType = {
@@ -84,7 +85,19 @@ ode.Lexer = function(input) {
    * @const
    * @type {Array.<string>}
    */
-  var LEGAL_NAME_SYMBOLS = ['+', '-', '.', '<', '>', '*', '/', '#', '?', '$'];
+  var LEGAL_NAME_SYMBOLS = [
+    '+',
+    '-',
+    '.',
+    '<',
+    '>',
+    '*',
+    '/',
+    '#',
+    '?',
+    '$',
+    '!',
+    '='];
 
   function isNameBegin(c) {
     return (extras.contains(extras.range('A', 'Z'), c) ||
@@ -139,7 +152,7 @@ ode.Lexer = function(input) {
           return getName();
         }
       }
-      
+
       if (c === '=') {
         if (input.charAt(pos + 1) === '=') {
           pos += 2;
@@ -199,7 +212,7 @@ ode.Lexer = function(input) {
     var output = '';
 
     pos++; // skip initial single quote
-    
+
     output = input.charAt(pos);
     pos++;
 

@@ -219,10 +219,10 @@ ode.Parser = function() {
   }
 
   function parseString(lexer) {
-    
+
     /** @type {ode.Token} */
     var stringToken = lexer.getCurrent();
-    
+
     return new ode.StringNode(stringToken.getVal());
   }
 

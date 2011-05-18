@@ -86,7 +86,7 @@ ode.natives.makeComparisonOperator = function(javaScriptOperatorString,
         e.stack.push(new ode.NumberNode(0));
       }
     } else {
-      e.parameterError(operationName, 'number, number', x.toString() + ', ' +
+      e.expectationError(operationName, 'number, number', x.toString() + ', ' +
         y.toString());
     }
   };
@@ -115,7 +115,7 @@ ode.natives.makeMathOperator = function(javaScriptOperatorString,
       e.stack.push(new ode.NumberNode(result));
 
     } else {
-      e.parameterError(operationName, 'number, number', x.toString() + ', ' +
+      e.expectationError(operationName, 'number, number', x.toString() + ', ' +
         y.toString());
     }
   };
@@ -134,7 +134,7 @@ ode.natives.print = function(e) {
   } else if (x instanceof ode.NameNode) {
     e.print(x.toString());
   } else {
-    e.parameterError('.', 'number, name, or block', x.toString());
+    e.expectationError('.', 'number, name, or block', x.toString());
   }
 };
 
@@ -155,7 +155,7 @@ ode.natives.dupLocation = function(e) {
     var position = x.toNumberValue();
     e.stack.duplicate(position);
   } else {
-    e.parameterError('dup#', 'number', x.toString());
+    e.expectationError('dup#', 'number', x.toString());
   }
 };
 
@@ -178,7 +178,7 @@ ode.natives.apply = function(e) {
   if (x instanceof ode.BlockNode) {
     e.runNestableNodes(x.nodes);
   } else {
-    e.parameterError('apply', 'block', x.toString());
+    e.expectationError('apply', 'block', x.toString());
   }
 };
 
@@ -205,10 +205,10 @@ ode.natives.ifte = function(e) {
       }
       ode.natives.apply(e);
     } else {
-      e.parameterError('ifte', 'boolean', predicateResult.toString());
+      e.expectationError('ifte', 'boolean', predicateResult.toString());
     }
   } else {
-    e.parameterError('ifte', 'three blocks', pif.toString() + ',' +
+    e.expectationError('ifte', 'three blocks', pif.toString() + ',' +
       pthen.toString() + ',' + pelse.toString());
   }
 };
@@ -225,10 +225,10 @@ ode.natives.dropLocation = function(e) {
     if (extras.isInteger(position) && (position >= 0)) {
       e.stack.drop(position);
     } else {
-      e.parameterError('drop#', 'non-negative integer', x.toString());
+      e.expectationError('drop#', 'non-negative integer', x.toString());
     }
   } else {
-    e.parameterError('drop#', 'number', x.toString());
+    e.expectationError('drop#', 'number', x.toString());
   }
 };
 
@@ -278,7 +278,7 @@ ode.natives.emptyPredicate = function(e) {
       e.stack.push(new ode.NumberNode(0));
     }
   } else {
-    e.parameterError('empty?', 'block', x.toString());
+    e.expectationError('empty?', 'block', x.toString());
   }
 };
 
@@ -292,7 +292,7 @@ ode.natives.cat = function(e) {
   if (x instanceof ode.BlockNode && y instanceof ode.BlockNode) {
     e.stack.push(x.concatenate(y));
   } else {
-    e.parameterError('cat', 'two blocks', x.toString() + ',' + y.toString());
+    e.expectationError('cat', 'two blocks', x.toString() + ',' + y.toString());
   }
 };
 
@@ -306,7 +306,7 @@ ode.natives.cons = function(e) {
   if (y instanceof ode.BlockNode) {
     e.stack.push(y.prepend(x));
   } else {
-    e.parameterError('cons', 'node,block', x.toString() + ',' + y.toString());
+    e.expectationError('cons', 'node,block', x.toString() + ',' + y.toString());
   }
 };
 
@@ -318,12 +318,12 @@ ode.natives.uncons = function(e) {
 
   if (x instanceof ode.BlockNode) {
     if (x.nodes.length === 0) {
-      e.parameterError('uncons', 'non-empty block', x.toString());
+      e.expectationError('uncons', 'non-empty block', x.toString());
     }
     e.stack.push(x.nodes[0]);
     e.stack.push(new ode.BlockNode(x.nodes.slice(1)));
   } else {
-    e.parameterError('uncons', 'block', x.toString());
+    e.expectationError('uncons', 'block', x.toString());
   }
 };
 
@@ -346,10 +346,10 @@ ode.natives.blockLocation = function(e) {
     if (extras.isInteger(length) && (length >= 0)) {
       e.runCreateBlock(length);
     } else {
-      e.parameterError('block#', 'non-negative integer', x.toString());
+      e.expectationError('block#', 'non-negative integer', x.toString());
     }
   } else {
-    e.parameterError('block#', 'number', x.toString());
+    e.expectationError('block#', 'number', x.toString());
   }
 };
 
@@ -384,7 +384,7 @@ ode.natives.evaluate = function(e) {
 
     e.stack.push(new ode.BlockNode(stackNodes));
   } else {
-    e.parameterError('$eval', 'block', block.toString());
+    e.expectationError('$eval', 'block', block.toString());
   }
 };
 
@@ -414,17 +414,17 @@ ode.natives.dollarDef = function(e) {
   var block = e.stack.pop();
 
   if (!extras.hasInstances(ode.BlockNode, block)) {
-    e.parameterError('$def', 'block', block.toString());
+    e.expectationError('$def', 'block', block.toString());
   }
 
   if (block.nodes.length === 0) {
-    e.parameterError('$def', 'name in a block', block.toString());
+    e.expectationError('$def', 'name in a block', block.toString());
   }
 
   var name = block.nodes[0];
 
   if (!extras.hasInstances(ode.NameNode, name)) {
-    e.parameterError('$def', 'name in a block', name.toString());
+    e.expectationError('$def', 'name in a block', name.toString());
   }
 
   var body = e.symbolTable.get(name.toString());
@@ -471,7 +471,7 @@ ode.natives.map = function(e) {
 
     e.stack.push(new ode.BlockNode(resultArray));
   } else {
-    e.parameterError('map', 'two blocks', f.toString() + ',' + v.toString());
+    e.expectationError('map', 'two blocks', f.toString() + ',' + v.toString());
   }
 };
 

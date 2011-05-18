@@ -60,6 +60,13 @@ ode.BooleanNode.prototype.toString = function() {
   return this.val ? 'true' : 'false';
 };
 
+/**
+ * @return {boolean} The boolean value of the node.
+ */
+ode.BooleanNode.prototype.toBooleanValue = function() {
+  return this.val ? true : false;
+};
+
 // Character
 
 /**
@@ -128,9 +135,38 @@ ode.NumberNode.prototype.toNumberValue = function() {
 ode.AggregateNode = function(nodes) {
   extras.base(this);
 
-  this.nodes = nodes;
+  /** @private */
+  this.nodes_ = nodes;
 };
 extras.inherits(ode.AggregateNode, ode.NestableNode);
+
+/**
+ * @return {number} The size of the aggregate.
+ */
+ode.AggregateNode.prototype.getSize = function() {
+  return this.nodes_.length;
+};
+
+/**
+ * @return {Array} The nodes of the aggregate.
+ */
+ode.AggregateNode.prototype.getNodes = function() {
+  return this.nodes_;
+};
+
+/**
+ * @return {ode.NestableNode} The first node of the aggregate.
+ */
+ode.AggregateNode.prototype.getFirst = function() {
+  return this.nodes_[0];
+};
+
+/**
+ * @return {ode.AggregateNode} The nodes of the aggregate.
+ */
+ode.AggregateNode.prototype.getRest = function() {
+  return new this.constructor(this.nodes_.slice(1));
+};
 
 // Block
 
@@ -146,8 +182,8 @@ extras.inherits(ode.BlockNode, ode.AggregateNode);
 
 /** @inheritDoc */
 ode.BlockNode.prototype.toString = function() {
-  if (this.nodes.length > 0) {
-    var stringList = extras.mapMethod(this.nodes, 'toString');
+  if (this.nodes_.length > 0) {
+    var stringList = extras.mapMethod(this.nodes_, 'toString');
     return '[' + stringList.join(' ') + ']';
   } else {
     return '[]';
@@ -155,19 +191,35 @@ ode.BlockNode.prototype.toString = function() {
 };
 
 /**
- * @param {ode.BlockNode} otherBlockNode The block node to concatenate.
- * @return {ode.BlockNode} The two block nodes concatenated.
+ * @param {ode.AggregateNode} other The other node to concatenate.
+ * @return {ode.BlockNode} The two nodes concatenated.
  */
-ode.BlockNode.prototype.concatenate = function(otherBlockNode) {
-  return new ode.BlockNode(this.nodes.concat(otherBlockNode.nodes));
+ode.BlockNode.prototype.concatenate = function(other) {
+  return new ode.BlockNode(this.nodes_.concat(other.getNodes()));
 };
 
 /**
- * @param {ode.NestableNode} otherNode The node to insert at the beginning.
- * @return {ode.BlockNode} The block node with the other node prepended.
+ * @param {ode.AggregateNode} other The other node to concatenate.
+ * @return {boolean} True if the two nodes can be concatenated.
  */
-ode.BlockNode.prototype.prepend = function(otherNode) {
-  return new ode.BlockNode([otherNode].concat(this.nodes));
+ode.BlockNode.prototype.canConcatenateWith = function(other) {
+  return other.getNodes ? true : false;
+};
+
+/**
+ * @param {ode.NestableNode} other The other node to prepend.
+ * @return {ode.BlockNode} The new node.
+ */
+ode.BlockNode.prototype.prependNode = function(other) {
+  return new ode.BlockNode([other].concat(this.nodes_));
+};
+
+/**
+ * @param {ode.NestableNode} other The other node to prepend.
+ * @return {boolean} True if the node can be prepended to this.
+ */
+ode.BlockNode.prototype.canPrependNode = function(other) {
+  return other instanceof ode.NestableNode;
 };
 
 // Set
@@ -184,8 +236,8 @@ extras.inherits(ode.SetNode, ode.AggregateNode);
 
 /** @inheritDoc */
 ode.SetNode.prototype.toString = function() {
-  if (this.nodes.length > 0) {
-    var stringList = extras.mapMethod(this.nodes, 'toString');
+  if (this.nodes_.length > 0) {
+    var stringList = extras.mapMethod(this.nodes_, 'toString');
     return '{' + stringList.join(' ') + '}';
   } else {
     return '{}';
@@ -215,6 +267,73 @@ ode.StringNode.prototype.toString = function() {
   }
 };
 
+/**
+ * @return {number} The size of the string.
+ */
+ode.StringNode.prototype.getSize = function() {
+  return this.val.length;
+};
+
+/**
+ * @param {ode.StringNode} other The other node to concatenate.
+ * @return {ode.StringNode} The two nodes concatenated.
+ */
+ode.StringNode.prototype.concatenate = function(other) {
+  return new ode.StringNode(this.val + other.val);
+};
+
+/**
+ * @param {ode.AggregateNode} other The other node to concatenate.
+ * @return {boolean} True if the two nodes can be concatenated.
+ */
+ode.StringNode.prototype.canConcatenateWith = function(other) {
+  return other instanceof ode.StringNode;
+};
+
+/**
+ * @param {ode.CharacterNode} other The other node to prepend.
+ * @return {ode.StringNode} The new node.
+ */
+ode.StringNode.prototype.prependNode = function(other) {
+  return new ode.StringNode(other.val + this.val);
+};
+
+/**
+ * @param {ode.CharacterNode} other The other node to prepend.
+ * @return {boolean} True if the node can be prepended to this.
+ */
+ode.StringNode.prototype.canPrependNode = function(other) {
+  return other instanceof ode.CharacterNode;
+};
+
+/**
+ * @return {Array} The nodes of the string.
+ */
+ode.StringNode.prototype.getNodes = function() {
+  var i;
+  var nodes = [];
+
+  for (i = 0; i < this.val.length; i++) {
+    nodes.push(new ode.CharacterNode(this.val.charAt(i)));
+  }
+
+  return nodes;
+};
+
+/**
+ * @return {ode.NestableNode} The first node of the aggregate.
+ */
+ode.StringNode.prototype.getFirst = function() {
+  return new ode.CharacterNode(this.val.charAt(0));
+};
+
+/**
+ * @return {ode.StringNode} The nodes of the aggregate.
+ */
+ode.StringNode.prototype.getRest = function() {
+  return new this.constructor(this.val.slice(1));
+};
+
 // Statement
 
 /**
@@ -236,15 +355,23 @@ ode.PhraseStatementNode = function(nodes) {
 
   /**
    * @type {Array.<ode.NestableNode>}
+   * @private
    */
-  this.nodes = nodes;
+  this.nodes_ = nodes;
 };
 extras.inherits(ode.PhraseStatementNode, ode.StatementNode);
 
 /** @inheritDoc */
 ode.PhraseStatementNode.prototype.toString = function() {
-  var stringList = extras.mapMethod(this.nodes, 'toString');
+  var stringList = extras.mapMethod(this.nodes_, 'toString');
   return stringList.join(' ');
+};
+
+/**
+ * @return {Array.<ode.NestableNode>} The nodes of the phrase.
+ */
+ode.PhraseStatementNode.prototype.getNodes = function() {
+  return this.nodes_;
 };
 
 /**

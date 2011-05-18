@@ -110,6 +110,50 @@ $(function() {
   });
   
   /***
+   * ### or : X Y -> Z
+   * 
+   * Z is the union of sets X and Y.
+   */
+  test("or", function() {
+    
+    Is.stack('{1 2 3} {0 2 4} or', '{0 1 2 3 4}');
+    
+  });
+  
+  /***
+   * ### xor : X Y -> Z
+   * 
+   * Z is the symmetric difference of sets X and Y.
+   */
+  test("xor", function() {
+    
+    Is.stack('{1 2 3} {0 2 4} xor', '{0 1 3 4}');
+    
+  });
+  
+  /***
+   * ### and : X Y -> Z
+   * 
+   * Z is the intersection of sets X and Y.
+   */
+  test("and", function() {
+    
+    Is.stack('{1 2 3} {0 2 4} and', '{2}');
+    
+  });
+  
+  /***
+   * ### not : X -> Y
+   * 
+   * Y is the complement of set X.
+   */
+  test("not", function() {
+
+    ok(false); // TODO: how can we create a non-infinite set complement?
+    
+  });
+  
+  /***
    * ## Math
    */
   module("Advanced Joy - Math");
