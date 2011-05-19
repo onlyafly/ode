@@ -48,11 +48,6 @@ test("block", function() {
   Is.output("1 2 3 4 4 block# .", "[1 2 3 4]");
 });
 
-test("apply", function() {
-  Is.output("[2 1] apply . .", "12");
-  Is.output("4 2 block apply . .", "24");
-});
-
 test("length", function() {
   Is.output("[1 2 3 x] length .", "4");
   Is.output("[] length .", "0");

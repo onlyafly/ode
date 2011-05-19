@@ -37,6 +37,10 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('concat', ode.joynatives.concat);
   i.addNativeOperation('size', ode.joynatives.size);
   i.addNativeOperation('cons', ode.joynatives.cons);
+  i.addNativeOperation('uncons', ode.joynatives.uncons);
+  i.addNativeOperation('i', ode.joynatives.i);
+  i.addNativeOperation('first', ode.joynatives.first);
+  i.addNativeOperation('rest', ode.joynatives.rest);
 
   // // // // // Maybe in Joy???
 
@@ -71,15 +75,10 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('throw-error', ode.joynatives.throwError);
 
   // Block
-  i.addNativeOperation('apply', ode.joynatives.apply);
-
   i.addNativeOperation('block', ode.joynatives.block);
   i.addNativeOperation('block#', ode.joynatives.blockLocation);
-
-  i.addNativeOperation('uncons', ode.joynatives.uncons);
   i.addNativeOperation('stack', ode.joynatives.stack);
   i.addNativeOperation('unstack', ode.joynatives.unstack);
-  i.addNativeOperation('length', ode.joynatives.length);
 
   // Functional
   i.addNativeOperation('map', ode.joynatives.map);
@@ -392,13 +391,13 @@ ode.joynatives.swap = function(e) {
 /**
  * @param {ode.Environment} e Current environment.
  */
-ode.joynatives.apply = function(e) {
+ode.joynatives.i = function(e) {
   var x = e.stack.pop();
 
   if (x instanceof ode.BlockNode) {
     e.runNestableNodes(x.getNodes());
   } else {
-    e.expectationError('apply', 'block', [x]);
+    e.expectationError('i', 'block', [x]);
   }
 };
 
@@ -413,7 +412,7 @@ ode.joynatives.ifte = function(e) {
   if (extras.hasInstances(ode.BlockNode, pif, pthen, pelse)) {
     // eval if
     e.stack.push(pif);
-    ode.joynatives.apply(e);
+    ode.joynatives.i(e);
     var predicateResult = e.stack.pop();
 
     // Can predicateResult be converted to a boolean value?
@@ -423,7 +422,7 @@ ode.joynatives.ifte = function(e) {
       } else {
         e.stack.push(pelse);
       }
-      ode.joynatives.apply(e);
+      ode.joynatives.i(e);
     } else {
       e.expectationError('ifte', 'boolean', [predicateResult]);
     }
@@ -565,6 +564,44 @@ ode.joynatives.uncons = function(e) {
 /**
  * @param {ode.Environment} e Current environment.
  */
+ode.joynatives.first = function(e) {
+  var x = e.stack.pop();
+
+  if (x.getFirst && x.getSize) {
+
+    if (x.getSize() === 0) {
+      e.expectationError('first', ['non-empty aggregate'], [x]);
+    }
+
+    e.stack.push(x.getFirst());
+
+  } else {
+    e.expectationError('first', ['aggregate'], [x]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.rest = function(e) {
+  var x = e.stack.pop();
+
+  if (x.getRest && x.getSize) {
+
+    if (x.getSize() === 0) {
+      e.expectationError('rest', ['non-empty aggregate'], [x]);
+    }
+
+    e.stack.push(x.getRest());
+
+  } else {
+    e.expectationError('rest', ['aggregate'], [x]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
 ode.joynatives.block = function(e) {
   e.runCreateBlock(1);
 };
@@ -612,7 +649,7 @@ ode.joynatives.evaluate = function(e) {
     e.enterFrame();
 
     e.stack.push(block);
-    ode.joynatives.apply(e);
+    ode.joynatives.i(e);
     var stackNodes = e.getStackNodes();
 
     e.exitFrame();
@@ -692,7 +729,7 @@ ode.joynatives.map = function(e) {
 
       e.stack.push(originalNode);
       e.stack.push(f);
-      ode.joynatives.apply(e);
+      ode.joynatives.i(e);
 
       extras.each(e.getStackNodes(), function(resultNode) {
         resultArray.push(resultNode);
@@ -729,7 +766,7 @@ ode.joynatives.fold = function(e) {
     extras.each(block.getNodes(), function(node) {
       e.stack.push(node);
       e.stack.push(func);
-      ode.joynatives.apply(e);
+      ode.joynatives.i(e);
     });
 
     var stackNodes = e.getStackNodes();
@@ -836,21 +873,4 @@ ode.joynatives.newstack = function(e) {
  */
 ode.joynatives.throwError = function(e) {
   throw new ode.RuntimeCustomException();
-};
-
-/**
- * @param {ode.Environment} e Current environment.
- */
-ode.joynatives.length = function(e) {
-
-  /** @type {ode.BlockNode} */
-  var block = e.stack.pop();
-
-  if (!extras.hasInstances(ode.BlockNode, block)) {
-    e.expectationError('length', 'block', [block]);
-  }
-
-  var len = block.getSize();
-  e.stack.push(new ode.NumberNode(len));
-
 };

@@ -360,6 +360,9 @@ $(function() {
   
   /////////////////////////////////////////////////////////////////////////////
 
+  /***
+   * ## Aggregate Operations
+   */
   module("Joy - Aggregate Operations");
 
   /***
@@ -406,18 +409,30 @@ $(function() {
     Is.stack('"abc" uncons', '\'a "bc"');
   });
 
+  /***
+   * ### i : [P] -> ...
+   *
+   * Executes P. So, [P] i == P.
+   */
   test("i", function() {
+    Is.output("[2 1] i . .", "12");
+    Is.output("4 2 block i . .", "24");
     Is.stack("[1 2 +] i", "3");
   });
 
+  /***
+   * ### rest : A -> R
+   * 
+   * R is the non-empty aggregate A with its first member removed.
+   */
   test("rest", function() {
     Is.stack("[1 2 +] rest", "[2 +]");
   });
 
   /***
-   * ## first (list -- element)
+   * ### first : A -> F
    * 
-   * 
+   * F is the first member of the non-empty aggregate A.
    */
   test("first", function() {
     Is.stack("[1 2 +] first", "1");
@@ -425,34 +440,48 @@ $(function() {
   
   /////////////////////////////////////////////////////////////////////////////
 
-  module("Joy - functional");
+  /***
+   * ## Functional Operations
+   */
+  module("Joy - Functional Operations");
 
+  /***
+   * ### map : A [P] -> B
+   * 
+   * Executes P on each member of aggregate A, collects results in same type aggregate B.
+   */
   test("map", function() {
     Is.output("[1 2 3] [dup] map .", "[1 1 2 2 3 3]");
     Is.output("[1 2 3 4] [dup *] map .", "[1 4 9 16]");
   });
 
+  /* TODO: Not sure if this is Joy
   test("map - stack executes in sandbox", function() {
-    // TODO: Not sure if this is Joy
-
     Is.exception("2 [1] [drop drop] map", null);
 
     // Check that after the map fails, all frames are dropped
     Is.exception("33 [66] [drop drop] map", null, true);
     Is.output(".", "33");
   });
+  */
 
-  test("map - read only stack", function() {
-    // TODO This doesn't seem right to me, but it is in faq1.html
+  /* TODO This doesn't seem right to me, but it is in faq1.html
+  test("map - read only stack", function() {    
     Is.stack("7 [[succ] [2 *] [dup *]] [i] map", "[8 14 49]");
   });
+  */
 
+  /***
+   * ### fold : A V0 [P] -> V
+   * 
+   * Starting with value V0, sequentially pushes members of aggregate A and combines with binary operator P to produce value V.  
+   */
   test("fold", function() {
     Is.output("[1 2 3 4 5] 0 [+] fold .", "15");
     Is.output("[1 2 3 4 5] 1 [*] fold .", "120");
 
     // Check that after the fold fails, all frames are dropped
-    Is.exception("33 [1] 0 [drop drop drop] fold", null, true);
+    Is.exception("33 [1] 0 [drop drop drop] fold", ode.RuntimeException, true);
     Is.output(".", "33");
 
     Is.output("[1 2 3 4 5] 0 [+] fold .", "15");
@@ -460,9 +489,15 @@ $(function() {
 
   /////////////////////////////////////////////////////////////////////////////  
   
-  module("Joy - recursion operations");
+  module("Joy - Recursion Operations");
 
-  /*
+  /***
+   * ### primrec : X [I] [C] -> R
+   * 
+   * Executes I to obtain an initial value R0. For integer X uses increasing
+   * positive integers to X, combines by C for new R. For aggregate X uses 
+   * successive members and combines by C for new R.
+   * 
    * In Joy there is a combinator for primitive recursion which has this pattern
    * built in and thus avoids the need for a definition. The primrec combinator
    * expects two quoted programs in addition to a data parameter. For an integer
@@ -472,12 +507,12 @@ $(function() {
    * with the result of applying the function to its predecessor. For the
    * factorial function the required quoted programs are very simple:
    * 
-   * [1] [*] primrec
+   *     [1] [*] primrec
    * 
    * computes the factorial recursively. There is no need for any definition.
    * For example, the following program computes the factorial of 5:
    * 
-   * 5 [1] [*] primrec
+   *     5 [1] [*] primrec
    * 
    * It first pushes the number 5 and then it pushes the two short quoted
    * programs. At this point the stack contains three elements. Then the primrec
@@ -837,10 +872,7 @@ $(function() {
   
   swons : A X -> B
   Aggregate B is A with a new member X (first member for sequences).
-  first : A -> F
-  F is the first member of the non-empty aggregate A.
-  rest : A -> R
-  R is the non-empty aggregate A with its first member removed.
+
   compare : A B -> I
   I (=-1,0,+1) is the comparison of aggregates A and B. The values correspond to the predicates <=, =, >=.
   at : A I -> X
@@ -896,8 +928,6 @@ $(function() {
   Tests whether R is a float.
   file : F -> B
   Tests whether F is a file. combinator
-  i : [P] -> ...
-  Executes P. So, [P] i == P.
   x : [P]i -> ...
   Executes P without popping [P]. So, [P] x == [P] P.
   dip : X [P] -> ... X
@@ -968,17 +998,12 @@ $(function() {
   Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If that yields true and there is just a [T], executes T and exit. If there are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case are ignored. If no B yields true, then [D] is used. It is then of the forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter executes R1, recurses, executes R2.
   step : A [P] -> ...
   Sequentially putting members of aggregate A onto stack, executes P for each member of A.
-  fold : A V0 [P] -> V
-  Starting with value V0, sequentially pushes members of aggregate A and combines with binary operator P to produce value V.
-  map : A [P] -> B
-  Executes P on each member of aggregate A, collects results in sametype aggregate B.
+  
   times : N [P] -> ...
   N times executes P.
   infra : L1 [P] -> L2
   Using list L1 as stack, executes P and returns a new list L2. The first element of L1 is used as the top of stack, and after execution of P the top of stack becomes the first element of L2.
-  primrec : X [I] [C] -> R
-  Executes I to obtain an initial value R0. For integer X uses increasing positive integers to X, combines by C for new R. For aggregate X uses successive members and combines by C for new R.
-  filter : A [B] -> A1
+   filter : A [B] -> A1
   Uses test B to filter aggregate A producing sametype aggregate A1.
   split : A [B] -> A1 A2
   Uses test B to split aggregate A into sametype aggregates A1 and A2 .
