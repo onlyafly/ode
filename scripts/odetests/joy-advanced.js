@@ -5,6 +5,8 @@ $(function() {
    */
   module("Advanced Joy - ???");
   
+  
+  
   /***
    * ### conts : -> [[P] [Q] ..]
    * 
@@ -94,7 +96,43 @@ $(function() {
   });
   
   /***
-   * ## File I/O
+   * ### get : -> F
+   * 
+   * Reads a factor from input and pushes it onto stack.
+   */
+  test("get", function() {
+    ok(false); // TODO
+  });
+  
+  /***
+   * ### put : X ->
+   * 
+   * Writes X to output, pops X off stack.
+   */  
+  test("put", function() {
+    ok(false); // TODO
+  });
+  
+  /***
+   * ### putch : N ->
+   * 
+   * N : numeric, writes character whose ASCII is N.
+   */
+  test("putch", function() {
+    ok(false); // TODO
+  });
+  
+  /***
+   * ### putchars : "abc.." ->
+   * 
+   * Writes abc.. (without quotes)
+   */  
+  test("putchars", function() {
+    ok(false); // TODO
+  });
+  
+  /***
+   * ## Sets
    */
   module("Advanced Joy - Sets");
   
@@ -177,7 +215,7 @@ $(function() {
     Is.stack("-94563 sign", "-1");
   });
   
-  /*** TODO
+  /* TODO
   neg : I -> J
   Integer J is the negative of integer I. Also supports float.
   ord : C -> I

@@ -594,15 +594,12 @@ $(function() {
 
   /////////////////////////////////////////////////////////////////////////////
   
-  module("Joy - input/output");
+  /***
+   * ## Input/Output
+   */
+  module("Joy - Input/Output");
 
-  test("get", function() {
-    ok(false); // TODO
-  });
-
-  test("put", function() {
-    ok(false); // TODO
-  });
+  
 
   test("printing - numbers", function() {
     Is.output("0 .", "0");
@@ -1039,14 +1036,7 @@ $(function() {
   Creates an aggregate A containing the interpreter's command line arguments.
   argc : -> I
   Pushes the number of command line arguments. This is quivalent to 'argv size'.
-  get : -> F
-  Reads a factor from input and pushes it onto stack.
-  put : X ->
-  Writes X to output, pops X off stack.
-  putch : N ->
-  N : numeric, writes character whose ASCII is N.
-  putchars : "abc.." ->
-  Writes abc.. (without quotes)
+  
   include : "filnam.ext" ->
   Transfers input to file whose name is "filnam.ext". On end-of-file returns to previous input file.
   abort : ->
