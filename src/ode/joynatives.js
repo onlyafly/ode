@@ -5,9 +5,13 @@ ode.joynatives = ode.joynatives || {};
  * @param {ode.Interpreter} i The interpreter.
  */
 ode.joynatives.initialize = function(i) {
-
-  // // // // // In Joy
-
+  
+  // Definitions and Symbols
+  i.addNativeOperation('body', ode.joynatives.body);
+  
+  // Control Flow
+  i.addNativeOperation('ifte', ode.joynatives.ifte);
+  
   // Math
   i.addNativeOperation('pred', ode.joynatives.pred);
   i.addNativeOperation('succ', ode.joynatives.succ);
@@ -42,23 +46,30 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('first', ode.joynatives.first);
   i.addNativeOperation('rest', ode.joynatives.rest);
 
-  // // // // // Maybe in Joy???
-
-
+  // Basic Stack Operations
+  i.addNativeOperation('id', function(e) {});
+  i.addNativeOperation('dup', ode.joynatives.dup);
+  i.addNativeOperation('dupd', ode.joynatives.dupd);
+  i.addNativeOperation('swap', ode.joynatives.swap);
+  i.addNativeOperation('rollup', ode.joynatives.makeRotationOp('rollup', [2, 2]));
+  i.addNativeOperation('rolldown', ode.joynatives.makeRotationOp('rolldown', [2]));
+  i.addNativeOperation('rotate', ode.joynatives.makeRotationOp('rotate', [1, 2]));
+  i.addNativeOperation('popd', function(e) { e.stack.drop(1); });
+  i.addNativeOperation('swapd', ode.joynatives.makeRotationOp('swapd', [2, 1]));
+  i.addNativeOperation('rollupd', ode.joynatives.makeRotationOp('rollupd', [3, 3, 2]));
+  i.addNativeOperation('rolldownd', ode.joynatives.makeRotationOp('rolldownd', [3, 1]));
+  i.addNativeOperation('rotated', ode.joynatives.makeRotationOp('rotated', [2, 3, 2]));
+  i.addNativeOperation('pop', ode.joynatives.pop);
+  
+  // TODO: some things below might not be in Joy
 
   // IO
   i.addNativeOperation('.', ode.joynatives.print);
 
-  // Control
-  i.addNativeOperation('ifte', ode.joynatives.ifte);
-
   // Stack
-  i.addNativeOperation('dup', ode.joynatives.dup);
-  i.addNativeOperation('dup#', ode.joynatives.dupLocation);
-  i.addNativeOperation('swap', ode.joynatives.swap);
-  i.addNativeOperation('drop', ode.joynatives.drop);
+  
+  i.addNativeOperation('dup#', ode.joynatives.dupLocation);  
   i.addNativeOperation('drop#', ode.joynatives.dropLocation);
-  i.addNativeOperation('rot', ode.joynatives.makeRot(3));
 
   // Predicates
   i.addNativeOperation('number?', ode.joynatives.numberPredicate);
@@ -68,7 +79,7 @@ ode.joynatives.initialize = function(i) {
   // Advanced
   i.addNativeOperation('$eval', ode.joynatives.evaluate);
   i.addNativeOperation('$type', ode.joynatives.type);
-  i.addNativeOperation('$def', ode.joynatives.dollarDef);
+
   i.addNativeOperation('def', ode.joynatives.def);
   i.addNativeOperation('undef', ode.joynatives.undef);
   i.addNativeOperation('newstack', ode.joynatives.newstack);
@@ -367,6 +378,14 @@ ode.joynatives.dup = function(e) {
 /**
  * @param {ode.Environment} e Current environment.
  */
+ode.joynatives.dupd = function(e) {
+  e.stack.duplicate(1);
+  e.stack.moveToTop(1);
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
 ode.joynatives.dupLocation = function(e) {
   var x = e.stack.pop();
 
@@ -453,7 +472,7 @@ ode.joynatives.dropLocation = function(e) {
 /**
  * @param {ode.Environment} e Current environment.
  */
-ode.joynatives.drop = function(e) {
+ode.joynatives.pop = function(e) {
   e.stack.pop();
 };
 
@@ -626,15 +645,19 @@ ode.joynatives.blockLocation = function(e) {
 };
 
 /**
- * @param {number} n The nth item will be rotated to the front.
+ * @param {string} operation The name of the operation.
+ * @param {Array.<number>} movements Array containing the sequence of movements
+ * from the given number to the top of the stack.
  * @return {function(ode.Environment)} The native definition.
  */
-ode.joynatives.makeRot = function(n) {
+ode.joynatives.makeRotationOp = function(operation, movements) {
   /**
    * @param {ode.Environment} e Current environment.
    */
   return function(e) {
-    e.stack.rotate(n);
+    extras.each(movements, function(n) {
+      e.stack.moveToTop(n);
+    });
   };
 };
 
@@ -680,23 +703,25 @@ ode.joynatives.type = function(e) {
 /**
  * @param {ode.Environment} e Current environment.
  */
-ode.joynatives.dollarDef = function(e) {
+ode.joynatives.body = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var block = e.stack.pop();
+  var node = e.stack.pop();
+  var name;
 
-  if (!extras.hasInstances(ode.BlockNode, block)) {
-    e.expectationError('$def', 'block', [block]);
-  }
-
-  if (block.getSize() === 0) {
-    e.expectationError('$def', 'name in a block', [block]);
-  }
-
-  var name = block.getNodes()[0];
-
-  if (!extras.hasInstances(ode.NameNode, name)) {
-    e.expectationError('$def', 'name in a block', [name]);
+  if (extras.hasInstances(ode.BlockNode, node)) {
+    if (node.getSize() !== 1) {
+      e.expectationError('body', 'name in a block', [node]);
+    }
+    
+    name = node.getNodes()[0];
+    
+    if (!extras.hasInstances(ode.NameNode, name)) {
+      e.expectationError('body', 'name in block', [node]);
+    }
+  } else if (extras.hasInstances(ode.NameNode, node)) {
+    name = node;
+  } else {
+    e.expectationError('body', 'name or name in block', [name]);
   }
 
   var body = e.symbolTable.get(name.toString());

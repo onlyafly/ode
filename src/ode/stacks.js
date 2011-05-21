@@ -54,13 +54,13 @@ ode.RuntimeStack = function() {
     array.push(array[array.length - 1 - position]);
   };
 
-  this.rotate = function(n) {
-    if (n > array.length) {
+  this.moveToTop = function(position) {
+    if (position > array.length) {
       throw new ode.RuntimeStackException(
-        'Attempted to rotate more items than on stack; stack size = ' +
-          array.length + '; number to rotate = ' + n);
+        'Attempted to move item outside of stack bounds; stack size = ' +
+          array.length + '; number to rotate = ' + position + 1);
     }
-    array.push(array.splice(array.length - n, 1)[0]);
+    array.push(array.splice(array.length - 1 - position, 1)[0]);
   };
 
   this.empty = function() {

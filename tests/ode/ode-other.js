@@ -68,6 +68,12 @@ test("minus sign in names", function() {
 
 module("Language - stack operations");
 
+test("dup#", function() {
+  Is.output("1 2 3 4 0 dup# . .", "44");
+  Is.output("1 2 3 4 1 dup# . .", "34");
+  Is.output("1 2 3 4 2 dup# . . .", "243");
+});
+
 
 test("pop#", function() {
   Is.output("1 2 3 4 0 pop# . .", "32");
@@ -81,11 +87,7 @@ test("$type", function() {
   Is.output("[1 [] 3 four [5 6]] [$type] map .", "[[number] [block] [number] [name] [block]]");
 });
 
-test("$def", function() {
-  Is.output("[block] $def .", "[native]");
-  Is.output("double = 2 *; [double] $def .", "[2 *]");
-  Is.output("[x] $def .", "[unknown]");
-});
+
 
 test("def", function() {
   Is.output("[+] [add] def", "", true);

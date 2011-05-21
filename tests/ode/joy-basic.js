@@ -624,11 +624,18 @@ $(function() {
 
   /////////////////////////////////////////////////////////////////////////////
   
+  /***
+   * ## Control Flow
+   */
   module("Joy - Control Flow");
 
+  /***
+   * ### ifte : [B] [T] [F] -> ...
+   * 
+   * Executes B. If that yields true, then executes T else executes F.
+   */
   test("ifte", function() {
-    // TODO: how is true and false represented in Joy?
-    Is.output("[1] [1 .] [2 .] ifte", "1");
+    Is.output("[true] [1 .] [2 .] ifte", "1");
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -647,16 +654,36 @@ $(function() {
     // TODO Is.output("undefs", "[]"); 
   });
   
+  /***
+   * ### body : U -> [P]
+   * 
+   * Quotation [P] is the body of user-defined symbol U.
+   * 
+   * Example:
+   * 
+   * - ´double == 2 *; [double] first body´ => [2 *]
+   * 
+   * Ode only:
+   * 
+   * User-defined symbol U can be a name or a name in a block.
+   */
   test("body", function() {
-    // TODO Is.output("double == 2 *; [double] first body .", "[2 *]");
+    
+    // Ode-specific:
+    Is.stack("[body] body", "[native]");
+    Is.stack("double == 2 *; [double] body", "[2 *]");
+    Is.stack("[x] body", "[unknown]");
+    
+    // Joy:
+    Is.stack("double == 2 *; [double] first body", "[2 *]");
   });
 
   /////////////////////////////////////////////////////////////////////////////
   
   /***
-   * ## Basic Stack
+   * ## Basic Stack Operations
    */
-  module("Joy - Basic Stack");
+  module("Joy - Basic Stack Operations");
 
   /***
    * ### id : ->
@@ -665,7 +692,7 @@ $(function() {
    * is equivalent to just P Q.
    */
   test("id", function() {
-    // TODO Is.output("id", "");
+    Is.stack("id", "");
   });
   
   /***
@@ -675,9 +702,6 @@ $(function() {
    */
   test("dup", function() {
     Is.output("1 dup + .", "2");
-    Is.output("1 2 3 4 0 dup# . .", "44");
-    Is.output("1 2 3 4 1 dup# . .", "34");
-    Is.output("1 2 3 4 2 dup# . . .", "243");
   });
 
   /***
@@ -695,7 +719,7 @@ $(function() {
    * Moves X and Y up, moves Z down
    */
   test("rollup", function() {
-    // TODO Is.stack("3 2 1 rollup", "1 3 2");
+    Is.stack("3 2 1 rollup", "1 3 2");
   });
   
   /***
@@ -704,7 +728,7 @@ $(function() {
    * Moves Y and Z down, moves X up.
    */
   test("rolldown", function() {
-    // TODO Is.stack("3 2 1 rolldown", "2 1 3");
+    Is.stack("3 2 1 rolldown", "2 1 3");
   });
   
   /***
@@ -713,7 +737,7 @@ $(function() {
    * Interchanges X and Z.
    */
   test("rotate", function() {
-    // TODO Is.stack("3 2 1 rotate", "1 2 3");
+    Is.stack("3 2 1 rotate", "1 2 3");
   });
   
   /**
@@ -722,7 +746,7 @@ $(function() {
    * As if defined by: popd == [pop] dip
    */
   test("popd", function() {
-    // TODO Is.stack("2 1 popd", "1");
+    Is.stack("2 1 popd", "1");
   });
   
   /**
@@ -731,7 +755,7 @@ $(function() {
    * As if defined by: dupd == [dup] dip
    */
   test("dupd", function() {
-    // TODO Is.stack("2 1 dupd", "2 2 1");
+    Is.stack("2 1 dupd", "2 2 1");
   });
   
   /**
@@ -740,7 +764,7 @@ $(function() {
    * As if defined by: swapd == [swap] dip
    */
   test("swapd", function() {
-    // TODO Is.stack("3 2 1 swapd", "2 3 1");
+    Is.stack("3 2 1 swapd", "2 3 1");
   });
   
   /**
@@ -749,7 +773,7 @@ $(function() {
    * As if defined by: rollupd == [rollup] dip
    */
   test("rollupd", function() {
-    // TODO Is.stack("1 2 3 4 rollupd", "3 1 2 4");
+    Is.stack("1 2 3 4 rollupd", "3 1 2 4");
   });
   
   /**
@@ -758,7 +782,7 @@ $(function() {
    * As if defined by: rolldownd == [rolldown] dip
    */
   test("rolldownd", function() {
-    // TODO Is.stack("1 2 3 4 rolldownd", "2 3 1 4");
+    Is.stack("1 2 3 4 rolldownd", "2 3 1 4");
   });
   
   /**
@@ -767,7 +791,7 @@ $(function() {
    * As if defined by: rotated == [rotate] dip
    */
   test("rotated", function() {
-    // TODO Is.stack("1 2 3 4 rotated", "3 2 1 4");
+    Is.stack("1 2 3 4 rotated", "3 2 1 4");
   });
   
   /***
@@ -776,7 +800,7 @@ $(function() {
    * Removes X from top of the stack.
    */
   test("pop", function() {
-    // TODO Is.stack("2 1 pop", "2");
+    Is.stack("2 1 pop", "2");
   });
   
   /////////////////////////////////////////////////////////////////////////////
@@ -896,8 +920,9 @@ $(function() {
   For operators and combinators, the string "sym" is the name of item sym, for literals sym the result string is its type.
   intern : "sym" -> sym
   Pushes the item whose name is "sym".
-  body : U -> [P]
-  Quotation [P] is the body of user-defined symbol U. predicate
+  
+  
+   predicates:
   
   
   equal : T U -> B
@@ -962,8 +987,7 @@ $(function() {
   Executes P1 and P2, each with X on top, producing two results.
   branch : B [T] [F] -> ...
   If B is true, then executes T else executes F.
-  ifte : [B] [T] [F] -> ...
-  Executes B. If that yields true, then executes T else executes F.
+  
   ifinteger : X [T] [E] -> ...
   If X is an integer, executes T else executes E.
   ifchar : X [T] [E] -> ...
