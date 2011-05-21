@@ -59,7 +59,7 @@ Ode is set up to be easily minified and combined into a single JavaScript file
 using Google's Closure Compiler. In order to compile it, you will need to have
 the following directory structure:
 
-* (parent folder)
+* root
   * closure-compiler
     * compiler.jar (downloaded from <http://code.google.com/closure/compiler/>)
   * ode (this folder)
