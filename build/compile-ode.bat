@@ -1,0 +1,22 @@
+java -jar ../../closure-compiler/compiler.jar ^
+--js ../src/ode/extras.js ^
+--js ../src/ode/base.js ^
+--js ../src/ode/exceptions.js ^
+--js ../src/ode/lexer.js ^
+--js ../src/ode/nodes.js ^
+--js ../src/ode/parser.js ^
+--js ../src/ode/symboltable.js ^
+--js ../src/ode/stacks.js ^
+--js ../src/ode/interpreter.js ^
+--js ../src/ode/joynatives.js ^
+--js ../src/ode/controller.js ^
+--js_output_file ../bin/ode.js ^
+--jscomp_error=deprecated ^
+--jscomp_error=visibility ^
+--jscomp_error=accessControls ^
+--jscomp_error=fileoverviewTags ^
+--jscomp_error=strictModuleDepCheck ^
+--jscomp_error=missingProperties ^
+--jscomp_error=unknownDefines ^
+--jscomp_error=checkTypes ^
+--warning_level VERBOSE

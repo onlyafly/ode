@@ -1,6 +1,10 @@
 Ode Todo
 ========
 
+Project
+-------
+* Convert everything to HTML 5.
+
 General Rules
 -------------
 * Test for ability to be converted to a type, not for node type.

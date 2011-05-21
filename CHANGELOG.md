@@ -1,8 +1,8 @@
 Ode Changelog
 =============
 
-v0.4.0 (2001-05-16)
--------------------
+v0.4.0 (in development)
+-----------------------
 
 * Implemented the majority of Joy.
 
