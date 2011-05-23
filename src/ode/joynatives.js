@@ -103,7 +103,7 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('undef', ode.joynatives.undef);
   i.addNativeOperation('throw-error', ode.joynatives.throwError);
 
-  // Block
+  // List
   i.addNativeOperation('block', ode.joynatives.block);
   i.addNativeOperation('block#', ode.joynatives.blockLocation);
 
@@ -188,8 +188,8 @@ ode.joynatives.split = function(e) {
       }
     });
 
-    e.stack.push(new ode.BlockNode(first));
-    e.stack.push(new ode.BlockNode(second));
+    e.stack.push(new ode.ListNode(first));
+    e.stack.push(new ode.ListNode(second));
   } else {
     e.expectationError('split', 'list, quote', [list, test]);
   }
@@ -445,12 +445,12 @@ ode.joynatives.print = function(e) {
 
   if (x instanceof ode.NumberNode) {
     e.print(x.toString());
-  } else if (x instanceof ode.BlockNode) {
+  } else if (x instanceof ode.ListNode) {
     e.print(x.toString());
   } else if (x instanceof ode.SymbolNode) {
     e.print(x.toString());
   } else {
-    e.expectationError('.', 'number, name, or block', [x]);
+    e.expectationError('.', 'number, name, or list', [x]);
   }
 };
 
@@ -499,10 +499,10 @@ ode.joynatives.swap = function(e) {
 ode.joynatives.i = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     e.runNestableNodes(x.getNodes());
   } else {
-    e.expectationError('i', 'block', [x]);
+    e.expectationError('i', 'list', [x]);
   }
 };
 
@@ -514,9 +514,9 @@ ode.joynatives.ifte = function(e) {
   var pthen = e.stack.pop();
   var pif = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, pif, pthen, pelse)) {
+  if (extras.hasInstances(ode.ListNode, pif, pthen, pelse)) {
 
-    var predicateResult = ode.joynatives.executeBlockAndPreserveStack_(e, pif);
+    var predicateResult = ode.joynatives.executeListAndPreserveStack_(e, pif);
 
     // Can predicateResult be converted to a boolean value?
     if (predicateResult.toBooleanValue) {
@@ -532,7 +532,7 @@ ode.joynatives.ifte = function(e) {
   } else {
     e.expectationError(
       'ifte',
-      'if-block, then-block, else-block',
+      'if-list, then-list, else-list',
       [pif, pthen, pelse]);
   }
 };
@@ -569,7 +569,7 @@ ode.joynatives.pop = function(e) {
 ode.joynatives.dip = function(e) {
   var computation = e.stack.pop();
 
-  if (!(computation instanceof ode.BlockNode)) {
+  if (!(computation instanceof ode.ListNode)) {
     e.expectationError('dip', 'list', [computation]);
   }
 
@@ -598,7 +598,7 @@ ode.joynatives.numberPredicate = function(e) {
 ode.joynatives.blockPredicate = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     e.stack.push(new ode.NumberNode(1));
   } else {
     e.stack.push(new ode.NumberNode(0));
@@ -611,14 +611,14 @@ ode.joynatives.blockPredicate = function(e) {
 ode.joynatives.emptyPredicate = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     if (x.getSize() === 0) {
       e.stack.push(new ode.NumberNode(1));
     } else {
       e.stack.push(new ode.NumberNode(0));
     }
   } else {
-    e.expectationError('empty?', 'block', [x]);
+    e.expectationError('empty?', 'list', [x]);
   }
 };
 
@@ -725,7 +725,7 @@ ode.joynatives.rest = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.block = function(e) {
-  e.runCreateBlock(1);
+  e.runCreateList(1);
 };
 
 /**
@@ -738,7 +738,7 @@ ode.joynatives.blockLocation = function(e) {
     var length = x.toNumberValue();
 
     if (extras.isInteger(length) && (length >= 0)) {
-      e.runCreateBlock(length);
+      e.runCreateList(length);
     } else {
       e.expectationError('block#', 'non-negative integer', [x]);
     }
@@ -770,7 +770,7 @@ ode.joynatives.infra = function(e) {
   var quote = e.stack.pop();
   var list = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, quote, list)) {
+  if (extras.hasInstances(ode.ListNode, quote, list)) {
 
     e.enterFrame();
 
@@ -788,7 +788,7 @@ ode.joynatives.infra = function(e) {
 
     e.exitFrame();
 
-    e.stack.push(new ode.BlockNode(stackNodes));
+    e.stack.push(new ode.ListNode(stackNodes));
   } else {
     e.expectationError('infra', 'list, quote', [list, quote]);
   }
@@ -801,13 +801,13 @@ ode.joynatives.type = function(e) {
   var x = e.stack.pop();
 
   if (x instanceof ode.SymbolNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('name')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('name')]));
   } else if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('number')]));
-  } else if (x instanceof ode.BlockNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('block')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('number')]));
+  } else if (x instanceof ode.ListNode) {
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('list')]));
   } else {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('?')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('?')]));
   }
 };
 
@@ -819,31 +819,31 @@ ode.joynatives.body = function(e) {
   var node = e.stack.pop();
   var name;
 
-  if (extras.hasInstances(ode.BlockNode, node)) {
+  if (extras.hasInstances(ode.ListNode, node)) {
     if (node.getSize() !== 1) {
-      e.expectationError('body', 'name in a block', [node]);
+      e.expectationError('body', 'name in a list', [node]);
     }
 
     name = node.getNodes()[0];
 
     if (!extras.hasInstances(ode.SymbolNode, name)) {
-      e.expectationError('body', 'name in block', [node]);
+      e.expectationError('body', 'name in list', [node]);
     }
   } else if (extras.hasInstances(ode.SymbolNode, node)) {
     name = node;
   } else {
-    e.expectationError('body', 'name or name in block', [name]);
+    e.expectationError('body', 'name or name in list', [name]);
   }
 
   var body = e.symbolTable.get(name.toString());
   var result;
 
   if (body instanceof ode.CustomDefinitionBody) {
-    result = new ode.BlockNode(body.phraseNode.getNodes());
+    result = new ode.ListNode(body.phraseNode.getNodes());
   } else if (body instanceof ode.NativeDefinitionBody) {
-    result = new ode.BlockNode([new ode.SymbolNode('native')]);
+    result = new ode.ListNode([new ode.SymbolNode('native')]);
   } else {
-    result = new ode.BlockNode([new ode.SymbolNode('unknown')]);
+    result = new ode.ListNode([new ode.SymbolNode('unknown')]);
   }
 
   e.stack.push(result);
@@ -854,9 +854,9 @@ ode.joynatives.body = function(e) {
  */
 ode.joynatives.primrec = function(e) {
   var computation = e.stack.pop();
-  var initialBlock = e.stack.pop();
+  var initialList = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, computation, initialBlock)) {
+  if (extras.hasInstances(ode.ListNode, computation, initialList)) {
 
     var data = e.stack.pop();
 
@@ -864,8 +864,8 @@ ode.joynatives.primrec = function(e) {
 
       var endingNumber = data.toNumberValue();
 
-      // Execute initial block to calculate the starting value
-      e.stack.push(initialBlock);
+      // Execute initial list to calculate the starting value
+      e.stack.push(initialList);
       ode.joynatives.i(e);
 
       for (var i = endingNumber; i > 0; i--) {
@@ -879,8 +879,8 @@ ode.joynatives.primrec = function(e) {
 
       var reversedNodes = extras.reverseArray(data.getNodes());
 
-      // Execute initial block to calculate the starting value
-      e.stack.push(initialBlock);
+      // Execute initial list to calculate the starting value
+      e.stack.push(initialList);
       ode.joynatives.i(e);
 
       extras.each(reversedNodes, function(node, i) {
@@ -893,32 +893,32 @@ ode.joynatives.primrec = function(e) {
     } else {
       e.expectationError(
         'primrec',
-        'number or block, block, block',
-        [data, initialBlock, computation]);
+        'number or list, list, list',
+        [data, initialList, computation]);
     }
 
   } else {
     e.expectationError(
       'primrec',
-      'block, block',
-      [initialBlock, computation]);
+      'list, list',
+      [initialList, computation]);
   }
 };
 
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @param {ode.BlockNode} block Block to execute.
- * @return {ode.NestableNode} The top node after executing the block.
+ * @param {ode.ListNode} list List to execute.
+ * @return {ode.NestableNode} The top node after executing the list.
  */
-ode.joynatives.executeBlockAndPreserveStack_ = function(e, block) {
+ode.joynatives.executeListAndPreserveStack_ = function(e, list) {
 
   // Preserve stack.
   ode.joynatives.stack(e);
   var preservedStack = e.stack.pop();
 
   // Eval if.
-  e.stack.push(block);
+  e.stack.push(list);
   ode.joynatives.i(e);
   var result = e.stack.pop();
 
@@ -932,7 +932,7 @@ ode.joynatives.executeBlockAndPreserveStack_ = function(e, block) {
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @param {ode.BlockNode} preservedStack Block to restore as the stack.
+ * @param {ode.ListNode} preservedStack List to restore as the stack.
  */
 ode.joynatives.restorePreservedStack_ = function(e, preservedStack) {
   // Restore stack.
@@ -943,7 +943,7 @@ ode.joynatives.restorePreservedStack_ = function(e, preservedStack) {
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @return {ode.BlockNode} The stack preserved as a block.
+ * @return {ode.ListNode} The stack preserved as a list.
  */
 ode.joynatives.getPreservedStack_ = function(e) {
   // Preserve stack.
@@ -961,9 +961,9 @@ ode.joynatives.genrec = function(e) {
   var bthen = e.stack.pop();
   var bif = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+  if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
-    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+    var result = ode.joynatives.executeListAndPreserveStack_(e, bif);
 
     if (result.toBooleanValue) {
 
@@ -974,7 +974,7 @@ ode.joynatives.genrec = function(e) {
         e.stack.push(belse1);
         ode.joynatives.i(e);
         e.stack.push(
-          new ode.BlockNode(
+          new ode.ListNode(
             [bif, bthen, belse1, belse2, new ode.SymbolNode('genrec')]));
         e.stack.push(belse2);
         ode.joynatives.i(e);
@@ -983,14 +983,14 @@ ode.joynatives.genrec = function(e) {
     } else {
       e.expectationError(
         'genrec',
-        'if-block that generates a boolean value',
+        'if-list that generates a boolean value',
         [bif]);
     }
 
   } else {
     e.expectationError(
       'genrec',
-      'if-block, then-block, else1-block, else2-block',
+      'if-list, then-list, else1-list, else2-list',
       [bif, bthen, belse1, belse2]);
   }
 };
@@ -1004,9 +1004,9 @@ ode.joynatives.linrec = function(e) {
   var bthen = e.stack.pop();
   var bif = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+  if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
-    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+    var result = ode.joynatives.executeListAndPreserveStack_(e, bif);
 
     if (result.toBooleanValue) {
 
@@ -1017,7 +1017,7 @@ ode.joynatives.linrec = function(e) {
         e.stack.push(belse1);
         ode.joynatives.i(e);
         e.stack.push(
-          new ode.BlockNode(
+          new ode.ListNode(
             [bif, bthen, belse1, belse2, new ode.SymbolNode('linrec')]));
         ode.joynatives.i(e);
         e.stack.push(belse2);
@@ -1027,14 +1027,14 @@ ode.joynatives.linrec = function(e) {
     } else {
       e.expectationError(
         'linrec',
-        'if-block that generates a boolean value',
+        'if-list that generates a boolean value',
         [bif]);
     }
 
   } else {
     e.expectationError(
       'linrec',
-      'if-block, then-block, else1-block, else2-block',
+      'if-list, then-list, else1-list, else2-list',
       [bif, bthen, belse1, belse2]);
   }
 };
@@ -1048,9 +1048,9 @@ ode.joynatives.binrec = function(e) {
   var bthen = e.stack.pop();
   var bif = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+  if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
-    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+    var result = ode.joynatives.executeListAndPreserveStack_(e, bif);
 
     if (result.toBooleanValue) {
 
@@ -1061,7 +1061,7 @@ ode.joynatives.binrec = function(e) {
         e.stack.push(belse1);
         ode.joynatives.i(e);
 
-        var recursiveQuote = new ode.BlockNode(
+        var recursiveQuote = new ode.ListNode(
           [bif, bthen, belse1, belse2, new ode.SymbolNode('binrec')]);
         var second = e.stack.pop(e);
         var first = e.stack.pop(e);
@@ -1081,14 +1081,14 @@ ode.joynatives.binrec = function(e) {
     } else {
       e.expectationError(
         'binrec',
-        'if-block that generates a boolean value',
+        'if-list that generates a boolean value',
         [bif]);
     }
 
   } else {
     e.expectationError(
       'binrec',
-      'if-block, then-block, else1-block, else2-block',
+      'if-list, then-list, else1-list, else2-list',
       [bif, bthen, belse1, belse2]);
   }
 };
@@ -1100,7 +1100,7 @@ ode.joynatives.map = function(e) {
   var f = e.stack.pop();
   var v = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, f, v)) {
+  if (extras.hasInstances(ode.ListNode, f, v)) {
     var resultArray = [];
 
     e.enterFrame();
@@ -1121,9 +1121,9 @@ ode.joynatives.map = function(e) {
 
     e.exitFrame();
 
-    e.stack.push(new ode.BlockNode(resultArray));
+    e.stack.push(new ode.ListNode(resultArray));
   } else {
-    e.expectationError('map', 'two blocks', [f, v]);
+    e.expectationError('map', 'two lists', [f, v]);
   }
 };
 
@@ -1140,7 +1140,7 @@ ode.joynatives.makeUnary = function(name, n) {
 
     var computation = e.stack.pop();
 
-    if (!(computation instanceof ode.BlockNode)) {
+    if (!(computation instanceof ode.ListNode)) {
       e.expectationError(name, 'list', [computation]);
     }
 
@@ -1174,17 +1174,17 @@ ode.joynatives.makeUnary = function(name, n) {
 ode.joynatives.fold = function(e) {
   var func = e.stack.pop();
   var init = e.stack.pop();
-  var block = e.stack.pop();
+  var list = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, func, block)) {
-    e.expectationError('map', 'list,value,block', [block, init, func]);
+  if (!extras.hasInstances(ode.ListNode, func, list)) {
+    e.expectationError('map', 'list,value,list', [list, init, func]);
   } else {
 
     e.enterFrame();
 
     e.stack.push(init);
 
-    extras.each(block.getNodes(), function(node) {
+    extras.each(list.getNodes(), function(node) {
       e.stack.push(node);
       e.stack.push(func);
       ode.joynatives.i(e);
@@ -1204,29 +1204,29 @@ ode.joynatives.fold = function(e) {
  */
 ode.joynatives.def = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var nameBlock = e.stack.pop();
-  /** @type {ode.BlockNode} */
-  var definitionBlock = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var nameList = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var definitionList = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, nameBlock, definitionBlock)) {
+  if (!extras.hasInstances(ode.ListNode, nameList, definitionList)) {
     e.expectationError(
       'def',
-      ['block', 'block'],
-      [nameBlock, definitionBlock]);
+      ['list', 'list'],
+      [nameList, definitionList]);
   }
 
-  if (nameBlock.getSize() !== 1) {
-    e.expectationError('def', ['name in a block'], [nameBlock]);
+  if (nameList.getSize() !== 1) {
+    e.expectationError('def', ['name in a list'], [nameList]);
   }
 
-  var name = nameBlock.getNodes()[0];
+  var name = nameList.getNodes()[0];
 
   if (!extras.hasInstances(ode.SymbolNode, name)) {
-    e.expectationError('def', ['name in a block'], [name]);
+    e.expectationError('def', ['name in a list'], [name]);
   }
 
-  var bodyPhraseNode = new ode.PhraseStatementNode(definitionBlock.getNodes());
+  var bodyPhraseNode = new ode.PhraseStatementNode(definitionList.getNodes());
   var bodyCustomDefinition = new ode.CustomDefinitionBody(bodyPhraseNode);
   e.symbolTable.set(name.val, bodyCustomDefinition);
 };
@@ -1236,21 +1236,21 @@ ode.joynatives.def = function(e) {
  */
 ode.joynatives.undef = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var nameBlock = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var nameList = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, nameBlock)) {
-    e.expectationError('undef', ['block'], [nameBlock]);
+  if (!extras.hasInstances(ode.ListNode, nameList)) {
+    e.expectationError('undef', ['list'], [nameList]);
   }
 
-  if (nameBlock.getSize() !== 1) {
-    e.expectationError('undef', ['name in a block'], [nameBlock]);
+  if (nameList.getSize() !== 1) {
+    e.expectationError('undef', ['name in a list'], [nameList]);
   }
 
-  var name = nameBlock.getNodes()[0];
+  var name = nameList.getNodes()[0];
 
   if (!extras.hasInstances(ode.SymbolNode, name)) {
-    e.expectationError('undef', ['name in a block'], [name]);
+    e.expectationError('undef', ['name in a list'], [name]);
   }
 
   e.symbolTable.drop(name.val);
@@ -1260,10 +1260,10 @@ ode.joynatives.undef = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.stack = function(e) {
-  var block = new ode.BlockNode(
+  var list = new ode.ListNode(
     extras.reverseArray(
       e.stack.getInternalArray()));
-  e.stack.push(block);
+  e.stack.push(list);
 };
 
 /**
@@ -1271,14 +1271,14 @@ ode.joynatives.stack = function(e) {
  */
 ode.joynatives.unstack = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var block = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var list = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, block)) {
-    e.expectationError('unstack', 'block', [block]);
+  if (!extras.hasInstances(ode.ListNode, list)) {
+    e.expectationError('unstack', 'list', [list]);
   }
 
-  e.stack.setInternalArray(extras.reverseArray(block.getNodes()));
+  e.stack.setInternalArray(extras.reverseArray(list.getNodes()));
 
 };
 

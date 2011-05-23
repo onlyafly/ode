@@ -45,7 +45,7 @@ ode.natives.initialize = function(i) {
   i.addNativeOperation('newstack', ode.natives.newstack);
   i.addNativeOperation('throw-error', ode.natives.throwError);
 
-  // Block
+  // List
   i.addNativeOperation('apply', ode.natives.apply);
   i.addNativeOperation('cat', ode.natives.cat);
   i.addNativeOperation('block', ode.natives.block);
@@ -129,7 +129,7 @@ ode.natives.print = function(e) {
 
   if (x instanceof ode.NumberNode) {
     e.print(x.toString());
-  } else if (x instanceof ode.BlockNode) {
+  } else if (x instanceof ode.ListNode) {
     e.print(x.toString());
   } else if (x instanceof ode.SymbolNode) {
     e.print(x.toString());
@@ -175,7 +175,7 @@ ode.natives.swap = function(e) {
 ode.natives.apply = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     e.runNestableNodes(x.nodes);
   } else {
     e.expectationError('apply', 'block', x.toString());
@@ -190,7 +190,7 @@ ode.natives.ifte = function(e) {
   var pthen = e.stack.pop();
   var pif = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, pif, pthen, pelse)) {
+  if (extras.hasInstances(ode.ListNode, pif, pthen, pelse)) {
     // eval if
     e.stack.push(pif);
     ode.natives.apply(e);
@@ -258,7 +258,7 @@ ode.natives.numberPredicate = function(e) {
 ode.natives.blockPredicate = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     e.stack.push(new ode.NumberNode(1));
   } else {
     e.stack.push(new ode.NumberNode(0));
@@ -271,7 +271,7 @@ ode.natives.blockPredicate = function(e) {
 ode.natives.emptyPredicate = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     if (x.nodes.length === 0) {
       e.stack.push(new ode.NumberNode(1));
     } else {
@@ -289,7 +289,7 @@ ode.natives.cat = function(e) {
   var y = e.stack.pop();
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode && y instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode && y instanceof ode.ListNode) {
     e.stack.push(x.concatenate(y));
   } else {
     e.expectationError('cat', 'two blocks', x.toString() + ',' + y.toString());
@@ -303,7 +303,7 @@ ode.natives.cons = function(e) {
   var y = e.stack.pop();
   var x = e.stack.pop();
 
-  if (y instanceof ode.BlockNode) {
+  if (y instanceof ode.ListNode) {
     e.stack.push(y.prepend(x));
   } else {
     e.expectationError('cons', 'node,block', x.toString() + ',' + y.toString());
@@ -316,12 +316,12 @@ ode.natives.cons = function(e) {
 ode.natives.uncons = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.BlockNode) {
+  if (x instanceof ode.ListNode) {
     if (x.nodes.length === 0) {
       e.expectationError('uncons', 'non-empty block', x.toString());
     }
     e.stack.push(x.nodes[0]);
-    e.stack.push(new ode.BlockNode(x.nodes.slice(1)));
+    e.stack.push(new ode.ListNode(x.nodes.slice(1)));
   } else {
     e.expectationError('uncons', 'block', x.toString());
   }
@@ -331,7 +331,7 @@ ode.natives.uncons = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.natives.block = function(e) {
-  e.runCreateBlock(1);
+  e.runCreateList(1);
 };
 
 /**
@@ -344,7 +344,7 @@ ode.natives.blockLocation = function(e) {
     var length = x.toNumberValue();
 
     if (extras.isInteger(length) && (length >= 0)) {
-      e.runCreateBlock(length);
+      e.runCreateList(length);
     } else {
       e.expectationError('block#', 'non-negative integer', x.toString());
     }
@@ -372,7 +372,7 @@ ode.natives.makeRot = function(n) {
 ode.natives.evaluate = function(e) {
   var block = e.stack.pop();
 
-  if (block instanceof ode.BlockNode) {
+  if (block instanceof ode.ListNode) {
 
     e.enterFrame();
 
@@ -382,7 +382,7 @@ ode.natives.evaluate = function(e) {
 
     e.exitFrame();
 
-    e.stack.push(new ode.BlockNode(stackNodes));
+    e.stack.push(new ode.ListNode(stackNodes));
   } else {
     e.expectationError('$eval', 'block', block.toString());
   }
@@ -395,13 +395,13 @@ ode.natives.type = function(e) {
   var x = e.stack.pop();
 
   if (x instanceof ode.SymbolNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('name')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('name')]));
   } else if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('number')]));
-  } else if (x instanceof ode.BlockNode) {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('block')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('number')]));
+  } else if (x instanceof ode.ListNode) {
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('block')]));
   } else {
-    e.stack.push(new ode.BlockNode([new ode.SymbolNode('?')]));
+    e.stack.push(new ode.ListNode([new ode.SymbolNode('?')]));
   }
 };
 
@@ -410,10 +410,10 @@ ode.natives.type = function(e) {
  */
 ode.natives.dollarDef = function(e) {
 
-  /** @type {ode.BlockNode} */
+  /** @type {ode.ListNode} */
   var block = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, block)) {
+  if (!extras.hasInstances(ode.ListNode, block)) {
     e.expectationError('$def', 'block', block.toString());
   }
 
@@ -431,11 +431,11 @@ ode.natives.dollarDef = function(e) {
   var result;
 
   if (body instanceof ode.CustomDefinitionBody) {
-    result = new ode.BlockNode(body.phraseNode.nodes);
+    result = new ode.ListNode(body.phraseNode.nodes);
   } else if (body instanceof ode.NativeDefinitionBody) {
-    result = new ode.BlockNode([new ode.SymbolNode('native')]);
+    result = new ode.ListNode([new ode.SymbolNode('native')]);
   } else {
-    result = new ode.BlockNode([new ode.SymbolNode('unknown')]);
+    result = new ode.ListNode([new ode.SymbolNode('unknown')]);
   }
 
   e.stack.push(result);
@@ -448,7 +448,7 @@ ode.natives.map = function(e) {
   var f = e.stack.pop();
   var v = e.stack.pop();
 
-  if (extras.hasInstances(ode.BlockNode, f, v)) {
+  if (extras.hasInstances(ode.ListNode, f, v)) {
     var resultArray = [];
 
     e.enterFrame();
@@ -469,7 +469,7 @@ ode.natives.map = function(e) {
 
     e.exitFrame();
 
-    e.stack.push(new ode.BlockNode(resultArray));
+    e.stack.push(new ode.ListNode(resultArray));
   } else {
     e.expectationError('map', 'two blocks', f.toString() + ',' + v.toString());
   }
@@ -483,7 +483,7 @@ ode.natives.fold = function(e) {
   var init = e.stack.pop();
   var block = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, func, block)) {
+  if (!extras.hasInstances(ode.ListNode, func, block)) {
     e.expectationError('map', 'list,value,block', [block, init, func]);
   } else {
 
@@ -511,30 +511,30 @@ ode.natives.fold = function(e) {
  */
 ode.natives.def = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var nameBlock = e.stack.pop();
-  /** @type {ode.BlockNode} */
-  var definitionBlock = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var nameList = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var definitionList = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, nameBlock, definitionBlock)) {
+  if (!extras.hasInstances(ode.ListNode, nameList, definitionList)) {
     e
       .expectationError(
         'def',
         ['block', 'block'],
-        [nameBlock, definitionBlock]);
+        [nameList, definitionList]);
   }
 
-  if (nameBlock.nodes.length !== 1) {
-    e.expectationError('def', ['name in a block'], [nameBlock]);
+  if (nameList.nodes.length !== 1) {
+    e.expectationError('def', ['name in a block'], [nameList]);
   }
 
-  var name = nameBlock.nodes[0];
+  var name = nameList.nodes[0];
 
   if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('def', ['name in a block'], [name]);
   }
 
-  var bodyPhraseNode = new ode.PhraseStatementNode(definitionBlock.nodes);
+  var bodyPhraseNode = new ode.PhraseStatementNode(definitionList.nodes);
   var bodyCustomDefinition = new ode.CustomDefinitionBody(bodyPhraseNode);
   e.symbolTable.set(name.val, bodyCustomDefinition);
 };
@@ -544,18 +544,18 @@ ode.natives.def = function(e) {
  */
 ode.natives.undef = function(e) {
 
-  /** @type {ode.BlockNode} */
-  var nameBlock = e.stack.pop();
+  /** @type {ode.ListNode} */
+  var nameList = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, nameBlock)) {
-    e.expectationError('undef', ['block'], [nameBlock]);
+  if (!extras.hasInstances(ode.ListNode, nameList)) {
+    e.expectationError('undef', ['block'], [nameList]);
   }
 
-  if (nameBlock.nodes.length !== 1) {
-    e.expectationError('undef', ['name in a block'], [nameBlock]);
+  if (nameList.nodes.length !== 1) {
+    e.expectationError('undef', ['name in a block'], [nameList]);
   }
 
-  var name = nameBlock.nodes[0];
+  var name = nameList.nodes[0];
 
   if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('undef', ['name in a block'], [name]);
@@ -570,7 +570,7 @@ ode.natives.undef = function(e) {
 ode.natives.stack = function(e) {
   // Slice is used to get a shallow copy of the array.
   var nodes = e.stack.getInternalArray().slice();
-  var block = new ode.BlockNode(nodes);
+  var block = new ode.ListNode(nodes);
   e.stack.push(block);
 };
 
@@ -579,10 +579,10 @@ ode.natives.stack = function(e) {
  */
 ode.natives.unstack = function(e) {
 
-  /** @type {ode.BlockNode} */
+  /** @type {ode.ListNode} */
   var block = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, block)) {
+  if (!extras.hasInstances(ode.ListNode, block)) {
     e.expectationError('unstack', 'block', [block]);
   }
 
@@ -609,10 +609,10 @@ ode.natives.throwError = function(e) {
  */
 ode.natives.length = function(e) {
 
-  /** @type {ode.BlockNode} */
+  /** @type {ode.ListNode} */
   var block = e.stack.pop();
 
-  if (!extras.hasInstances(ode.BlockNode, block)) {
+  if (!extras.hasInstances(ode.ListNode, block)) {
     e.expectationError('length', 'block', [block]);
   }
 

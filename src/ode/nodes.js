@@ -188,20 +188,20 @@ ode.AggregateNode.prototype.getRest = function() {
   return new this.constructor(this.nodes_.slice(1), this.typeName_);
 };
 
-// Block
+// List
 
 /**
  * @constructor
  * @extends {ode.AggregateNode}
- * @param {Array.<ode.NestableNode>} nodes The nodes in the block.
+ * @param {Array.<ode.NestableNode>} nodes The nodes in the list.
  */
-ode.BlockNode = function(nodes) {
+ode.ListNode = function(nodes) {
   extras.base(this, nodes, 'list');
 };
-extras.inherits(ode.BlockNode, ode.AggregateNode);
+extras.inherits(ode.ListNode, ode.AggregateNode);
 
 /** @inheritDoc */
-ode.BlockNode.prototype.toString = function() {
+ode.ListNode.prototype.toString = function() {
   if (this.nodes_.length > 0) {
     var stringList = extras.mapMethod(this.nodes_, 'toString');
     return '[' + stringList.join(' ') + ']';
@@ -212,33 +212,33 @@ ode.BlockNode.prototype.toString = function() {
 
 /**
  * @param {ode.AggregateNode} other The other node to concatenate.
- * @return {ode.BlockNode} The two nodes concatenated.
+ * @return {ode.ListNode} The two nodes concatenated.
  */
-ode.BlockNode.prototype.concatenate = function(other) {
-  return new ode.BlockNode(this.nodes_.concat(other.getNodes()));
+ode.ListNode.prototype.concatenate = function(other) {
+  return new ode.ListNode(this.nodes_.concat(other.getNodes()));
 };
 
 /**
  * @param {ode.AggregateNode} other The other node to concatenate.
  * @return {boolean} True if the two nodes can be concatenated.
  */
-ode.BlockNode.prototype.canConcatenateWith = function(other) {
+ode.ListNode.prototype.canConcatenateWith = function(other) {
   return other.getNodes ? true : false;
 };
 
 /**
  * @param {ode.NestableNode} other The other node to prepend.
- * @return {ode.BlockNode} The new node.
+ * @return {ode.ListNode} The new node.
  */
-ode.BlockNode.prototype.prependNode = function(other) {
-  return new ode.BlockNode([other].concat(this.nodes_));
+ode.ListNode.prototype.prependNode = function(other) {
+  return new ode.ListNode([other].concat(this.nodes_));
 };
 
 /**
  * @param {ode.NestableNode} other The other node to prepend.
  * @return {boolean} True if the node can be prepended to this.
  */
-ode.BlockNode.prototype.canPrependNode = function(other) {
+ode.ListNode.prototype.canPrependNode = function(other) {
   return other instanceof ode.NestableNode;
 };
 

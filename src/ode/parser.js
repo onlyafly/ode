@@ -83,7 +83,7 @@ ode.Parser = function() {
     if (first) {
       switch (first.getType()) {
 
-        case ode.TokenType.OPEN_BLOCK:
+        case ode.TokenType.OPEN_LIST:
         case ode.TokenType.OPEN_SET:
         case ode.TokenType.STRING:
           return parseAggregateNode(lexer);
@@ -93,7 +93,7 @@ ode.Parser = function() {
         case ode.TokenType.CHARACTER:
           return parseAtomicNode(lexer);
 
-        case ode.TokenType.CLOSE_BLOCK:
+        case ode.TokenType.CLOSE_LIST:
         case ode.TokenType.CLOSE_SET:
           throw new ode.ParsingException('Unbalanced brackets');
 
@@ -121,8 +121,8 @@ ode.Parser = function() {
     if (first) {
       switch (first.getType()) {
 
-        case ode.TokenType.OPEN_BLOCK:
-          return parseBlock(lexer);
+        case ode.TokenType.OPEN_LIST:
+          return parseList(lexer);
 
         case ode.TokenType.OPEN_SET:
           return parseSet(lexer);
@@ -176,25 +176,25 @@ ode.Parser = function() {
     }
   }
 
-  function parseBlock(lexer) {
+  function parseList(lexer) {
 
     lexer.moveNext();
 
     var nestableNodes = [];
-    var continueParsingBlock = true;
+    var continueParsingList = true;
 
-    while (lexer.getCurrent() !== null && continueParsingBlock) {
+    while (lexer.getCurrent() !== null && continueParsingList) {
       var first = lexer.getCurrent();
 
-      if (first && first.getType() === ode.TokenType.CLOSE_BLOCK) {
-        continueParsingBlock = false;
+      if (first && first.getType() === ode.TokenType.CLOSE_LIST) {
+        continueParsingList = false;
       } else {
         nestableNodes.push(parseNestableNode(lexer));
         lexer.moveNext();
       }
     }
 
-    return new ode.BlockNode(nestableNodes);
+    return new ode.ListNode(nestableNodes);
   }
 
   function parseSet(lexer) {
@@ -202,13 +202,13 @@ ode.Parser = function() {
     lexer.moveNext();
 
     var atomicNodes = [];
-    var continueParsingBlock = true;
+    var continueParsingList = true;
 
-    while (lexer.getCurrent() !== null && continueParsingBlock) {
+    while (lexer.getCurrent() !== null && continueParsingList) {
       var first = lexer.getCurrent();
 
       if (first && first.getType() === ode.TokenType.CLOSE_SET) {
-        continueParsingBlock = false;
+        continueParsingList = false;
       } else {
         atomicNodes.push(parseAtomicNode(lexer));
         lexer.moveNext();

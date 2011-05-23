@@ -8,16 +8,16 @@
  * the user.
  * @param {function(Array.<ode.NestableNode>,number=)} runNestableNodes
  * Execute an array of nestable nodes.
- * @param {function(number)} runCreateBlock Create a block out of the top n
+ * @param {function(number)} runCreateList Create a list out of the top n
  * nodes.
  */
 ode.Environment = function(stack, symbolTable, print, runNestableNodes,
-  runCreateBlock) {
+  runCreateList) {
   this.stack = stack;
   this.symbolTable = symbolTable;
   this.print = print;
   this.runNestableNodes = runNestableNodes;
-  this.runCreateBlock = runCreateBlock;
+  this.runCreateList = runCreateList;
 
   /** @private */
   this.frames_ = new ode.FrameStack();
@@ -97,7 +97,7 @@ ode.Interpreter = function(primaryStack, symbolTable, print) {
     symbolTable,
     print,
     extras.bind(this.runNestableNodes, this),
-    extras.bind(this.runCreateBlock, this));
+    extras.bind(this.runCreateList, this));
 };
 
 /**
@@ -152,8 +152,8 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
   var recursionCount = recursionCountParam || 0;
 
   extras.each(nestableNodesArray, function(nestableNode) {
-    if (nestableNode instanceof ode.BlockNode) {
-      that.runBlock(nestableNode);
+    if (nestableNode instanceof ode.ListNode) {
+      that.runList(nestableNode);
     } else if (nestableNode instanceof ode.SetNode) {
       that.runSet(nestableNode);
     } else if (nestableNode instanceof ode.StringNode) {
@@ -183,10 +183,10 @@ ode.Interpreter.prototype.runDefinition = function(definitionNode) {
 };
 
 /**
- * @param {ode.BlockNode} blockNode Block node to execute.
+ * @param {ode.ListNode} listNode List node to execute.
  */
-ode.Interpreter.prototype.runBlock = function(blockNode) {
-  this.e.stack.push(blockNode);
+ode.Interpreter.prototype.runList = function(listNode) {
+  this.e.stack.push(listNode);
 };
 
 /**
@@ -259,9 +259,9 @@ ode.Interpreter.prototype.runSymbol = function(symbolName, recursionCount) {
 };
 
 /**
- * @param {number} length Number of nodes on top of the stack to put in block.
+ * @param {number} length Number of nodes on top of the stack to put in list.
  */
-ode.Interpreter.prototype.runCreateBlock = function(length) {
+ode.Interpreter.prototype.runCreateList = function(length) {
   var that = this;
   var nodesArray = [];
 
@@ -271,7 +271,7 @@ ode.Interpreter.prototype.runCreateBlock = function(length) {
     });
   }
 
-  this.e.stack.push(new ode.BlockNode(nodesArray));
+  this.e.stack.push(new ode.ListNode(nodesArray));
 };
 
 /**

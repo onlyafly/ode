@@ -741,7 +741,7 @@ $(function() {
    * 
    * Ode only:
    * 
-   * User-defined symbol U can be a name or a name in a block.
+   * User-defined symbol U can be a name or a name in a list.
    */
   test("body", function() {
     

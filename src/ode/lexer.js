@@ -4,8 +4,8 @@
  * @enum {string}
  */
 ode.TokenType = {
-  OPEN_BLOCK: 'open block',
-  CLOSE_BLOCK: 'close block',
+  OPEN_LIST: 'open list',
+  CLOSE_LIST: 'close list',
   OPEN_SET: 'open set',
   CLOSE_SET: 'close set',
   STRING: 'string',
@@ -186,9 +186,9 @@ ode.Lexer = function(input) {
       else {
         switch (c) {
           case ('['):
-            return getOperator(new ode.Token(ode.TokenType.OPEN_BLOCK, '['));
+            return getOperator(new ode.Token(ode.TokenType.OPEN_LIST, '['));
           case (']'):
-            return getOperator(new ode.Token(ode.TokenType.CLOSE_BLOCK, ']'));
+            return getOperator(new ode.Token(ode.TokenType.CLOSE_LIST, ']'));
           case ('{'):
             return getOperator(new ode.Token(ode.TokenType.OPEN_SET, '{'));
           case ('}'):

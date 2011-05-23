@@ -33,12 +33,12 @@ test("operators", function() {
   verify();
 });
 
-test("blocks", function() {
+test("lists", function() {
   actual = parseStatement("[] [. +]");
   expected = 
     new ode.PhraseStatementNode([
-      new ode.BlockNode([]),
-      new ode.BlockNode([
+      new ode.ListNode([]),
+      new ode.ListNode([
         new ode.SymbolNode("."),
         new ode.SymbolNode("+")
       ])
