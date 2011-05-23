@@ -133,7 +133,9 @@ $(function() {
    */
   test("name", function() {
     Is.stack("[+ / example map] [name] map", '["+" "/" "example" "map"]');
-    Is.stack('[1 \'A [] "a" {} true false] [name] map', '["number" "character" "list" "string" "set" "boolean" "boolean"]'); // TODO: not sure if this is right
+    
+    // TODO: not sure if this is real Joy
+    Is.stack('[1 \'A [] "a" {} true false] [name] map', '["number" "character" "list" "string" "set" "boolean" "boolean"]');
   });
   
   /***
@@ -877,6 +879,15 @@ $(function() {
     Is.stack("2 1 pop", "2");
   });
   
+  /***
+   * ### dip : X [P] -> ... X
+   * 
+   * Saves X, executes P, pushes X back.
+   */
+  test("dip", function() {
+    Is.stack("1 2 3 [pop] dip", "1 3");
+  });
+  
   /////////////////////////////////////////////////////////////////////////////
   
   /***
@@ -934,6 +945,47 @@ $(function() {
   test("infra", function() {
     Is.stack("[1 2 3 4] [+ *] infra", "[9 4]");
     Is.output("[1 2 3 4] [.] infra", "1");
+  });
+  
+  /***
+   * ### unary : X [P] -> R
+   * 
+   * Executes P, which leaves R on top of the stack. No matter how many 
+   * parameters this consumes, exactly one is removed from the stack.
+   */
+  test("unary", function() {
+    Is.stack("1 2 3 4 [2 *] unary", "1 2 3 8");
+  });
+  
+  /***
+   * ### unary2 : X1 X2 [P] -> R1 R2
+   * 
+   * Executes P twice, with X1 and X2 on top of the stack. Returns the
+   * two values R1 and R2.
+   */
+  test("unary2", function() {
+    // From "The Algebra of Joy", these two tests should produce identical
+    // results:
+    Is.stack("2 3 5 [*] unary2 + [pop] dip", "16");
+    Is.stack("2 3 5 + *", "16");
+  });
+  
+  /***
+   * ### unary3 : X1 X2 X3 [P] -> R1 R2 R3
+   * 
+   * Executes P three times, with Xi, returns Ri (i = 1..3).
+   */
+  test("unary3", function() {
+    Is.stack("1 2 3 4 [2 *] unary3", "1 4 6 8");
+  });
+  
+  /***
+   * ### unary4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
+   * 
+   * Executes P four times, with Xi, returns Ri (i = 1..4).
+   */
+  test("unary4", function() {
+    Is.stack("0 1 2 3 4 [2 *] unary4", "0 2 4 6 8");
   });
   
   /* TODO
@@ -1005,8 +1057,7 @@ $(function() {
   Tests whether F is a file. combinator
   x : [P]i -> ...
   Executes P without popping [P]. So, [P] x == [P] P.
-  dip : X [P] -> ... X
-  Saves X, executes P, pushes X back.
+
   app1 : X [P] -> R
   Executes P, pushes result R on stack without X.
   app11 : X Y [P] -> R
@@ -1017,14 +1068,6 @@ $(function() {
   Saves state of stack and then executes [P]. Then executes each [Pi] to give Ri pushed onto saved stack.
   nullary : [P] -> R
   Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, none are removed from the stack.
-  unary : X [P] -> R
-  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly one is removed from the stack.
-  unary2 : X1 X2 [P] -> R1 R2
-  Executes P twice, with X1 and X2 on top of the stack. Returns the two values R1 and R2.
-  unary3 : X1 X2 X3 [P] -> R1 R2 R3
-  Executes P three times, with Xi, returns Ri (i = 1..3).
-  unary4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
-  Executes P four times, with Xi, returns Ri (i = 1..4).
 
   binary : X Y [P] -> R
   Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly two are removed from the stack.
@@ -1083,6 +1126,8 @@ $(function() {
   test('unimplemented/undocumented functions', function() {
     // TODO ok(false);
   });
+  
+  /////////////////////////////////////////////////////////////////////////////
   
   /***
    * ## Notes on Joy

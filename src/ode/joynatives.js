@@ -62,12 +62,17 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('rolldownd', ode.joynatives.makeRotationOp([3, 1]));
   i.addNativeOperation('rotated', ode.joynatives.makeRotationOp([2, 3, 2]));
   i.addNativeOperation('pop', ode.joynatives.pop);
+  i.addNativeOperation('dip', ode.joynatives.dip);
 
   // Advanced Stack Operations
   i.addNativeOperation('newstack', ode.joynatives.newstack);
   i.addNativeOperation('stack', ode.joynatives.stack);
   i.addNativeOperation('unstack', ode.joynatives.unstack);
   i.addNativeOperation('infra', ode.joynatives.infra);
+  i.addNativeOperation('unary', ode.joynatives.makeUnary('unary', 1));
+  i.addNativeOperation('unary2', ode.joynatives.makeUnary('unary2', 2));
+  i.addNativeOperation('unary3', ode.joynatives.makeUnary('unary3', 3));
+  i.addNativeOperation('unary4', ode.joynatives.makeUnary('unary4', 4));
 
   // Recursion
   i.addNativeOperation('primrec', ode.joynatives.primrec);
@@ -556,6 +561,22 @@ ode.joynatives.dropLocation = function(e) {
  */
 ode.joynatives.pop = function(e) {
   e.stack.pop();
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.dip = function(e) {
+  var computation = e.stack.pop();
+
+  if (!(computation instanceof ode.BlockNode)) {
+    e.expectationError('dip', 'list', [computation]);
+  }
+
+  var saved = e.stack.pop();
+  e.stack.push(computation);
+  ode.joynatives.i(e);
+  e.stack.push(saved);
 };
 
 /**
@@ -1104,6 +1125,47 @@ ode.joynatives.map = function(e) {
   } else {
     e.expectationError('map', 'two blocks', [f, v]);
   }
+};
+
+/**
+ * @param {string} name The name of the operation.
+ * @param {number} n The number of iterations.
+ * @return {function(ode.Environment)} The native definition function.
+ */
+ode.joynatives.makeUnary = function(name, n) {
+  /**
+   * @param {ode.Environment} e Current environment.
+   */
+  return function(e) {
+
+    var computation = e.stack.pop();
+
+    if (!(computation instanceof ode.BlockNode)) {
+      e.expectationError(name, 'list', [computation]);
+    }
+
+    var args = [];
+    var results = [];
+    var i;
+
+    for (i = 0; i < n; i++) {
+      args.unshift(e.stack.pop());
+    }
+
+    var preservedStack = ode.joynatives.getPreservedStack_(e);
+
+    for (i = 0; i < n; i++) {
+      e.stack.push(args[i]);
+      e.stack.push(computation);
+      ode.joynatives.i(e);
+      results.push(e.stack.pop());
+      ode.joynatives.restorePreservedStack_(e, preservedStack);
+    }
+
+    extras.each(results, function(node) {
+      e.stack.push(node);
+    });
+  };
 };
 
 /**
