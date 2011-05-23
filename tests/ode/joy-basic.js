@@ -133,7 +133,7 @@ $(function() {
    */
   test("name", function() {
     Is.stack("[+ / example map] [name] map", '["+" "/" "example" "map"]');
-    Is.stack("[1 'A []] [name] map", '["number" "character" "list"]'); // TODO: not sure if this is right
+    Is.stack('[1 \'A [] "a" {} true false] [name] map', '["number" "character" "list" "string" "set" "boolean" "boolean"]'); // TODO: not sure if this is right
   });
   
   /***
@@ -146,7 +146,7 @@ $(function() {
     Is.stack('1 2 "+" intern [] cons i', '3');
     
     // Example from http://tech.groups.yahoo.com/group/concatenative/message/1561
-    Is.stack('100 200 "p" "op" concat intern [] i', '100');
+    Is.stack('100 200 "p" "op" concat intern [] cons i', '100');
   });
   
   /////////////////////////////////////////////////////////////////////////////

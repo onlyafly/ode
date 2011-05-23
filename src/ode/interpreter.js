@@ -158,8 +158,8 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
       that.runSet(nestableNode);
     } else if (nestableNode instanceof ode.StringNode) {
       that.runString(nestableNode.val);
-    } else if (nestableNode instanceof ode.NameNode) {
-      that.runName(nestableNode.val, recursionCount);
+    } else if (nestableNode instanceof ode.SymbolNode) {
+      that.runSymbol(nestableNode.val, recursionCount);
     } else if (nestableNode instanceof ode.NumberNode) {
       that.runNumber(nestableNode.val);
     } else if (nestableNode instanceof ode.BooleanNode) {
@@ -225,11 +225,11 @@ ode.Interpreter.prototype.runCharacter = function(characterValue) {
 };
 
 /**
- * @param {string} name Name of to execute.
+ * @param {string} symbolName Name of symbol to execute.
  * @param {number} recursionCount The current recursion count.
  */
-ode.Interpreter.prototype.runName = function(name, recursionCount) {
-  var definition = this.e.symbolTable.get(name);
+ode.Interpreter.prototype.runSymbol = function(symbolName, recursionCount) {
+  var definition = this.e.symbolTable.get(symbolName);
 
   if (definition instanceof ode.CustomDefinitionBody) {
     while (true) {
@@ -251,10 +251,10 @@ ode.Interpreter.prototype.runName = function(name, recursionCount) {
     }
   } else if (definition instanceof ode.NativeDefinitionBody) {
     definition.nativeFunction(this.e);
-  } else if (name === 'self') {
+  } else if (symbolName === 'self') {
     throw new ode.TailCallbackException();
   } else {
-    throw new ode.RuntimeException('Undefined name: ' + name);
+    throw new ode.RuntimeException('Undefined symbol: ' + symbolName);
   }
 };
 
@@ -275,10 +275,15 @@ ode.Interpreter.prototype.runCreateBlock = function(length) {
 };
 
 /**
- * @param {string} name Name of the operation.
+ * @param {string} symbolName Symbol name of the operation.
  * @param {function(ode.Environment)} implementation The native implementation
  * of the operation.
  */
-ode.Interpreter.prototype.addNativeOperation = function(name, implementation) {
-  this.e.symbolTable.set(name, new ode.NativeDefinitionBody(implementation));
+ode.Interpreter.prototype.addNativeOperation = function(
+  symbolName,
+  implementation) {
+
+  this.e.symbolTable.set(
+    symbolName,
+    new ode.NativeDefinitionBody(implementation));
 };

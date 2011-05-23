@@ -39,7 +39,7 @@ test("stringifyStack", function() {
   expected = "5 6 7";
   validate();
   
-  stack.push(new ode.BlockNode([new ode.NumberNode(5), new ode.NameNode("dude")]));
+  stack.push(new ode.BlockNode([new ode.NumberNode(5), new ode.SymbolNode("dude")]));
   
   actual = controller.stringifyStack();
   expected = "5 6 7 [5 dude]";

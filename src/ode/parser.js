@@ -18,7 +18,7 @@ ode.Parser = function() {
 
     var first = lexer.getCurrent();
 
-    if (first && first.getType() === ode.TokenType.NAME) {
+    if (first && first.getType() === ode.TokenType.SYMBOL) {
       lexer.moveNext();
       var second = lexer.getCurrent();
 
@@ -59,12 +59,12 @@ ode.Parser = function() {
 
     var first = lexer.getCurrent();
 
-    if (first && first.getType() === ode.TokenType.NAME) {
-      var definitionName = lexer.getCurrent().getRepr();
+    if (first && first.getType() === ode.TokenType.SYMBOL) {
+      var symbolName = lexer.getCurrent().getRepr();
       lexer.moveNext();
       ensureAndSkip(lexer, ode.TokenType.EQUALS, '=');
       return new ode.DefinitionStatementNode(
-        definitionName,
+        symbolName,
         parsePhraseStatement(lexer));
     } else {
       throw new ode.ParsingException('Unexpected token in definition: ' +
@@ -88,7 +88,7 @@ ode.Parser = function() {
         case ode.TokenType.STRING:
           return parseAggregateNode(lexer);
 
-        case ode.TokenType.NAME:
+        case ode.TokenType.SYMBOL:
         case ode.TokenType.NUMBER:
         case ode.TokenType.CHARACTER:
           return parseAtomicNode(lexer);
@@ -147,8 +147,8 @@ ode.Parser = function() {
     if (first) {
       switch (first.getType()) {
 
-        case ode.TokenType.NAME:
-          return parseNameLike(lexer);
+        case ode.TokenType.SYMBOL:
+          return parseSymbolLike(lexer);
 
         case ode.TokenType.NUMBER:
           return new ode.NumberNode(lexer.getCurrent().getVal());
@@ -163,7 +163,7 @@ ode.Parser = function() {
   }
 
 
-  function parseNameLike(lexer) {
+  function parseSymbolLike(lexer) {
 
     var token = lexer.getCurrent();
 
@@ -172,7 +172,7 @@ ode.Parser = function() {
     } else if (token.getRepr() === 'false') {
       return new ode.BooleanNode(false);
     } else {
-      return new ode.NameNode(lexer.getCurrent().getRepr());
+      return new ode.SymbolNode(lexer.getCurrent().getRepr());
     }
   }
 

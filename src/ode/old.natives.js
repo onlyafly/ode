@@ -131,7 +131,7 @@ ode.natives.print = function(e) {
     e.print(x.toString());
   } else if (x instanceof ode.BlockNode) {
     e.print(x.toString());
-  } else if (x instanceof ode.NameNode) {
+  } else if (x instanceof ode.SymbolNode) {
     e.print(x.toString());
   } else {
     e.expectationError('.', 'number, name, or block', x.toString());
@@ -394,14 +394,14 @@ ode.natives.evaluate = function(e) {
 ode.natives.type = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.NameNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('name')]));
+  if (x instanceof ode.SymbolNode) {
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('name')]));
   } else if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('number')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('number')]));
   } else if (x instanceof ode.BlockNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('block')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('block')]));
   } else {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('?')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('?')]));
   }
 };
 
@@ -423,7 +423,7 @@ ode.natives.dollarDef = function(e) {
 
   var name = block.nodes[0];
 
-  if (!extras.hasInstances(ode.NameNode, name)) {
+  if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('$def', 'name in a block', name.toString());
   }
 
@@ -433,9 +433,9 @@ ode.natives.dollarDef = function(e) {
   if (body instanceof ode.CustomDefinitionBody) {
     result = new ode.BlockNode(body.phraseNode.nodes);
   } else if (body instanceof ode.NativeDefinitionBody) {
-    result = new ode.BlockNode([new ode.NameNode('native')]);
+    result = new ode.BlockNode([new ode.SymbolNode('native')]);
   } else {
-    result = new ode.BlockNode([new ode.NameNode('unknown')]);
+    result = new ode.BlockNode([new ode.SymbolNode('unknown')]);
   }
 
   e.stack.push(result);
@@ -530,7 +530,7 @@ ode.natives.def = function(e) {
 
   var name = nameBlock.nodes[0];
 
-  if (!extras.hasInstances(ode.NameNode, name)) {
+  if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('def', ['name in a block'], [name]);
   }
 
@@ -557,7 +557,7 @@ ode.natives.undef = function(e) {
 
   var name = nameBlock.nodes[0];
 
-  if (!extras.hasInstances(ode.NameNode, name)) {
+  if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('undef', ['name in a block'], [name]);
   }
 

@@ -126,15 +126,13 @@ ode.joynatives.name = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.intern = function(e) {
-  /* TODO
   var node = e.stack.pop();
 
-  if (x.toNumberValue) {
-    e.stack.push(new ode.NumberNode(x.toNumberValue() - 1));
+  if (node instanceof ode.StringNode) {
+    e.stack.push(new ode.SymbolNode(node.val));
   } else {
-    e.expectationError('pred', 'number', [x]);
+    e.expectationError('intern', 'string', [node]);
   }
-  */
 };
 
 /**
@@ -444,7 +442,7 @@ ode.joynatives.print = function(e) {
     e.print(x.toString());
   } else if (x instanceof ode.BlockNode) {
     e.print(x.toString());
-  } else if (x instanceof ode.NameNode) {
+  } else if (x instanceof ode.SymbolNode) {
     e.print(x.toString());
   } else {
     e.expectationError('.', 'number, name, or block', [x]);
@@ -781,14 +779,14 @@ ode.joynatives.infra = function(e) {
 ode.joynatives.type = function(e) {
   var x = e.stack.pop();
 
-  if (x instanceof ode.NameNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('name')]));
+  if (x instanceof ode.SymbolNode) {
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('name')]));
   } else if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('number')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('number')]));
   } else if (x instanceof ode.BlockNode) {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('block')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('block')]));
   } else {
-    e.stack.push(new ode.BlockNode([new ode.NameNode('?')]));
+    e.stack.push(new ode.BlockNode([new ode.SymbolNode('?')]));
   }
 };
 
@@ -807,10 +805,10 @@ ode.joynatives.body = function(e) {
 
     name = node.getNodes()[0];
 
-    if (!extras.hasInstances(ode.NameNode, name)) {
+    if (!extras.hasInstances(ode.SymbolNode, name)) {
       e.expectationError('body', 'name in block', [node]);
     }
-  } else if (extras.hasInstances(ode.NameNode, node)) {
+  } else if (extras.hasInstances(ode.SymbolNode, node)) {
     name = node;
   } else {
     e.expectationError('body', 'name or name in block', [name]);
@@ -822,9 +820,9 @@ ode.joynatives.body = function(e) {
   if (body instanceof ode.CustomDefinitionBody) {
     result = new ode.BlockNode(body.phraseNode.getNodes());
   } else if (body instanceof ode.NativeDefinitionBody) {
-    result = new ode.BlockNode([new ode.NameNode('native')]);
+    result = new ode.BlockNode([new ode.SymbolNode('native')]);
   } else {
-    result = new ode.BlockNode([new ode.NameNode('unknown')]);
+    result = new ode.BlockNode([new ode.SymbolNode('unknown')]);
   }
 
   e.stack.push(result);
@@ -956,7 +954,7 @@ ode.joynatives.genrec = function(e) {
         ode.joynatives.i(e);
         e.stack.push(
           new ode.BlockNode(
-            [bif, bthen, belse1, belse2, new ode.NameNode('genrec')]));
+            [bif, bthen, belse1, belse2, new ode.SymbolNode('genrec')]));
         e.stack.push(belse2);
         ode.joynatives.i(e);
       }
@@ -999,7 +997,7 @@ ode.joynatives.linrec = function(e) {
         ode.joynatives.i(e);
         e.stack.push(
           new ode.BlockNode(
-            [bif, bthen, belse1, belse2, new ode.NameNode('linrec')]));
+            [bif, bthen, belse1, belse2, new ode.SymbolNode('linrec')]));
         ode.joynatives.i(e);
         e.stack.push(belse2);
         ode.joynatives.i(e);
@@ -1043,7 +1041,7 @@ ode.joynatives.binrec = function(e) {
         ode.joynatives.i(e);
 
         var recursiveQuote = new ode.BlockNode(
-          [bif, bthen, belse1, belse2, new ode.NameNode('binrec')]);
+          [bif, bthen, belse1, belse2, new ode.SymbolNode('binrec')]);
         var second = e.stack.pop(e);
         var first = e.stack.pop(e);
 
@@ -1162,7 +1160,7 @@ ode.joynatives.def = function(e) {
 
   var name = nameBlock.getNodes()[0];
 
-  if (!extras.hasInstances(ode.NameNode, name)) {
+  if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('def', ['name in a block'], [name]);
   }
 
@@ -1189,7 +1187,7 @@ ode.joynatives.undef = function(e) {
 
   var name = nameBlock.getNodes()[0];
 
-  if (!extras.hasInstances(ode.NameNode, name)) {
+  if (!extras.hasInstances(ode.SymbolNode, name)) {
     e.expectationError('undef', ['name in a block'], [name]);
   }
 

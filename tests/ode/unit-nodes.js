@@ -13,7 +13,7 @@ $(function() {
   module("Unit - Nodes");
 
   test("atomic nodes", function() {
-    var nameNode = new ode.NameNode("foo");
+    var nameNode = new ode.SymbolNode("foo");
     actual = nameNode.toString();
     expected = "foo";
     verify();
@@ -37,7 +37,7 @@ $(function() {
 
   test("inheritance heirarchy", function() {
     var num = new ode.NumberNode(42);
-    var name = new ode.NameNode("dude");
+    var name = new ode.SymbolNode("dude");
     var block = new ode.BlockNode([num, name]);
     var phrase = new ode.PhraseStatementNode([block]);
     var def = new ode.DefinitionStatementNode("test", phrase);
@@ -46,7 +46,7 @@ $(function() {
     ok(extras.hasInstances(ode.Node, num, name, block, phrase, def, prog));
     ok(extras.hasInstances(ode.AtomicNode, num, name));
     ok(extras.hasInstances(ode.NumberNode, num));
-    ok(extras.hasInstances(ode.NameNode, name));
+    ok(extras.hasInstances(ode.SymbolNode, name));
     ok(extras.hasInstances(ode.NestableNode, num, name, block));
     ok(extras.hasInstances(ode.BlockNode, block));
     ok(extras.hasInstances(ode.StatementNode, phrase, def));

@@ -26,8 +26,8 @@ test("operators", function() {
   actual = parseStatement(". +");
   expected =
     new ode.PhraseStatementNode([
-      new ode.NameNode("."),
-      new ode.NameNode("+")
+      new ode.SymbolNode("."),
+      new ode.SymbolNode("+")
     ]);
   
   verify();
@@ -39,8 +39,8 @@ test("blocks", function() {
     new ode.PhraseStatementNode([
       new ode.BlockNode([]),
       new ode.BlockNode([
-        new ode.NameNode("."),
-        new ode.NameNode("+")
+        new ode.SymbolNode("."),
+        new ode.SymbolNode("+")
       ])
     ]);
     

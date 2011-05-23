@@ -7,21 +7,33 @@ ode.Node = function() {
 /**
  * @constructor
  * @extends {ode.Node}
+ * @param {string} typeName The type name of this node.
  */
-ode.NestableNode = function() {
+ode.NestableNode = function(typeName) {
   extras.base(this);
+
+  /** @private */
+  this.typeName_ = typeName;
 };
 extras.inherits(ode.NestableNode, ode.Node);
+
+/**
+ * @return {string} The type name of this node.
+ */
+ode.NestableNode.prototype.getTypeName = function() {
+  return this.typeName_;
+};
 
 // Atomic
 
 /**
  * @constructor
- * @param {!*} val The value of the node.
  * @extends {ode.NestableNode}
+ * @param {!*} val The value of the node.
+ * @param {string} typeName The type name of this node.
  */
-ode.AtomicNode = function(val) {
-  extras.base(this);
+ode.AtomicNode = function(val, typeName) {
+  extras.base(this, typeName);
   this.val = val;
 };
 extras.inherits(ode.AtomicNode, ode.NestableNode);
@@ -31,22 +43,22 @@ ode.AtomicNode.prototype.toString = function() {
   return this.val.toString();
 };
 
-// Name
+// Symbol
 
 /**
  * @constructor
  * @extends {ode.AtomicNode}
  * @param {!*} val Value for this node.
  */
-ode.NameNode = function(val) {
-  extras.base(this, val);
+ode.SymbolNode = function(val) {
+  extras.base(this, val, 'symbol');
 };
-extras.inherits(ode.NameNode, ode.AtomicNode);
+extras.inherits(ode.SymbolNode, ode.AtomicNode);
 
 /**
  * @return {string} The name of this symbol.
  */
-ode.NameNode.prototype.getName = function() {
+ode.SymbolNode.prototype.getName = function() {
   return this.val.toString();
 };
 
@@ -58,7 +70,7 @@ ode.NameNode.prototype.getName = function() {
  * @param {!boolean} val Value for this node.
  */
 ode.BooleanNode = function(val) {
-  extras.base(this, val);
+  extras.base(this, val, 'boolean');
 };
 extras.inherits(ode.BooleanNode, ode.AtomicNode);
 
@@ -82,7 +94,7 @@ ode.BooleanNode.prototype.toBooleanValue = function() {
  * @param {!string} val Value for this node.
  */
 ode.CharacterNode = function(val) {
-  extras.base(this, val);
+  extras.base(this, val, 'character');
 };
 extras.inherits(ode.CharacterNode, ode.AtomicNode);
 
@@ -99,7 +111,7 @@ ode.CharacterNode.prototype.toString = function() {
  * @param {!*} val Value for this node.
  */
 ode.NumberNode = function(val) {
-  extras.base(this, val);
+  extras.base(this, val, 'number');
 };
 extras.inherits(ode.NumberNode, ode.AtomicNode);
 
@@ -138,9 +150,10 @@ ode.NumberNode.prototype.toNumberValue = function() {
  * @constructor
  * @extends {ode.NestableNode}
  * @param {Array} nodes The nodes in the aggregate.
+ * @param {string} typeName The type name of this node.
  */
-ode.AggregateNode = function(nodes) {
-  extras.base(this);
+ode.AggregateNode = function(nodes, typeName) {
+  extras.base(this, typeName);
 
   /** @private */
   this.nodes_ = nodes;
@@ -172,7 +185,7 @@ ode.AggregateNode.prototype.getFirst = function() {
  * @return {ode.AggregateNode} The nodes of the aggregate.
  */
 ode.AggregateNode.prototype.getRest = function() {
-  return new this.constructor(this.nodes_.slice(1));
+  return new this.constructor(this.nodes_.slice(1), this.typeName_);
 };
 
 // Block
@@ -183,7 +196,7 @@ ode.AggregateNode.prototype.getRest = function() {
  * @param {Array.<ode.NestableNode>} nodes The nodes in the block.
  */
 ode.BlockNode = function(nodes) {
-  extras.base(this, nodes);
+  extras.base(this, nodes, 'list');
 };
 extras.inherits(ode.BlockNode, ode.AggregateNode);
 
@@ -237,7 +250,7 @@ ode.BlockNode.prototype.canPrependNode = function(other) {
  * @param {Array.<ode.AtomicNode>} nodes The atomic nodes in the set.
  */
 ode.SetNode = function(nodes) {
-  extras.base(this, nodes);
+  extras.base(this, nodes, 'set');
 };
 extras.inherits(ode.SetNode, ode.AggregateNode);
 
@@ -259,7 +272,7 @@ ode.SetNode.prototype.toString = function() {
  * @param {string} val The value in this string node.
  */
 ode.StringNode = function(val) {
-  extras.base(this, null);
+  extras.base(this, null, 'string');
 
   this.val = val;
 };

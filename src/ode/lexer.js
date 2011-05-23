@@ -11,7 +11,7 @@ ode.TokenType = {
   STRING: 'string',
   SEMICOLON: 'semicolon',
   EQUALS: 'equals',
-  NAME: 'name',
+  SYMBOL: 'symbol',
   NUMBER: 'number',
   CHARACTER: 'character'
 };
@@ -99,15 +99,15 @@ ode.Lexer = function(input) {
     '!',
     '='];
 
-  function isNameBegin(c) {
+  function isSymbolBegin(c) {
     return (extras.contains(extras.range('A', 'Z'), c) ||
       extras.contains(extras.range('a', 'z'), c) || extras.contains(
       LEGAL_NAME_SYMBOLS,
       c));
   }
 
-  function isNameContinue(c) {
-    return (isNameBegin(c) || isNumeric(c) || extras.contains(['='], c));
+  function isSymbolContinue(c) {
+    return (isSymbolBegin(c) || isNumeric(c) || extras.contains(['='], c));
   }
 
   function isNumberBegin(c) {
@@ -149,7 +149,7 @@ ode.Lexer = function(input) {
         if (isNumberBegin(input.charAt(pos + 1))) {
           return getNumber();
         } else {
-          return getName();
+          return getSymbol();
         }
       }
 
@@ -158,7 +158,7 @@ ode.Lexer = function(input) {
           pos += 2;
           return new ode.Token(ode.TokenType.EQUALS, '==');
         } else {
-          return getName();
+          return getSymbol();
         }
       }
 
@@ -170,8 +170,8 @@ ode.Lexer = function(input) {
         return getString();
       }
 
-      else if (isNameBegin(c)) {
-        return getName();
+      else if (isSymbolBegin(c)) {
+        return getSymbol();
       }
 
       else if (isNumberBegin(c)) {
@@ -250,15 +250,15 @@ ode.Lexer = function(input) {
     return new ode.Token(ode.TokenType.STRING, '"' + output + '"', output);
   }
 
-  function getName() {
+  function getSymbol() {
     var output = '';
 
-    while (pos < input.length && isNameContinue(input.charAt(pos))) {
+    while (pos < input.length && isSymbolContinue(input.charAt(pos))) {
       output += input.charAt(pos);
       pos += 1;
     }
 
-    return new ode.Token(ode.TokenType.NAME, output);
+    return new ode.Token(ode.TokenType.SYMBOL, output);
   }
 
   function getOperator(token) {
