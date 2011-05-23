@@ -308,3 +308,13 @@ extras.withoutElement = function(arr, e) {
   var i = arr.indexOf(e);
   return arr.slice(0, i).concat(arr.slice(i + 1));
 };
+
+/**
+ * @param {Array} arr The array to operate on.
+ * @return {Array} A reversed copy of the array.
+ */
+extras.reverseArray = function(arr) {
+  var copy = arr.slice();
+  copy.reverse();
+  return copy;
+};

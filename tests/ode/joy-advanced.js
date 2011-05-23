@@ -1,11 +1,11 @@
 $(function() {
   
+  /////////////////////////////////////////////////////////////////////////////
+  
   /***
    * ## ???
    */
-  module("Advanced Joy - ???");
-  
-  
+  module("Advanced Joy - ???");  
   
   /***
    * ### conts : -> [[P] [Q] ..]
@@ -76,6 +76,8 @@ $(function() {
     ok(false); // TODO
   });
   
+  /////////////////////////////////////////////////////////////////////////////
+  
   /***
    * ## File I/O
    */
@@ -130,6 +132,45 @@ $(function() {
   test("putchars", function() {
     ok(false); // TODO
   });
+  
+  /* TODO
+   * fclose : S ->
+  Stream S is closed and removed from the stack.
+  feof : S -> S B
+  B is the end-of-file status of stream S.
+  ferror : S -> S B
+  B is the error status of stream S.
+  fflush : S -> S
+  Flush stream S, forcing all buffered output to be written.
+  fgetch : S -> S C
+  C is the next available character from stream S.
+  fgets : S -> S L
+  L is the next available line (as a string) from stream S.
+  fopen : P M -> S
+  The file system object with pathname P is opened with mode M (r, w, a, etc.) and stream object S is pushed; if the open fails, file:NULL is pushed.
+  fread : S I -> S L
+  I bytes are read from the current position of stream S and returned as a list of I integers.
+  fwrite : S L -> S
+  A list of integers are written as bytes to the current position of stream S.
+  fremove : P -> B
+  The file system object with pathname P is removed from the file system. is a boolean indicating success or failure.
+  frename : P1 P2 -> B
+  The file system object with pathname P1 is renamed to P2. B is a boolean indicating success or failure.
+  fput : S X -> S
+  Writes X to stream S, pops X off stack.
+  fputch : S C -> S
+  The character C is written to the current position of stream S.
+  fputchars : S "abc.." -> S
+  The string abc.. (no quotes) is written to the current position of stream S.
+  fputstring : S "abc.." -> S
+  == fputchars, as a temporary alternative.
+  fseek : S P W -> S
+  Stream S is repositioned to position P relative to whence-point W, where W = 0, 1, 2 for beginning, current position, end respectively.
+  ftell : S -> S I
+  I is the current position of stream S.
+   */
+  
+  /////////////////////////////////////////////////////////////////////////////
   
   /***
    * ## Sets
@@ -190,6 +231,8 @@ $(function() {
     ok(false); // TODO: how can we create a non-infinite set complement?
     
   });
+  
+  /////////////////////////////////////////////////////////////////////////////
   
   /***
    * ## Math
@@ -268,6 +311,48 @@ $(function() {
   I is an integer equal to the float F truncated toward zero.
   */
   test("random math operations", function() {
+    ok(false);
+  });
+  
+  /////////////////////////////////////////////////////////////////////////////
+  
+  /***
+   * ## System Specific Operations
+   */
+  module("Advanced Joy - System Specific Operations");
+  
+  /*
+  help : ->
+  Lists all defined symbols, including those from library files. Then lists all primitives of raw Joy (There is a variant: "_help" which lists hidden symbols).
+  helpdetail : [ S1 S2 .. ]
+  Gives brief help on each symbol S in the list.
+  manual : ->
+  Writes this manual of all Joy primitives to output file.
+  setautoput : I ->
+  Sets value of flag for automatic put to I (if I = 0, none; if I = 1, put; if I = 2, stack.
+  setundeferror : I ->
+  Sets flag that controls behavior of undefined functions (0 = no error, 1 = error).
+  setecho : I ->
+  Sets value of echo flag for listing. I = 0: no echo, 1: echo, 2: with tab, 3: and linenumber.
+  gc : ->
+  Initiates garbage collection.
+  system : "command" ->
+  Escapes to shell, executes string "command". The string may cause execution of another program. When that has finished, the process returns to Joy.
+  getenv : "variable" -> "value"
+  Retrieves the value of the environment variable "variable".
+  argv : -> A
+  Creates an aggregate A containing the interpreter's command line arguments.
+  argc : -> I
+  Pushes the number of command line arguments. This is quivalent to 'argv size'.
+  
+  include : "filnam.ext" ->
+  Transfers input to file whose name is "filnam.ext". On end-of-file returns to previous input file.
+  abort : ->
+  Aborts execution of current Joy program, returns to Joy main cycle.
+  quit : ->
+  Exit from Joy.
+  */
+  test("random System Specific operations", function() {
     ok(false);
   });
   

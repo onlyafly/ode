@@ -19,33 +19,35 @@ ode.Environment = function(stack, symbolTable, print, runNestableNodes,
   this.runNestableNodes = runNestableNodes;
   this.runCreateBlock = runCreateBlock;
 
+  /** @private */
+  this.frames_ = new ode.FrameStack();
+
   // Setup frame stack
-  this.frames = new ode.FrameStack();
-  this.frames.push(this.stack);
+  this.frames_.push(this.stack);
 };
 
 /**
  * Place a new frame on top of the stack.
  */
 ode.Environment.prototype.enterFrame = function() {
-  this.frames.push(new ode.RuntimeStack());
-  this.stack = this.frames.top();
+  this.frames_.push(new ode.RuntimeStack());
+  this.stack = this.frames_.top();
 };
 
 /**
  * Drop the frame on top of the stack.
  */
 ode.Environment.prototype.exitFrame = function() {
-  this.frames.pop();
-  this.stack = this.frames.top();
+  this.frames_.pop();
+  this.stack = this.frames_.top();
 };
 
 /**
  * Drop all frames on top of the stack.
  */
 ode.Environment.prototype.resetFrames = function() {
-  this.frames.dropAllChildFrames();
-  this.stack = this.frames.top();
+  this.frames_.dropAllChildFrames();
+  this.stack = this.frames_.top();
 };
 
 /**

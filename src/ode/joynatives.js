@@ -5,13 +5,15 @@ ode.joynatives = ode.joynatives || {};
  * @param {ode.Interpreter} i The interpreter.
  */
 ode.joynatives.initialize = function(i) {
-  
+
   // Definitions and Symbols
   i.addNativeOperation('body', ode.joynatives.body);
-  
+  i.addNativeOperation('name', ode.joynatives.name);
+  i.addNativeOperation('intern', ode.joynatives.intern);
+
   // Control Flow
   i.addNativeOperation('ifte', ode.joynatives.ifte);
-  
+
   // Math
   i.addNativeOperation('pred', ode.joynatives.pred);
   i.addNativeOperation('succ', ode.joynatives.succ);
@@ -51,24 +53,38 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('dup', ode.joynatives.dup);
   i.addNativeOperation('dupd', ode.joynatives.dupd);
   i.addNativeOperation('swap', ode.joynatives.swap);
-  i.addNativeOperation('rollup', ode.joynatives.makeRotationOp('rollup', [2, 2]));
-  i.addNativeOperation('rolldown', ode.joynatives.makeRotationOp('rolldown', [2]));
-  i.addNativeOperation('rotate', ode.joynatives.makeRotationOp('rotate', [1, 2]));
+  i.addNativeOperation('rollup', ode.joynatives.makeRotationOp([2, 2]));
+  i.addNativeOperation('rolldown', ode.joynatives.makeRotationOp([2]));
+  i.addNativeOperation('rotate', ode.joynatives.makeRotationOp([1, 2]));
   i.addNativeOperation('popd', function(e) { e.stack.drop(1); });
-  i.addNativeOperation('swapd', ode.joynatives.makeRotationOp('swapd', [2, 1]));
-  i.addNativeOperation('rollupd', ode.joynatives.makeRotationOp('rollupd', [3, 3, 2]));
-  i.addNativeOperation('rolldownd', ode.joynatives.makeRotationOp('rolldownd', [3, 1]));
-  i.addNativeOperation('rotated', ode.joynatives.makeRotationOp('rotated', [2, 3, 2]));
+  i.addNativeOperation('swapd', ode.joynatives.makeRotationOp([2, 1]));
+  i.addNativeOperation('rollupd', ode.joynatives.makeRotationOp([3, 3, 2]));
+  i.addNativeOperation('rolldownd', ode.joynatives.makeRotationOp([3, 1]));
+  i.addNativeOperation('rotated', ode.joynatives.makeRotationOp([2, 3, 2]));
   i.addNativeOperation('pop', ode.joynatives.pop);
-  
+
+  // Advanced Stack Operations
+  i.addNativeOperation('newstack', ode.joynatives.newstack);
+  i.addNativeOperation('stack', ode.joynatives.stack);
+  i.addNativeOperation('unstack', ode.joynatives.unstack);
+  i.addNativeOperation('infra', ode.joynatives.infra);
+
+  // Recursion
+  i.addNativeOperation('primrec', ode.joynatives.primrec);
+  i.addNativeOperation('genrec', ode.joynatives.genrec);
+  i.addNativeOperation('linrec', ode.joynatives.linrec);
+  i.addNativeOperation('binrec', ode.joynatives.binrec);
+
+  // Functional
+  i.addNativeOperation('split', ode.joynatives.split);
+
   // TODO: some things below might not be in Joy
 
   // IO
   i.addNativeOperation('.', ode.joynatives.print);
 
   // Stack
-  
-  i.addNativeOperation('dup#', ode.joynatives.dupLocation);  
+  i.addNativeOperation('dup#', ode.joynatives.dupLocation);
   i.addNativeOperation('drop#', ode.joynatives.dropLocation);
 
   // Predicates
@@ -77,23 +93,48 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('empty?', ode.joynatives.emptyPredicate);
 
   // Advanced
-  i.addNativeOperation('$eval', ode.joynatives.evaluate);
   i.addNativeOperation('$type', ode.joynatives.type);
-
   i.addNativeOperation('def', ode.joynatives.def);
   i.addNativeOperation('undef', ode.joynatives.undef);
-  i.addNativeOperation('newstack', ode.joynatives.newstack);
   i.addNativeOperation('throw-error', ode.joynatives.throwError);
 
   // Block
   i.addNativeOperation('block', ode.joynatives.block);
   i.addNativeOperation('block#', ode.joynatives.blockLocation);
-  i.addNativeOperation('stack', ode.joynatives.stack);
-  i.addNativeOperation('unstack', ode.joynatives.unstack);
 
   // Functional
   i.addNativeOperation('map', ode.joynatives.map);
   i.addNativeOperation('fold', ode.joynatives.fold);
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.name = function(e) {
+  var node = e.stack.pop();
+
+  if (node.getName) {
+    e.stack.push(new ode.StringNode(node.getName()));
+  } else if (node.getTypeName) {
+    e.stack.push(new ode.StringNode(node.getTypeName()));
+  } else {
+    e.expectationError('name', 'symbol or literal', [node]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.intern = function(e) {
+  /* TODO
+  var node = e.stack.pop();
+
+  if (x.toNumberValue) {
+    e.stack.push(new ode.NumberNode(x.toNumberValue() - 1));
+  } else {
+    e.expectationError('pred', 'number', [x]);
+  }
+  */
 };
 
 /**
@@ -106,6 +147,48 @@ ode.joynatives.pred = function(e) {
     e.stack.push(new ode.NumberNode(x.toNumberValue() - 1));
   } else {
     e.expectationError('pred', 'number', [x]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.split = function(e) {
+  var test = e.stack.pop();
+  var list = e.stack.pop();
+
+  if (test.getNodes && list.getNodes) {
+
+    var first = [];
+    var second = [];
+
+    extras.each(list.getNodes(), function(node) {
+
+      var preservedStack = ode.joynatives.getPreservedStack_(e);
+
+      e.stack.push(node);
+
+      e.stack.push(test);
+      ode.joynatives.i(e);
+      var result = e.stack.pop();
+
+      ode.joynatives.restorePreservedStack_(e, preservedStack);
+
+      if (result.toBooleanValue) {
+        if (result.toBooleanValue()) {
+          first.push(node);
+        } else {
+          second.push(node);
+        }
+      } else {
+        e.expectationError('split', 'boolean', [result]);
+      }
+    });
+
+    e.stack.push(new ode.BlockNode(first));
+    e.stack.push(new ode.BlockNode(second));
+  } else {
+    e.expectationError('split', 'list, quote', [list, test]);
   }
 };
 
@@ -429,10 +512,8 @@ ode.joynatives.ifte = function(e) {
   var pif = e.stack.pop();
 
   if (extras.hasInstances(ode.BlockNode, pif, pthen, pelse)) {
-    // eval if
-    e.stack.push(pif);
-    ode.joynatives.i(e);
-    var predicateResult = e.stack.pop();
+
+    var predicateResult = ode.joynatives.executeBlockAndPreserveStack_(e, pif);
 
     // Can predicateResult be converted to a boolean value?
     if (predicateResult.toBooleanValue) {
@@ -446,7 +527,10 @@ ode.joynatives.ifte = function(e) {
       e.expectationError('ifte', 'boolean', [predicateResult]);
     }
   } else {
-    e.expectationError('ifte', 'three blocks', [pif, pthen, pelse]);
+    e.expectationError(
+      'ifte',
+      'if-block, then-block, else-block',
+      [pif, pthen, pelse]);
   }
 };
 
@@ -645,12 +729,11 @@ ode.joynatives.blockLocation = function(e) {
 };
 
 /**
- * @param {string} operation The name of the operation.
  * @param {Array.<number>} movements Array containing the sequence of movements
  * from the given number to the top of the stack.
  * @return {function(ode.Environment)} The native definition.
  */
-ode.joynatives.makeRotationOp = function(operation, movements) {
+ode.joynatives.makeRotationOp = function(movements) {
   /**
    * @param {ode.Environment} e Current environment.
    */
@@ -664,22 +747,31 @@ ode.joynatives.makeRotationOp = function(operation, movements) {
 /**
  * @param {ode.Environment} e Current environment.
  */
-ode.joynatives.evaluate = function(e) {
-  var block = e.stack.pop();
+ode.joynatives.infra = function(e) {
+  var quote = e.stack.pop();
+  var list = e.stack.pop();
 
-  if (block instanceof ode.BlockNode) {
+  if (extras.hasInstances(ode.BlockNode, quote, list)) {
 
     e.enterFrame();
 
-    e.stack.push(block);
+    // Push the list as the new stack.
+    var listNodes = extras.reverseArray(list.getNodes());
+    extras.each(listNodes, function(node) {
+      e.stack.push(node);
+    });
+
+    // Execute the quote in the new stack.
+    e.stack.push(quote);
     ode.joynatives.i(e);
-    var stackNodes = e.getStackNodes();
+
+    var stackNodes = extras.reverseArray(e.getStackNodes());
 
     e.exitFrame();
 
     e.stack.push(new ode.BlockNode(stackNodes));
   } else {
-    e.expectationError('$eval', 'block', [block]);
+    e.expectationError('infra', 'list, quote', [list, quote]);
   }
 };
 
@@ -712,9 +804,9 @@ ode.joynatives.body = function(e) {
     if (node.getSize() !== 1) {
       e.expectationError('body', 'name in a block', [node]);
     }
-    
+
     name = node.getNodes()[0];
-    
+
     if (!extras.hasInstances(ode.NameNode, name)) {
       e.expectationError('body', 'name in block', [node]);
     }
@@ -736,6 +828,250 @@ ode.joynatives.body = function(e) {
   }
 
   e.stack.push(result);
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.primrec = function(e) {
+  var computation = e.stack.pop();
+  var initialBlock = e.stack.pop();
+
+  if (extras.hasInstances(ode.BlockNode, computation, initialBlock)) {
+
+    var data = e.stack.pop();
+
+    if (data.toNumberValue) {
+
+      var endingNumber = data.toNumberValue();
+
+      // Execute initial block to calculate the starting value
+      e.stack.push(initialBlock);
+      ode.joynatives.i(e);
+
+      for (var i = endingNumber; i > 0; i--) {
+        e.stack.push(new ode.NumberNode(i));
+        ode.joynatives.swap(e);
+        e.stack.push(computation);
+        ode.joynatives.i(e);
+      }
+
+    } else if (data.getNodes) {
+
+      var reversedNodes = extras.reverseArray(data.getNodes());
+
+      // Execute initial block to calculate the starting value
+      e.stack.push(initialBlock);
+      ode.joynatives.i(e);
+
+      extras.each(reversedNodes, function(node, i) {
+        e.stack.push(node);
+        ode.joynatives.swap(e);
+        e.stack.push(computation);
+        ode.joynatives.i(e);
+      });
+
+    } else {
+      e.expectationError(
+        'primrec',
+        'number or block, block, block',
+        [data, initialBlock, computation]);
+    }
+
+  } else {
+    e.expectationError(
+      'primrec',
+      'block, block',
+      [initialBlock, computation]);
+  }
+};
+
+/**
+ * @private
+ * @param {ode.Environment} e Current environment.
+ * @param {ode.BlockNode} block Block to execute.
+ * @return {ode.NestableNode} The top node after executing the block.
+ */
+ode.joynatives.executeBlockAndPreserveStack_ = function(e, block) {
+
+  // Preserve stack.
+  ode.joynatives.stack(e);
+  var preservedStack = e.stack.pop();
+
+  // Eval if.
+  e.stack.push(block);
+  ode.joynatives.i(e);
+  var result = e.stack.pop();
+
+  // Restore stack.
+  e.stack.push(preservedStack);
+  ode.joynatives.unstack(e);
+
+  return result;
+};
+
+/**
+ * @private
+ * @param {ode.Environment} e Current environment.
+ * @param {ode.BlockNode} preservedStack Block to restore as the stack.
+ */
+ode.joynatives.restorePreservedStack_ = function(e, preservedStack) {
+  // Restore stack.
+  e.stack.push(preservedStack);
+  ode.joynatives.unstack(e);
+};
+
+/**
+ * @private
+ * @param {ode.Environment} e Current environment.
+ * @return {ode.BlockNode} The stack preserved as a block.
+ */
+ode.joynatives.getPreservedStack_ = function(e) {
+  // Preserve stack.
+  ode.joynatives.stack(e);
+  var preservedStack = e.stack.pop();
+  return preservedStack;
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.genrec = function(e) {
+  var belse2 = e.stack.pop();
+  var belse1 = e.stack.pop();
+  var bthen = e.stack.pop();
+  var bif = e.stack.pop();
+
+  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+
+    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+
+    if (result.toBooleanValue) {
+
+      if (result.toBooleanValue()) {
+        e.stack.push(bthen);
+        ode.joynatives.i(e);
+      } else {
+        e.stack.push(belse1);
+        ode.joynatives.i(e);
+        e.stack.push(
+          new ode.BlockNode(
+            [bif, bthen, belse1, belse2, new ode.NameNode('genrec')]));
+        e.stack.push(belse2);
+        ode.joynatives.i(e);
+      }
+
+    } else {
+      e.expectationError(
+        'genrec',
+        'if-block that generates a boolean value',
+        [bif]);
+    }
+
+  } else {
+    e.expectationError(
+      'genrec',
+      'if-block, then-block, else1-block, else2-block',
+      [bif, bthen, belse1, belse2]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.linrec = function(e) {
+  var belse2 = e.stack.pop();
+  var belse1 = e.stack.pop();
+  var bthen = e.stack.pop();
+  var bif = e.stack.pop();
+
+  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+
+    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+
+    if (result.toBooleanValue) {
+
+      if (result.toBooleanValue()) {
+        e.stack.push(bthen);
+        ode.joynatives.i(e);
+      } else {
+        e.stack.push(belse1);
+        ode.joynatives.i(e);
+        e.stack.push(
+          new ode.BlockNode(
+            [bif, bthen, belse1, belse2, new ode.NameNode('linrec')]));
+        ode.joynatives.i(e);
+        e.stack.push(belse2);
+        ode.joynatives.i(e);
+      }
+
+    } else {
+      e.expectationError(
+        'linrec',
+        'if-block that generates a boolean value',
+        [bif]);
+    }
+
+  } else {
+    e.expectationError(
+      'linrec',
+      'if-block, then-block, else1-block, else2-block',
+      [bif, bthen, belse1, belse2]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.binrec = function(e) {
+  var belse2 = e.stack.pop();
+  var belse1 = e.stack.pop();
+  var bthen = e.stack.pop();
+  var bif = e.stack.pop();
+
+  if (extras.hasInstances(ode.BlockNode, bif, bthen, belse1, belse2)) {
+
+    var result = ode.joynatives.executeBlockAndPreserveStack_(e, bif);
+
+    if (result.toBooleanValue) {
+
+      if (result.toBooleanValue()) {
+        e.stack.push(bthen);
+        ode.joynatives.i(e);
+      } else {
+        e.stack.push(belse1);
+        ode.joynatives.i(e);
+
+        var recursiveQuote = new ode.BlockNode(
+          [bif, bthen, belse1, belse2, new ode.NameNode('binrec')]);
+        var second = e.stack.pop(e);
+        var first = e.stack.pop(e);
+
+        e.stack.push(first);
+        e.stack.push(recursiveQuote);
+        ode.joynatives.i(e);
+
+        e.stack.push(second);
+        e.stack.push(recursiveQuote);
+        ode.joynatives.i(e);
+
+        e.stack.push(belse2);
+        ode.joynatives.i(e);
+      }
+
+    } else {
+      e.expectationError(
+        'binrec',
+        'if-block that generates a boolean value',
+        [bif]);
+    }
+
+  } else {
+    e.expectationError(
+      'binrec',
+      'if-block, then-block, else1-block, else2-block',
+      [bif, bthen, belse1, belse2]);
+  }
 };
 
 /**
@@ -864,9 +1200,9 @@ ode.joynatives.undef = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.stack = function(e) {
-  // Slice is used to get a shallow copy of the array.
-  var nodes = e.stack.getInternalArray().slice();
-  var block = new ode.BlockNode(nodes);
+  var block = new ode.BlockNode(
+    extras.reverseArray(
+      e.stack.getInternalArray()));
   e.stack.push(block);
 };
 
@@ -882,7 +1218,7 @@ ode.joynatives.unstack = function(e) {
     e.expectationError('unstack', 'block', [block]);
   }
 
-  e.stack.setInternalArray(block.getNodes());
+  e.stack.setInternalArray(extras.reverseArray(block.getNodes()));
 
 };
 

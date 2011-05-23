@@ -110,14 +110,45 @@ $(function() {
   /////////////////////////////////////////////////////////////////////////////
   
   /***
-   * ## Definitions
+   * ## Definitions and Symbols
    */
-  module("Joy - Definitions");
+  module("Joy - Definitions and Symbols");
 
+  /***
+   * ### ==
+   * 
+   * Defines a definition.
+   * 
+   *     double == dup +;
+   */
   test("native name redefinition", function() {
     Is.output("1 2 +; + == .; +", "3");
   });
-
+  
+  /***
+   * ### name : sym -> "sym"
+   * 
+   * For operators and combinators, the string "sym" is the name of item sym,
+   * for literals sym the result string is its type.
+   */
+  test("name", function() {
+    Is.stack("[+ / example map] [name] map", '["+" "/" "example" "map"]');
+    Is.stack("[1 'A []] [name] map", '["number" "character" "list"]'); // TODO: not sure if this is right
+  });
+  
+  /***
+   * ### intern : "sym" -> sym
+   * 
+   * Pushes the item whose name is "sym".
+   */
+  test("intern", function() {
+    Is.stack('"+" intern', '+');
+    Is.stack('1 2 "+" intern [] cons i', '3');
+    
+    // Example from http://tech.groups.yahoo.com/group/concatenative/message/1561
+    Is.stack('100 200 "p" "op" concat intern [] i', '100');
+  });
+  
   /////////////////////////////////////////////////////////////////////////////
   
   /***
@@ -486,10 +517,25 @@ $(function() {
 
     Is.output("[1 2 3 4 5] 0 [+] fold .", "15");
   });
+  
+  /***
+   * ### split : A [B] -> A1 A2
+   * 
+   * Uses test B to split aggregate A into same type aggregates A1 and A2.
+   * 
+   * (Note: Preserves stack state before each test is run, restoring it after).
+   */
+  test("split", function() {
+    Is.stack("[5 2 4 3 1] [3 <] split", "[2 1] [5 4 3]");
+    Is.stack("3 [5 2 4 3 1] [>] split", "3 [2 1] [5 4 3]");
+  });
 
   /////////////////////////////////////////////////////////////////////////////  
   
-  module("Joy - Recursion Operations");
+  /***
+   * ## Recursion
+   */
+  module("Joy - Recursion");
 
   /***
    * ### primrec : X [I] [C] -> R
@@ -498,8 +544,7 @@ $(function() {
    * positive integers to X, combines by C for new R. For aggregate X uses 
    * successive members and combines by C for new R.
    * 
-   * In Joy there is a combinator for primitive recursion which has this pattern
-   * built in and thus avoids the need for a definition. The primrec combinator
+   * The primrec combinator
    * expects two quoted programs in addition to a data parameter. For an integer
    * data parameter it works like this: If the data parameter is zero, then the
    * first quotation has to produce the value to be returned. If the data
@@ -527,51 +572,78 @@ $(function() {
    * As may be seen from this program, the usual branching of recursive
    * definitions is built into the combinator. The primrec combinator can be
    * used with many other quotation parameters to compute quite different
-   * functions. It can also be used with data types other than integers. Joy has
-   * many more combinators which can be used to calculate many functions without
-   * forcing the user to give recursive or non-recursive definitions. Some of
-   * the combinators are more data-specific than primrec, and others are far
-   * more general.
+   * functions. It can also be used with data types other than integers.
    */
   test("primrec", function() {
-    // TODO Is.stack("5  [1]  [*]  primrec", "120");
+    // From Joy docs:
+    Is.stack("5 [1] [*] primrec", "120");
+    Is.stack("{1 2 3} [[]] [cons] primrec", "[1 2 3]");
+    Is.stack("[1 2 3] [[]] [[] cons cons] primrec", "[1 [2 [3 []]]]");
   });
 
-  /*
+  /***
+   * ### linrec : [P] [T] [R1] [R2] -> ...
+   * 
+   * Executes P. If that yields true, executes T. Else executes R1, recurses,
+   * executes R2. 
+   * 
    * A high proportion of recursively defined functions exhibit a very simple
    * pattern: There is some test, the if-part, which determines whether the
    * ground case obtains. If it does, then the non-recursive branch is executed,
    * the basis case of recursion. If it does not, then the recursive part is
    * executed, including one or more recursive calls.
+   * 
+   * The linrec combinator is 
+   * very similar to the genrec combinator. The essential difference is that 
+   * the bundled up quotation is immediately called before the rec2-part. 
+   * Consequently it can only be used for linear recursion.
    */
   test("linrec", function() {
-    /* TODO
     Is.stack("fact == [null]  [succ]  [dup pred]  [*]  linrec", "", true);
-    Is.stack("5 fact", "120", true);
+    Is.output("5 fact .", "120", true);
     Is.stack("[5 2 3] [fact] map", "[120 2 6]");
-    */
   });
 
-  /*
+  /***
+   * ### binrec : [B] [T] [R1] [R2] -> ...
+   * 
+   * Executes B. If that yields true, executes T. Else uses R1 to produce two 
+   * intermediates, recurses on both, then executes R2 to combines their results.
+   * 
    * In many recursive definitions there are two recursive calls of the function
    * being defined. This is the pattern of binary recursion, and it is used in
    * the usual definitions of quicksort and of the Fibonacci function. In
    * analogy with the linrec combinator for linear recursion, Joy has a binrec
    * combinator for binary recursion. The following will quicksort a list whose
-   * members can be a mixture of anything except lists.
+   * members can be a mixture of anything except lists:
+   * 
+   *     quicksort ==
+   *       [small]
+   *       []
+   *       [uncons [>] split]
+   *       [swapd cons concat]
+   *       binrec;
+   * 
+   * And an example using the above quicksort:
+   * 
+   * `[5 3 1 4 2] quicksort` => [1 2 3 4 5]
    */
   test("binrec", function() {
-    /* TODO
     Is.stack(
       "quicksort == [small]  []  [uncons [>] split]  [swapd cons concat]  binrec",
       "",
       true);
-
     Is.stack("[3 1 2] quicksort", "[1 2 3]");
-    */
+    
+    Is.stack("10 [small] [] [pred dup pred] [+] binrec", "55");
   });
 
-  /*
+  /***
+   * ### genrec : [B] [T] [R1] [R2] -> ...
+   * 
+   * Executes B, if that yields true executes T. Else executes R1 and then
+   * [[B] [T] [R1] [R2] genrec] R2.
+   *
    * One of these is the genrec combinator which takes four program parameters
    * in addition to whatever data parameters it needs. Fourth from the top is an
    * if-part, followed by a then-part. If the if-part yields true, then the
@@ -586,13 +658,13 @@ $(function() {
    * The four parts are here aligned to make comparisons easier.
    */
   test("genrec", function() {
-    /* TODO
     Is.stack("5 [null] [succ] [dup pred] [i *] genrec", "120");
+    /* TODO
     Is.stack("6 [small] [] [pred dup pred] [app2 +] genrec", "8");
     Is.stack(
       "[6 1 3 2] [small] [] [uncons [>] split] [app2 swapd cons concat] genrec",
       "[1 2 3 6]");
-    */
+      */
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -614,7 +686,7 @@ $(function() {
   });
   
   /***
-   * rand : -> I
+   * ### rand : -> I
    *
    * I is a random integer.
    */
@@ -632,10 +704,12 @@ $(function() {
   /***
    * ### ifte : [B] [T] [F] -> ...
    * 
-   * Executes B. If that yields true, then executes T else executes F.
+   * Preserves the stack state, then executes B. The stack state is then
+   * restored. If B yielded true, then executes T else executes F.
    */
   test("ifte", function() {
-    Is.output("[true] [1 .] [2 .] ifte", "1");
+    Is.stack("[true] [1] [2] ifte", "1");
+    Is.stack("10 [1000 >] [2 /] [3 *] ifte", "30");
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -806,38 +880,60 @@ $(function() {
   /////////////////////////////////////////////////////////////////////////////
   
   /***
-   * ## Advanced Stack
+   * ## Advanced Stack Operations
    */
   module("Joy - Advanced Stack");
 
   /***
-   * ### stack : .. X Y Z -> .. X Y Z [Z Y X ..] 
+   * ### newstack : ... -> 
    * 
-   * Pushes the stack as a list.
+   * Removes all items from the stack.
    */
-  test("stack", function() {
-    // TODO Is.stack("1 2 3 stack", "1 2 3 [3 2 1]");
+  test("newstack", function() {
+    Is.stack("1 2 3 newstack", "");
   });
   
   /***
-   * ### unstack (list -- *)
+   * ### stack : .. X Y Z -> .. X Y Z [Z Y X ..] 
    * 
-   * Replaces the current stack with the contents of a list.
+   * Pushes the stack as a list.
+   * 
+   * (Note that when treating lists as stacks, the first element in the list
+   * will be the top item of the stack.)
+   */
+  test("stack", function() {
+    Is.stack("1 2 3 stack", "1 2 3 [3 2 1]");
+    Is.stack("[A B C] uncons uncons uncons pop stack", "A B C [C B A]");
+    Is.stack("stack", "[]");
+  });
+  
+  /***
+   * ### unstack : [X Y ..] -> ..Y X
+   * 
+   * The list [X Y ..] becomes the new stack.
+   * 
+   * (Note that when treating lists as stacks, the first element in the list
+   * will be the top item of the stack.)
    */
   test("unstack", function() {
-    // TODO Is.stack("[1 2 3 x] unstack", "1 2 3 x");
-    // TODO Is.stack("[] unstack", "");
+    Is.stack("[1 2 3 x] unstack", "x 3 2 1");
+    Is.stack("[A B C] unstack", "C B A");
+    Is.stack("[] unstack", "");
   });
 
   /***
-   * ### infra (list quote -- list)
+   * ### infra : L1 [P] -> L2
    * 
-   * A list on the stack, such as [1 2 3 4] can be treated temporarily as the
-   * stack by a quotation, say [+ *] and the combinator infra, with the result
-   * [9 4].
+   * Using list L1 as stack, executes P and returns a new list L2. The first
+   * element of L1 is used as the top of stack, and after execution of P the 
+   * top of stack becomes the first element of L2.  
+   * 
+   * (Note that when treating lists as stacks, the first element in the list
+   * will be the top item of the stack.)
    */
   test("infra", function() {
-    // TODO Is.output("[1 2 3 4] [+ *] infra", "[9 4]");
+    Is.stack("[1 2 3 4] [+ *] infra", "[9 4]");
+    Is.output("[1 2 3 4] [.] infra", "1");
   });
   
   /* TODO
@@ -855,71 +951,27 @@ $(function() {
   N is the maximum of numeric values N1 and N2. Also supports float.
   min : N1 N2 -> N
   N is the minimum of numeric values N1 and N2. Also supports float.
-  fclose : S ->
-  Stream S is closed and removed from the stack.
-  feof : S -> S B
-  B is the end-of-file status of stream S.
-  ferror : S -> S B
-  B is the error status of stream S.
-  fflush : S -> S
-  Flush stream S, forcing all buffered output to be written.
-  fgetch : S -> S C
-  C is the next available character from stream S.
-  fgets : S -> S L
-  L is the next available line (as a string) from stream S.
-  fopen : P M -> S
-  The file system object with pathname P is opened with mode M (r, w, a, etc.) and stream object S is pushed; if the open fails, file:NULL is pushed.
-  fread : S I -> S L
-  I bytes are read from the current position of stream S and returned as a list of I integers.
-  fwrite : S L -> S
-  A list of integers are written as bytes to the current position of stream S.
-  fremove : P -> B
-  The file system object with pathname P is removed from the file system. is a boolean indicating success or failure.
-  frename : P1 P2 -> B
-  The file system object with pathname P1 is renamed to P2. B is a boolean indicating success or failure.
-  fput : S X -> S
-  Writes X to stream S, pops X off stack.
-  fputch : S C -> S
-  The character C is written to the current position of stream S.
-  fputchars : S "abc.." -> S
-  The string abc.. (no quotes) is written to the current position of stream S.
-  fputstring : S "abc.." -> S
-  == fputchars, as a temporary alternative.
-  fseek : S P W -> S
-  Stream S is repositioned to position P relative to whence-point W, where W = 0, 1, 2 for beginning, current position, end respectively.
-  ftell : S -> S I
-  I is the current position of stream S.
-  unstack : [X Y ..] -> ..Y X
-  The list [X Y ..] becomes the new stack.
-  
   swons : A X -> B
   Aggregate B is A with a new member X (first member for sequences).
-
   compare : A B -> I
   I (=-1,0,+1) is the comparison of aggregates A and B. The values correspond to the predicates <=, =, >=.
   at : A I -> X
   X (= A[I]) is the member of A at position I.
   of : I A -> X
-  X (= A[I]) is the I-th member of aggregate A.
-  
+  X (= A[I]) is the I-th member of aggregate A.  
   opcase : X [..[X Xs]..] -> [Xs]
   Indexing on type of X, returns the list [Xs].
   case : X [..[X Y]..] -> Y i
-  Indexing on the value of X, execute the matching Y.
-  
+  Indexing on the value of X, execute the matching Y.  
   unswons : A -> R F
   R and F are the rest and the first of non-empty aggregate A.
   drop : A N -> B
   Aggregate B is the result of deleting the first N elements of A.
   take : A N -> B
-  Aggregate B is the result of retaining just the first N elements of A.
-  
+  Aggregate B is the result of retaining just the first N elements of A.  
   enconcat : X S T -> U
   Sequence U is the concatenation of sequences S and T with X inserted between S and T (== swapd cons concat)
-  name : sym -> "sym"
-  For operators and combinators, the string "sym" is the name of item sym, for literals sym the result string is its type.
-  intern : "sym" -> sym
-  Pushes the item whose name is "sym".
+
   
   
    predicates:
@@ -973,12 +1025,7 @@ $(function() {
   Executes P three times, with Xi, returns Ri (i = 1..3).
   unary4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
   Executes P four times, with Xi, returns Ri (i = 1..4).
-  app2 : X1 X2 [P] -> R1 R2
-  Obsolescent. == unary2
-  app3 : X1 X2 X3 [P] -> R1 R2 R3
-  Obsolescent. == unary3
-  app4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
-  Obsolescent. == unary4
+
   binary : X Y [P] -> R
   Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly two are removed from the stack.
   ternary : X Y Z [P] -> R
@@ -1008,27 +1055,19 @@ $(function() {
   Tries each Bi. If that yields true, then executes Ti and exits. If no Bi yields true, executes default D.
   while : [B] [D] -> ...
   While executing B yields true executes D.
-  linrec : [P] [T] [R1] [R2] -> ...
-  Executes P. If that yields true, executes T. Else executes R1, recurses, executes R2.
+  
   tailrec : [P] [T] [R1] -> ...
   Executes P. If that yields true, executes T. Else executes R1, recurses.
-  binrec : [B] [T] [R1] [R2] -> ...
-  Executes P. If that yields true, executes T. Else uses R1 to produce two intermediates, recurses on both, then executes R2 to combines their results.
-  genrec : [B] [T] [R1] [R2] -> ...
-  Executes B, if that yields true executes T. Else executes R1 and then [[B] [T] [R1] [R2] genrec] R2.
-  condlinrec : [ [C1] [C2] .. [D] ] -> ...
+    condlinrec : [ [C1] [C2] .. [D] ] -> ...
   Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If that yields true and there is just a [T], executes T and exit. If there are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case are ignored. If no B yields true, then [D] is used. It is then of the forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter executes R1, recurses, executes R2.
   step : A [P] -> ...
   Sequentially putting members of aggregate A onto stack, executes P for each member of A.
   
   times : N [P] -> ...
   N times executes P.
-  infra : L1 [P] -> L2
-  Using list L1 as stack, executes P and returns a new list L2. The first element of L1 is used as the top of stack, and after execution of P the top of stack becomes the first element of L2.
    filter : A [B] -> A1
   Uses test B to filter aggregate A producing sametype aggregate A1.
-  split : A [B] -> A1 A2
-  Uses test B to split aggregate A into sametype aggregates A1 and A2 .
+
   some : A [B] -> X
   Applies test B to members of aggregate A, X = true if some pass.
   all : A [B] -> X
@@ -1039,38 +1078,30 @@ $(function() {
   T is a tree. If T is a leaf, executes O. Else executes [[O] [C] treerec] C.
   treegenrec : T [O1] [O2] [C] -> ...
   T is a tree. If T is a leaf, executes O1. Else executes O2 and then [[O1] [O2] [C] treegenrec] C. miscellaneous commands
-  help : ->
-  Lists all defined symbols, including those from library files. Then lists all primitives of raw Joy (There is a variant: "_help" which lists hidden symbols).
-  helpdetail : [ S1 S2 .. ]
-  Gives brief help on each symbol S in the list.
-  manual : ->
-  Writes this manual of all Joy primitives to output file.
-  setautoput : I ->
-  Sets value of flag for automatic put to I (if I = 0, none; if I = 1, put; if I = 2, stack.
-  setundeferror : I ->
-  Sets flag that controls behavior of undefined functions (0 = no error, 1 = error).
-  setecho : I ->
-  Sets value of echo flag for listing. I = 0: no echo, 1: echo, 2: with tab, 3: and linenumber.
-  gc : ->
-  Initiates garbage collection.
-  system : "command" ->
-  Escapes to shell, executes string "command". The string may cause execution of another program. When that has finished, the process returns to Joy.
-  getenv : "variable" -> "value"
-  Retrieves the value of the environment variable "variable".
-  argv : -> A
-  Creates an aggregate A containing the interpreter's command line arguments.
-  argc : -> I
-  Pushes the number of command line arguments. This is quivalent to 'argv size'.
-  
-  include : "filnam.ext" ->
-  Transfers input to file whose name is "filnam.ext". On end-of-file returns to previous input file.
-  abort : ->
-  Aborts execution of current Joy program, returns to Joy main cycle.
-  quit : ->
-  Exit from Joy.
+
   */
   test('unimplemented/undocumented functions', function() {
     // TODO ok(false);
   });
+  
+  /***
+   * ## Notes on Joy
+   *
+   * These operators are mentioned occassionally in Joy examples, but have been
+   * replaced by new operations by Manfred von Thun, original author of Joy,
+   * himself. 
+   * 
+   * ### app2 : X1 X2 [P] -> R1 R2
+   * 
+   * Obsolescent. == unary2
+   * 
+   * ### app3 : X1 X2 X3 [P] -> R1 R2 R3
+   * 
+   * Obsolescent. == unary3
+   * 
+   * ### app4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4
+   * 
+   * Obsolescent. == unary4
+   */
 
 });

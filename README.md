@@ -31,7 +31,7 @@ Directory Structure
   * __lib__ -- required third-party JavaScript libraries
   * __other__ -- unorganized pages
   * __src__ -- source code
-    * __extras__
+    * __other__
     * __ode__ -- the Ode interpreter
     * __odeedit__ -- the Ode programming environment
   * __tests__ -- unit and other tests

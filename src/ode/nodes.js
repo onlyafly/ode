@@ -43,6 +43,13 @@ ode.NameNode = function(val) {
 };
 extras.inherits(ode.NameNode, ode.AtomicNode);
 
+/**
+ * @return {string} The name of this symbol.
+ */
+ode.NameNode.prototype.getName = function() {
+  return this.val.toString();
+};
+
 // Boolean
 
 /**

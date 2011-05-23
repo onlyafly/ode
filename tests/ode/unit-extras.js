@@ -47,4 +47,18 @@ test("withoutElement", function() {
   same(actual, expected);
 });
 
+test("reverseArray", function() {
+
+  var a = [1, 2, 3];
+  var actual, expected; 
+  
+  actual = extras.reverseArray(a);
+  expected = [3, 2, 1];
+  same(actual, expected);
+  
+  actual = a;
+  expected = [1, 2, 3];
+  same(actual, expected, "Original array should be unchanged after reverse");
+});
+
 });

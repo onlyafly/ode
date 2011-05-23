@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
+
 <title>Ode Language Documentation</title>
 
 <link rel="stylesheet" type="text/css" href="../styles/documentation.css">
@@ -160,9 +162,23 @@ forcing the user to give recursive or non-recursive definitions. Some of
 the combinators are more data-specific than primrec, and others are far
 more general.</p><h2>Input/Output</h2><p>rand : -> I</p>
 
-<p>I is a random integer.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
+<p>I is a random integer.</p><h2>Control Flow</h2><h3>ifte : [B] [T] [F] -> ...</h3>
 
-<p>Push a list of all undefined symbols in the current symbol table.</p><h2>Basic Stack</h2><h3>id : -></h3>
+<p>Executes B. If that yields true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
+
+<p>Push a list of all undefined symbols in the current symbol table.</p><h3>body : U -> [P]</h3>
+
+<p>Quotation [P] is the body of user-defined symbol U.</p>
+
+<p>Example:</p>
+
+<ul>
+<li>�double == 2 *; [double] first body� => [2 *]</li>
+</ul>
+
+<p>Ode only:</p>
+
+<p>User-defined symbol U can be a name or a name in a block.</p><h2>Basic Stack Operations</h2><h3>id : -></h3>
 
 <p>Identity function, does nothing. Any program of the form P id Q
 is equivalent to just P Q.</p><h3>dup : X -> X X</h3>
@@ -177,15 +193,26 @@ is equivalent to just P Q.</p><h3>dup : X -> X X</h3>
 
 <p>Interchanges X and Z.</p><h3>pop : X -></h3>
 
-<p>Removes X from top of the stack.</p><h2>Advanced Stack</h2><h3>stack : .. X Y Z -> .. X Y Z [Z Y X ..]</h3>
+<p>Removes X from top of the stack.</p><h2>Advanced Stack</h2><h3>newstack : ... -></h3>
 
-<p>Pushes the stack as a list.</p><h3>unstack (list -- *)</h3>
+<p>Removes all items from the stack.</p><h3>stack : .. X Y Z -> .. X Y Z [Z Y X ..]</h3>
 
-<p>Replaces the current stack with the contents of a list.</p><h3>infra (list quote -- list)</h3>
+<p>Pushes the stack as a list.</p>
 
-<p>A list on the stack, such as [1 2 3 4] can be treated temporarily as the
-stack by a quotation, say [+ *] and the combinator infra, with the result
-[9 4].</p></div> <!-- #content -->
+<p>(Note that when treating lists as stacks, the first element in the list
+will be the top item of the stack.)</p><h3>unstack : [X Y ..] -> ..Y X</h3>
+
+<p>The list [X Y ..] becomes the new stack.</p>
+
+<p>(Note that when treating lists as stacks, the first element in the list
+will be the top item of the stack.)</p><h3>infra : L1 [P] -> L2</h3>
+
+<p>Using list L1 as stack, executes P and returns a new list L2. The first
+element of L1 is used as the top of stack, and after execution of P the
+top of stack becomes the first element of L2.</p>
+
+<p>(Note that when treating lists as stacks, the first element in the list
+will be the top item of the stack.)</p></div> <!-- #content -->
 
 </body>
 </html>

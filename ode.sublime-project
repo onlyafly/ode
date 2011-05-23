@@ -3,10 +3,30 @@
 	{
 		"selected_items":
 		[
+			[
+				"Blo",
+				"BlockNode"
+			]
 		]
 	},
 	"buffers":
 	[
+		{
+			"file": "/C/Users/Kevin/code/ode/src/ode/joynatives.js",
+			"settings":
+			{
+				"buffer_size": 25359,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Kevin/code/ode/tests/ode/joy-basic.js",
+			"settings":
+			{
+				"buffer_size": 31414,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "",
 	"file_history":
@@ -31,6 +51,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"primrec",
+			"genrec"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -55,8 +77,71 @@
 	"groups":
 	[
 		{
+			"selected": 0,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "/C/Users/Kevin/code/ode/src/ode/joynatives.js",
+					"settings":
+					{
+						"buffer_size": 25359,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21408,
+								21408
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0,
+						"translation.y": 16120,
+						"zoom_level": 1
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 1,
+					"file": "/C/Users/Kevin/code/ode/tests/ode/joy-basic.js",
+					"settings":
+					{
+						"buffer_size": 31414,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15707,
+								15707
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0,
+						"translation.y": 11551,
+						"zoom_level": 1
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -69,6 +154,12 @@
 				0,
 				1,
 				1
+			],
+			[
+				0,
+				1,
+				1,
+				2
 			]
 		],
 		"cols":
@@ -79,6 +170,7 @@
 		"rows":
 		[
 			0,
+			0.5,
 			1
 		]
 	},
