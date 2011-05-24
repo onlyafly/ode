@@ -430,6 +430,17 @@ $(function() {
     Is.stack("[B] [A] cons", "[[B] A]");
     Is.stack('\'a "bcd" cons', '"abcd"');
   });
+  
+  /***
+   * ### swons : A X -> B
+   * 
+   * Aggregate B is A with a new member X (first member for sequences). This is
+   * the same as cons, but with the arguments reversed.
+   */
+  test("swons", function() {
+    Is.stack("[B] [A] swons", "[[A] B]");
+    Is.stack('"bcd" \'a swons', '"abcd"');
+  });  
 
   /***
    * ### uncons : A -> F R
@@ -481,22 +492,23 @@ $(function() {
   /***
    * ### map : A [P] -> B
    * 
-   * Executes P on each member of aggregate A, collects results in same type aggregate B.
+   * Executes P on each member of aggregate A, collects results in same type
+   * aggregate B.
    */
   test("map", function() {
     Is.output("[1 2 3] [dup] map .", "[1 1 2 2 3 3]");
     Is.output("[1 2 3 4] [dup *] map .", "[1 4 9 16]");
   });
 
-  /* TODO: Not sure if this is Joy
   test("map - stack executes in sandbox", function() {
-    Is.exception("2 [1] [drop drop] map", null);
+    // TODO Not sure if this is Joy    
+    
+    Is.exception("2 [1] [pop pop] map", ode.RuntimeException);
 
     // Check that after the map fails, all frames are dropped
-    Is.exception("33 [66] [drop drop] map", null, true);
+    Is.exception("33 [66] [pop pop] map", ode.RuntimeException, true);
     Is.output(".", "33");
   });
-  */
 
   /* TODO This doesn't seem right to me, but it is in faq1.html
   test("map - read only stack", function() {    
@@ -507,7 +519,8 @@ $(function() {
   /***
    * ### fold : A V0 [P] -> V
    * 
-   * Starting with value V0, sequentially pushes members of aggregate A and combines with binary operator P to produce value V.  
+   * Starting with value V0, sequentially pushes members of aggregate A and 
+   * combines with binary operator P to produce value V.  
    */
   test("fold", function() {
     Is.output("[1 2 3 4 5] 0 [+] fold .", "15");
@@ -661,12 +674,10 @@ $(function() {
    */
   test("genrec", function() {
     Is.stack("5 [null] [succ] [dup pred] [i *] genrec", "120");
-    /* TODO
-    Is.stack("6 [small] [] [pred dup pred] [app2 +] genrec", "8");
+    Is.stack("6 [small] [] [pred dup pred] [unary2 +] genrec", "8");
     Is.stack(
-      "[6 1 3 2] [small] [] [uncons [>] split] [app2 swapd cons concat] genrec",
+      "[6 1 3 2] [small] [] [uncons [>] split] [unary2 swapd cons concat] genrec",
       "[1 2 3 6]");
-      */
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -737,7 +748,7 @@ $(function() {
    * 
    * Example:
    * 
-   * - ´double == 2 *; [double] first body´ => [2 *]
+   * - `double == 2 *; [double] first body` => [2 *]
    * 
    * Ode only:
    * 
@@ -988,153 +999,280 @@ $(function() {
     Is.stack("0 1 2 3 4 [2 *] unary4", "0 2 4 6 8");
   });
   
-  /* TODO
-  strtol : S I -> J
-  String S is converted to the integer J using base I. If I = 0, assumes base 10, but leading "0" means base 8 and leading "0x" means base 16.
-  strtod : S -> R
-  String S is converted to the float R.
-  format : N C I J -> S
-  S is the formatted version of N in mode C ('d or 'i = decimal, 'o = octal, 'x or 'X = hex with lower or upper case letters) with maximum width I and minimum width J.
-  formatf : F C I J -> S
-  S is the formatted version of F in mode C ('e or 'E = exponential, 'f = fractional, 'g or G = general with lower or upper case letters) with maximum width I and precision J.
-  srand : I ->
-  Sets the random integer seed to integer I.
-  max : N1 N2 -> N
-  N is the maximum of numeric values N1 and N2. Also supports float.
-  min : N1 N2 -> N
-  N is the minimum of numeric values N1 and N2. Also supports float.
-  swons : A X -> B
-  Aggregate B is A with a new member X (first member for sequences).
-  compare : A B -> I
-  I (=-1,0,+1) is the comparison of aggregates A and B. The values correspond to the predicates <=, =, >=.
-  at : A I -> X
-  X (= A[I]) is the member of A at position I.
-  of : I A -> X
-  X (= A[I]) is the I-th member of aggregate A.  
-  opcase : X [..[X Xs]..] -> [Xs]
-  Indexing on type of X, returns the list [Xs].
-  case : X [..[X Y]..] -> Y i
-  Indexing on the value of X, execute the matching Y.  
-  unswons : A -> R F
-  R and F are the rest and the first of non-empty aggregate A.
-  drop : A N -> B
-  Aggregate B is the result of deleting the first N elements of A.
-  take : A N -> B
-  Aggregate B is the result of retaining just the first N elements of A.  
-  enconcat : X S T -> U
-  Sequence U is the concatenation of sequences S and T with X inserted between S and T (== swapd cons concat)
-
+  /////////////////////////////////////////////////////////////////////////////
   
+  // TODO
   
-   predicates:
-  
-  
-  equal : T U -> B
-  (Recursively) tests whether trees T and U are identical.
-  has : A X -> B
-  Tests whether aggregate A has X as a member.
-  in : X A -> B
-  Tests whether X is a member of aggregate A.
-  integer : X -> B
-  Tests whether X is an integer.
-  char : X -> B
-  Tests whether X is a character.
-  logical : X -> B
-  Tests whether X is a logical.
-  set : X -> B
-  Tests whether X is a set.
-  string : X -> B
-  Tests whether X is a string.
-  list : X -> B
-  Tests whether X is a list.
-  leaf : X -> B
-  Tests whether X is not a list.
-  user : X -> B
-  Tests whether X is a user-defined symbol.
-  float : R -> B
-  Tests whether R is a float.
-  file : F -> B
-  Tests whether F is a file. combinator
-  x : [P]i -> ...
-  Executes P without popping [P]. So, [P] x == [P] P.
-
-  app1 : X [P] -> R
-  Executes P, pushes result R on stack without X.
-  app11 : X Y [P] -> R
-  Executes P, pushes result R on stack.
-  app12 : X Y1 Y2 [P] -> R1 R2
-  Executes P twice, with Y1 and Y2, returns R1 and R2.
-  construct : [P] [[P1] [P2] ..] -> R1 R2 ..
-  Saves state of stack and then executes [P]. Then executes each [Pi] to give Ri pushed onto saved stack.
-  nullary : [P] -> R
-  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, none are removed from the stack.
-
-  binary : X Y [P] -> R
-  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly two are removed from the stack.
-  ternary : X Y Z [P] -> R
-  Executes P, which leaves R on top of the stack. No matter how many parameters this consumes, exactly three are removed from the stack.
-  cleave : X [P1] [P2] -> R1 R2
-  Executes P1 and P2, each with X on top, producing two results.
-  branch : B [T] [F] -> ...
-  If B is true, then executes T else executes F.
-  
-  ifinteger : X [T] [E] -> ...
-  If X is an integer, executes T else executes E.
-  ifchar : X [T] [E] -> ...
-  If X is a character, executes T else executes E.
-  iflogical : X [T] [E] -> ...
-  If X is a logical or truth value, executes T else executes E.
-  ifset : X [T] [E] -> ...
-  If X is a set, executes T else executes E.
-  ifstring : X [T] [E] -> ...
-  If X is a string, executes T else executes E.
-  iflist : X [T] [E] -> ...
-  If X is a list, executes T else executes E.
-  iffloat : X [T] [E] -> ...
-  If X is a float, executes T else executes E.
-  iffile : X [T] [E] -> ...
-  If X is a file, executes T else executes E.
-  cond : [..[[Bi] Ti]..[D]] -> ...
-  Tries each Bi. If that yields true, then executes Ti and exits. If no Bi yields true, executes default D.
-  while : [B] [D] -> ...
-  While executing B yields true executes D.
-  
-  tailrec : [P] [T] [R1] -> ...
-  Executes P. If that yields true, executes T. Else executes R1, recurses.
-    condlinrec : [ [C1] [C2] .. [D] ] -> ...
-  Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If that yields true and there is just a [T], executes T and exit. If there are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case are ignored. If no B yields true, then [D] is used. It is then of the forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter executes R1, recurses, executes R2.
-  step : A [P] -> ...
-  Sequentially putting members of aggregate A onto stack, executes P for each member of A.
-  
-  times : N [P] -> ...
-  N times executes P.
-   filter : A [B] -> A1
-  Uses test B to filter aggregate A producing sametype aggregate A1.
-
-  some : A [B] -> X
-  Applies test B to members of aggregate A, X = true if some pass.
-  all : A [B] -> X
-  Applies test B to members of aggregate A, X = true if all pass.
-  treestep : T [P] -> ...
-  Recursively traverses leaves of tree T, executes P for each leaf.
-  treerec : T [O] [C] -> ...
-  T is a tree. If T is a leaf, executes O. Else executes [[O] [C] treerec] C.
-  treegenrec : T [O1] [O2] [C] -> ...
-  T is a tree. If T is a leaf, executes O1. Else executes O2 and then [[O1] [O2] [C] treegenrec] C. miscellaneous commands
-
-  */
-  test('unimplemented/undocumented functions', function() {
-    // TODO ok(false);
-  });
+  /***
+   * ## Not Yet Implemented
+   *
+   * *These operators are part of Joy, but have not yet been implemented.*
+   *
+   * ### strtol : S I -> J
+   * 
+   * String S is converted to the integer J using base I. If I = 0, assumes
+   * base 10, but leading "0" means base 8 and leading "0x" means base 16.
+   * 
+   * ### strtod : S -> R
+   * 
+   * String S is converted to the float R.
+   * 
+   * ### format : N C I J -> S
+   * 
+   * S is the formatted version of N in mode C ('d or 'i = decimal,
+   * 'o = octal, 'x or 'X = hex with lower or upper case letters) with 
+   * maximum width I and minimum width J.
+   * 
+   * ### formatf : F C I J -> S
+   * 
+   * S is the formatted version of F in mode C ('e or 'E = exponential, 
+   * 'f = fractional, 'g or G = general with lower or upper case letters) 
+   * with maximum width I and precision J.
+   * 
+   * ### srand : I ->
+   * 
+   * Sets the random integer seed to integer I.
+   * 
+   * ### max : N1 N2 -> N
+   * 
+   * N is the maximum of numeric values N1 and N2. Also supports float.
+   * 
+   * ### min : N1 N2 -> N
+   * 
+   * N is the minimum of numeric values N1 and N2. Also supports float.
+   *
+   * ### compare : A B -> I
+   * 
+   * I (=-1,0,+1) is the comparison of aggregates A and B. The values 
+   * correspond to the predicates <=, =, >=.
+   * 
+   * ### at : A I -> X
+   * 
+   * X (= A[I]) is the member of A at position I.
+   * 
+   * ### of : I A -> X
+   * 
+   * X (= A[I]) is the I-th member of aggregate A.  
+   * 
+   * ### opcase : X [..[X Xs]..] -> [Xs]
+   * 
+   * Indexing on type of X, returns the list [Xs].
+   * 
+   * ### case : X [..[X Y]..] -> Y i
+   * 
+   * Indexing on the value of X, execute the matching Y.  
+   * 
+   * ### unswons : A -> R F
+   * 
+   * R and F are the rest and the first of non-empty aggregate A.
+   * 
+   * ### drop : A N -> B
+   * 
+   * Aggregate B is the result of deleting the first N elements of A.
+   * 
+   * ### take : A N -> B
+   * 
+   * Aggregate B is the result of retaining just the first N elements 
+   * of A.  
+   * 
+   * ### enconcat : X S T -> U
+   * 
+   * Sequence U is the concatenation of sequences S and T with X inserted 
+   * between S and T (== swapd cons concat)
+   * 
+   * ### equal : T U -> B
+   * 
+   * (Recursively) tests whether trees T and U are identical.
+   * 
+   * ### has : A X -> B
+   * 
+   * Tests whether aggregate A has X as a member.
+   * 
+   * ### in : X A -> B
+   * 
+   * Tests whether X is a member of aggregate A.
+   * 
+   * ### integer : X -> B
+   * 
+   * Tests whether X is an integer.
+   * 
+   * ### char : X -> B
+   * 
+   * Tests whether X is a character.
+   * 
+   * ### logical : X -> B
+   * 
+   * Tests whether X is a logical.
+   * 
+   * ### set : X -> B
+   * 
+   * Tests whether X is a set.
+   * 
+   * ### string : X -> B
+   * 
+   * Tests whether X is a string.
+   * 
+   * ### list : X -> B
+   * 
+   * Tests whether X is a list.
+   * 
+   * ### leaf : X -> B
+   * 
+   * Tests whether X is not a list.
+   * 
+   * ### user : X -> B
+   * 
+   * Tests whether X is a user-defined symbol.
+   * 
+   * ### float : R -> B
+   * 
+   * Tests whether R is a float.
+   * 
+   * ### file : F -> B
+   * 
+   * Tests whether F is a file.
+   * 
+   * ### x : [P]i -> ...
+   * 
+   * Executes P without popping [P]. So, [P] x == [P] P.
+   * 
+   * ### app1 : X [P] -> R
+   * 
+   * Executes P, pushes result R on stack without X.
+   * 
+   * ### app11 : X Y [P] -> R
+   * 
+   * Executes P, pushes result R on stack.
+   * 
+   * ### app12 : X Y1 Y2 [P] -> R1 R2
+   * 
+   * Executes P twice, with Y1 and Y2, returns R1 and R2.
+   * 
+   * ### construct : [P] [[P1] [P2] ..] -> R1 R2 ..
+   * 
+   * Saves state of stack and then executes [P]. Then executes each [Pi] to 
+   * give Ri pushed onto saved stack.
+   * 
+   * ### nullary : [P] -> R
+   * 
+   * Executes P, which leaves R on top of the stack. No matter how many 
+   * parameters this consumes, none are removed from the stack.
+   * 
+   * ### binary : X Y [P] -> R
+   * 
+   * Executes P, which leaves R on top of the stack. No matter how many 
+   * parameters this consumes, exactly two are removed from the stack.
+   * 
+   * ### ternary : X Y Z [P] -> R
+   * 
+   * Executes P, which leaves R on top of the stack. No matter how many 
+   * parameters this consumes, exactly three are removed from the stack.
+   * 
+   * ### cleave : X [P1] [P2] -> R1 R2
+   * 
+   * Executes P1 and P2, each with X on top, producing two results.
+   * 
+   * ### branch : B [T] [F] -> ...
+   * 
+   * If B is true, then executes T else executes F.
+   * 
+   * ### ifinteger : X [T] [E] -> ...
+   * 
+   * If X is an integer, executes T else executes E.
+   * 
+   * ### ifchar : X [T] [E] -> ...
+   * 
+   * If X is a character, executes T else executes E.
+   * 
+   * ### iflogical : X [T] [E] -> ...
+   * 
+   * If X is a logical or truth value, executes T else executes E.
+   * 
+   * ### ifset : X [T] [E] -> ...
+   * 
+   * If X is a set, executes T else executes E.
+   * 
+   * ### ifstring : X [T] [E] -> ...
+   * 
+   * If X is a string, executes T else executes E.
+   * 
+   * ### iflist : X [T] [E] -> ...
+   * 
+   * If X is a list, executes T else executes E.
+   * 
+   * ### iffloat : X [T] [E] -> ...
+   * 
+   * If X is a float, executes T else executes E.
+   * 
+   * ### iffile : X [T] [E] -> ...
+   * 
+   * If X is a file, executes T else executes E.
+   * 
+   * ### cond : [..[[Bi] Ti]..[D]] -> ...
+   * 
+   * Tries each Bi. If that yields true, then executes Ti and exits. If no Bi 
+   * yields true, executes default D.
+   * 
+   * ### while : [B] [D] -> ...
+   * 
+   * While executing B yields true executes D.
+   * 
+   * ### tailrec : [P] [T] [R1] -> ...
+   * 
+   * Executes P. If that yields true, executes T. Else executes R1, recurses.
+   * 
+   * ### condlinrec : [ [C1] [C2] .. [D] ] -> ...
+   * 
+   * Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If 
+   * that yields true and there is just a [T], executes T and exit. If there 
+   * are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case 
+   * are ignored. If no B yields true, then [D] is used. It is then of the 
+   * forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter 
+   * executes R1, recurses, executes R2.
+   * 
+   * ### step : A [P] -> ...
+   * 
+   * Sequentially putting members of aggregate A onto stack, executes P for 
+   * each member of A.
+   * 
+   * ### times : N [P] -> ...
+   * 
+   * N times executes P.
+   * 
+   * ### filter : A [B] -> A1
+   * 
+   * Uses test B to filter aggregate A producing sametype aggregate A1.
+   * 
+   * ### some : A [B] -> X
+   * 
+   * Applies test B to members of aggregate A, X = true if some pass.
+   * 
+   * ### all : A [B] -> X
+   * 
+   * Applies test B to members of aggregate A, X = true if all pass.
+   * 
+   * ### treestep : T [P] -> ...
+   * 
+   * Recursively traverses leaves of tree T, executes P for each leaf.
+   * 
+   * ### treerec : T [O] [C] -> ...
+   * 
+   * T is a tree. If T is a leaf, executes O. Else executes [[O] [C] treerec] C.
+   * 
+   * ### treegenrec : T [O1] [O2] [C] -> ...
+   * 
+   * T is a tree. If T is a leaf, executes O1. Else executes O2 and then 
+   * [[O1] [O2] [C] treegenrec] C.
+   */
   
   /////////////////////////////////////////////////////////////////////////////
   
   /***
    * ## Notes on Joy
    *
-   * These operators are mentioned occassionally in Joy examples, but have been
+   * *These operators are mentioned occassionally in Joy examples, but have been
    * replaced by new operations by Manfred von Thun, original author of Joy,
-   * himself. 
+   * himself.* 
    * 
    * ### app2 : X1 X2 [P] -> R1 R2
    * 

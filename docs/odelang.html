@@ -10,9 +10,21 @@
 </head>
 <body>
 
-<div class="content">
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
 
-<h1>Ode Language Documentation</h1><h2>Literals</h2><h3>Boolean Literals</h3>
+  <div class="content">
+
+    <h1>Ode Language Documentation</h1>
+
+    <p>
+      <em>
+        This documentation is borrowed from the  
+        <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
+        with modifications to clarify how certain operators function in the Ode environment.
+      </em>
+    </p><h2>Literals</h2><h3>Boolean Literals</h3>
 
 <p>The logical type, or the type of truth values. It has just two
 literals: true and false.</p>
@@ -58,7 +70,17 @@ Literals of this type are written inside square brackets.</p>
 
 <p>The type of floating-point numbers. Literals of this type are
 written with embedded decimal points (like 1.2) and optional
-exponent specifiers (like 1.5E2).</p><h2>Definitions</h2><h2>Math</h2><h3>+ : M I -> N</h3>
+exponent specifiers (like 1.5E2).</p><h2>Definitions and Symbols</h2><h3>==</h3>
+
+<p>Defines a definition.</p>
+
+<pre><code>double == dup +;
+</code></pre><h3>name : sym -> "sym"</h3>
+
+<p>For operators and combinators, the string "sym" is the name of item sym,
+for literals sym the result string is its type.</p><h3>intern : "sym" -> sym</h3>
+
+<p>Pushes the item whose name is "sym".</p><h2>Math</h2><h3>+ : M I -> N</h3>
 
 <p>Numeric N is the result of adding integer I to numeric M. Also
 supports float.</p><h3>succ : M -> N</h3>
@@ -107,7 +129,10 @@ supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
 
 <p>Integer I is the number of elements of aggregate A.</p><h3>cons : X A -> B</h3>
 
-<p>Aggregate B is A with a new member X (first member for sequences).</p><h3>uncons : A -> F R</h3>
+<p>Aggregate B is A with a new member X (first member for sequences).</p><h3>swons : A X -> B</h3>
+
+<p>Aggregate B is A with a new member X (first member for sequences). This is
+the same as cons, but with the arguments reversed.</p><h3>uncons : A -> F R</h3>
 
 <p>F and R are the first and the rest of non-empty aggregate A.</p><h3>i : [P] -> ...</h3>
 
@@ -117,16 +142,21 @@ supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
 
 <p>F is the first member of the non-empty aggregate A.</p><h2>Functional Operations</h2><h3>map : A [P] -> B</h3>
 
-<p>Executes P on each member of aggregate A, collects results in same type aggregate B.</p><h3>fold : A V0 [P] -> V</h3>
+<p>Executes P on each member of aggregate A, collects results in same type
+aggregate B.</p><h3>fold : A V0 [P] -> V</h3>
 
-<p>Starting with value V0, sequentially pushes members of aggregate A and combines with binary operator P to produce value V.</p><h3>primrec : X [I] [C] -> R</h3>
+<p>Starting with value V0, sequentially pushes members of aggregate A and
+combines with binary operator P to produce value V.</p><h3>split : A [B] -> A1 A2</h3>
+
+<p>Uses test B to split aggregate A into same type aggregates A1 and A2.</p>
+
+<p>(Note: Preserves stack state before each test is run, restoring it after).</p><h2>Recursion</h2><h3>primrec : X [I] [C] -> R</h3>
 
 <p>Executes I to obtain an initial value R0. For integer X uses increasing
 positive integers to X, combines by C for new R. For aggregate X uses
 successive members and combines by C for new R.</p>
 
-<p>In Joy there is a combinator for primitive recursion which has this pattern
-built in and thus avoids the need for a definition. The primrec combinator
+<p>The primrec combinator
 expects two quoted programs in addition to a data parameter. For an integer
 data parameter it works like this: If the data parameter is zero, then the
 first quotation has to produce the value to be returned. If the data
@@ -156,15 +186,64 @@ on the stack. When all is done, the stack contains 120, the factorial of 5.
 As may be seen from this program, the usual branching of recursive
 definitions is built into the combinator. The primrec combinator can be
 used with many other quotation parameters to compute quite different
-functions. It can also be used with data types other than integers. Joy has
-many more combinators which can be used to calculate many functions without
-forcing the user to give recursive or non-recursive definitions. Some of
-the combinators are more data-specific than primrec, and others are far
-more general.</p><h2>Input/Output</h2><p>rand : -> I</p>
+functions. It can also be used with data types other than integers.</p><h3>linrec : [P] [T] [R1] [R2] -> ...</h3>
+
+<p>Executes P. If that yields true, executes T. Else executes R1, recurses,
+executes R2.</p>
+
+<p>A high proportion of recursively defined functions exhibit a very simple
+pattern: There is some test, the if-part, which determines whether the
+ground case obtains. If it does, then the non-recursive branch is executed,
+the basis case of recursion. If it does not, then the recursive part is
+executed, including one or more recursive calls.</p>
+
+<p>The linrec combinator is
+very similar to the genrec combinator. The essential difference is that
+the bundled up quotation is immediately called before the rec2-part.
+Consequently it can only be used for linear recursion.</p><h3>binrec : [B] [T] [R1] [R2] -> ...</h3>
+
+<p>Executes B. If that yields true, executes T. Else uses R1 to produce two
+intermediates, recurses on both, then executes R2 to combines their results.</p>
+
+<p>In many recursive definitions there are two recursive calls of the function
+being defined. This is the pattern of binary recursion, and it is used in
+the usual definitions of quicksort and of the Fibonacci function. In
+analogy with the linrec combinator for linear recursion, Joy has a binrec
+combinator for binary recursion. The following will quicksort a list whose
+members can be a mixture of anything except lists:</p>
+
+<pre><code>quicksort ==
+  [small]
+  []
+  [uncons [&gt;] split]
+  [swapd cons concat]
+  binrec;
+</code></pre>
+
+<p>And an example using the above quicksort:</p>
+
+<p><code>[5 3 1 4 2] quicksort</code> => [1 2 3 4 5]</p><h3>genrec : [B] [T] [R1] [R2] -> ...</h3>
+
+<p>Executes B, if that yields true executes T. Else executes R1 and then
+[[B] [T] [R1] [R2] genrec] R2.</p>
+
+<p>One of these is the genrec combinator which takes four program parameters
+in addition to whatever data parameters it needs. Fourth from the top is an
+if-part, followed by a then-part. If the if-part yields true, then the
+then-part is executed and the combinator terminates. The other two
+parameters are the rec1-part and the rec2part. If the if-part yields false,
+the rec1-part is executed. Following that the four program parameters and
+the combinator are again pushed onto the stack bundled up in a quoted form.
+Then the rec2-part is executed, where it will find the bundled form.
+Typically it will then execute the bundled form, either with i or with
+app2, or some other combinator. The following pieces of code, without any
+definitions, compute the factorial, the (naive) Fibonacci and quicksort.
+The four parts are here aligned to make comparisons easier.</p><h2>Input/Output</h2><h3>rand : -> I</h3>
 
 <p>I is a random integer.</p><h2>Control Flow</h2><h3>ifte : [B] [T] [F] -> ...</h3>
 
-<p>Executes B. If that yields true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
+<p>Preserves the stack state, then executes B. The stack state is then
+restored. If B yielded true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
 
 <p>Push a list of all undefined symbols in the current symbol table.</p><h3>body : U -> [P]</h3>
 
@@ -173,12 +252,12 @@ more general.</p><h2>Input/Output</h2><p>rand : -> I</p>
 <p>Example:</p>
 
 <ul>
-<li>�double == 2 *; [double] first body� => [2 *]</li>
+<li><code>double == 2 *; [double] first body</code> => [2 *]</li>
 </ul>
 
 <p>Ode only:</p>
 
-<p>User-defined symbol U can be a name or a name in a block.</p><h2>Basic Stack Operations</h2><h3>id : -></h3>
+<p>User-defined symbol U can be a name or a name in a list.</p><h2>Basic Stack Operations</h2><h3>id : -></h3>
 
 <p>Identity function, does nothing. Any program of the form P id Q
 is equivalent to just P Q.</p><h3>dup : X -> X X</h3>
@@ -193,7 +272,9 @@ is equivalent to just P Q.</p><h3>dup : X -> X X</h3>
 
 <p>Interchanges X and Z.</p><h3>pop : X -></h3>
 
-<p>Removes X from top of the stack.</p><h2>Advanced Stack</h2><h3>newstack : ... -></h3>
+<p>Removes X from top of the stack.</p><h3>dip : X [P] -> ... X</h3>
+
+<p>Saves X, executes P, pushes X back.</p><h2>Advanced Stack Operations</h2><h3>newstack : ... -></h3>
 
 <p>Removes all items from the stack.</p><h3>stack : .. X Y Z -> .. X Y Z [Z Y X ..]</h3>
 
@@ -212,7 +293,291 @@ element of L1 is used as the top of stack, and after execution of P the
 top of stack becomes the first element of L2.</p>
 
 <p>(Note that when treating lists as stacks, the first element in the list
-will be the top item of the stack.)</p></div> <!-- #content -->
+will be the top item of the stack.)</p><h3>unary : X [P] -> R</h3>
+
+<p>Executes P, which leaves R on top of the stack. No matter how many
+parameters this consumes, exactly one is removed from the stack.</p><h3>unary2 : X1 X2 [P] -> R1 R2</h3>
+
+<p>Executes P twice, with X1 and X2 on top of the stack. Returns the
+two values R1 and R2.</p><h3>unary3 : X1 X2 X3 [P] -> R1 R2 R3</h3>
+
+<p>Executes P three times, with Xi, returns Ri (i = 1..3).</p><h3>unary4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4</h3>
+
+<p>Executes P four times, with Xi, returns Ri (i = 1..4).</p><h2>Not Yet Implemented</h2>
+
+<p><em>These operators are part of Joy, but have not yet been implemented.</em></p>
+
+<h3>strtol : S I -> J</h3>
+
+<p>String S is converted to the integer J using base I. If I = 0, assumes
+base 10, but leading "0" means base 8 and leading "0x" means base 16.</p>
+
+<h3>strtod : S -> R</h3>
+
+<p>String S is converted to the float R.</p>
+
+<h3>format : N C I J -> S</h3>
+
+<p>S is the formatted version of N in mode C ('d or 'i = decimal,
+'o = octal, 'x or 'X = hex with lower or upper case letters) with
+maximum width I and minimum width J.</p>
+
+<h3>formatf : F C I J -> S</h3>
+
+<p>S is the formatted version of F in mode C ('e or 'E = exponential,
+'f = fractional, 'g or G = general with lower or upper case letters)
+with maximum width I and precision J.</p>
+
+<h3>srand : I -></h3>
+
+<p>Sets the random integer seed to integer I.</p>
+
+<h3>max : N1 N2 -> N</h3>
+
+<p>N is the maximum of numeric values N1 and N2. Also supports float.</p>
+
+<h3>min : N1 N2 -> N</h3>
+
+<p>N is the minimum of numeric values N1 and N2. Also supports float.</p>
+
+<h3>compare : A B -> I</h3>
+
+<p>I (=-1,0,+1) is the comparison of aggregates A and B. The values
+correspond to the predicates &lt;=, =, >=.</p>
+
+<h3>at : A I -> X</h3>
+
+<p>X (= A[I]) is the member of A at position I.</p>
+
+<h3>of : I A -> X</h3>
+
+<p>X (= A[I]) is the I-th member of aggregate A.</p>
+
+<h3>opcase : X [..[X Xs]..] -> [Xs]</h3>
+
+<p>Indexing on type of X, returns the list [Xs].</p>
+
+<h3>case : X [..[X Y]..] -> Y i</h3>
+
+<p>Indexing on the value of X, execute the matching Y.</p>
+
+<h3>unswons : A -> R F</h3>
+
+<p>R and F are the rest and the first of non-empty aggregate A.</p>
+
+<h3>drop : A N -> B</h3>
+
+<p>Aggregate B is the result of deleting the first N elements of A.</p>
+
+<h3>take : A N -> B</h3>
+
+<p>Aggregate B is the result of retaining just the first N elements
+of A.</p>
+
+<h3>enconcat : X S T -> U</h3>
+
+<p>Sequence U is the concatenation of sequences S and T with X inserted
+between S and T (== swapd cons concat)</p>
+
+<h3>equal : T U -> B</h3>
+
+<p>(Recursively) tests whether trees T and U are identical.</p>
+
+<h3>has : A X -> B</h3>
+
+<p>Tests whether aggregate A has X as a member.</p>
+
+<h3>in : X A -> B</h3>
+
+<p>Tests whether X is a member of aggregate A.</p>
+
+<h3>integer : X -> B</h3>
+
+<p>Tests whether X is an integer.</p>
+
+<h3>char : X -> B</h3>
+
+<p>Tests whether X is a character.</p>
+
+<h3>logical : X -> B</h3>
+
+<p>Tests whether X is a logical.</p>
+
+<h3>set : X -> B</h3>
+
+<p>Tests whether X is a set.</p>
+
+<h3>string : X -> B</h3>
+
+<p>Tests whether X is a string.</p>
+
+<h3>list : X -> B</h3>
+
+<p>Tests whether X is a list.</p>
+
+<h3>leaf : X -> B</h3>
+
+<p>Tests whether X is not a list.</p>
+
+<h3>user : X -> B</h3>
+
+<p>Tests whether X is a user-defined symbol.</p>
+
+<h3>float : R -> B</h3>
+
+<p>Tests whether R is a float.</p>
+
+<h3>file : F -> B</h3>
+
+<p>Tests whether F is a file.</p>
+
+<h3>x : [P]i -> ...</h3>
+
+<p>Executes P without popping [P]. So, [P] x == [P] P.</p>
+
+<h3>app1 : X [P] -> R</h3>
+
+<p>Executes P, pushes result R on stack without X.</p>
+
+<h3>app11 : X Y [P] -> R</h3>
+
+<p>Executes P, pushes result R on stack.</p>
+
+<h3>app12 : X Y1 Y2 [P] -> R1 R2</h3>
+
+<p>Executes P twice, with Y1 and Y2, returns R1 and R2.</p>
+
+<h3>construct : [P] [[P1] [P2] ..] -> R1 R2 ..</h3>
+
+<p>Saves state of stack and then executes [P]. Then executes each [Pi] to
+give Ri pushed onto saved stack.</p>
+
+<h3>nullary : [P] -> R</h3>
+
+<p>Executes P, which leaves R on top of the stack. No matter how many
+parameters this consumes, none are removed from the stack.</p>
+
+<h3>binary : X Y [P] -> R</h3>
+
+<p>Executes P, which leaves R on top of the stack. No matter how many
+parameters this consumes, exactly two are removed from the stack.</p>
+
+<h3>ternary : X Y Z [P] -> R</h3>
+
+<p>Executes P, which leaves R on top of the stack. No matter how many
+parameters this consumes, exactly three are removed from the stack.</p>
+
+<h3>cleave : X [P1] [P2] -> R1 R2</h3>
+
+<p>Executes P1 and P2, each with X on top, producing two results.</p>
+
+<h3>branch : B [T] [F] -> ...</h3>
+
+<p>If B is true, then executes T else executes F.</p>
+
+<h3>ifinteger : X [T] [E] -> ...</h3>
+
+<p>If X is an integer, executes T else executes E.</p>
+
+<h3>ifchar : X [T] [E] -> ...</h3>
+
+<p>If X is a character, executes T else executes E.</p>
+
+<h3>iflogical : X [T] [E] -> ...</h3>
+
+<p>If X is a logical or truth value, executes T else executes E.</p>
+
+<h3>ifset : X [T] [E] -> ...</h3>
+
+<p>If X is a set, executes T else executes E.</p>
+
+<h3>ifstring : X [T] [E] -> ...</h3>
+
+<p>If X is a string, executes T else executes E.</p>
+
+<h3>iflist : X [T] [E] -> ...</h3>
+
+<p>If X is a list, executes T else executes E.</p>
+
+<h3>iffloat : X [T] [E] -> ...</h3>
+
+<p>If X is a float, executes T else executes E.</p>
+
+<h3>iffile : X [T] [E] -> ...</h3>
+
+<p>If X is a file, executes T else executes E.</p>
+
+<h3>cond : [..[[Bi] Ti]..[D]] -> ...</h3>
+
+<p>Tries each Bi. If that yields true, then executes Ti and exits. If no Bi
+yields true, executes default D.</p>
+
+<h3>while : [B] [D] -> ...</h3>
+
+<p>While executing B yields true executes D.</p>
+
+<h3>tailrec : [P] [T] [R1] -> ...</h3>
+
+<p>Executes P. If that yields true, executes T. Else executes R1, recurses.</p>
+
+<h3>condlinrec : [ [C1] [C2] .. [D] ] -> ...</h3>
+
+<p>Each [Ci] is of the forms [[B] [T]] or [[B] [R1] [R2]]. Tries each B. If
+that yields true and there is just a [T], executes T and exit. If there
+are [R1] and [R2], executes R1, recurses, executes R2. Subsequent case
+are ignored. If no B yields true, then [D] is used. It is then of the
+forms [[T]] or [[R1] [R2]]. For the former, executes T. For the latter
+executes R1, recurses, executes R2.</p>
+
+<h3>step : A [P] -> ...</h3>
+
+<p>Sequentially putting members of aggregate A onto stack, executes P for
+each member of A.</p>
+
+<h3>times : N [P] -> ...</h3>
+
+<p>N times executes P.</p>
+
+<h3>filter : A [B] -> A1</h3>
+
+<p>Uses test B to filter aggregate A producing sametype aggregate A1.</p>
+
+<h3>some : A [B] -> X</h3>
+
+<p>Applies test B to members of aggregate A, X = true if some pass.</p>
+
+<h3>all : A [B] -> X</h3>
+
+<p>Applies test B to members of aggregate A, X = true if all pass.</p>
+
+<h3>treestep : T [P] -> ...</h3>
+
+<p>Recursively traverses leaves of tree T, executes P for each leaf.</p>
+
+<h3>treerec : T [O] [C] -> ...</h3>
+
+<p>T is a tree. If T is a leaf, executes O. Else executes [[O] [C] treerec] C.</p>
+
+<h3>treegenrec : T [O1] [O2] [C] -> ...</h3>
+
+<p>T is a tree. If T is a leaf, executes O1. Else executes O2 and then
+[[O1] [O2] [C] treegenrec] C.</p><h2>Notes on Joy</h2>
+
+<p><em>These operators are mentioned occassionally in Joy examples, but have been
+replaced by new operations by Manfred von Thun, original author of Joy,
+himself.</em></p>
+
+<h3>app2 : X1 X2 [P] -> R1 R2</h3>
+
+<p>Obsolescent. == unary2</p>
+
+<h3>app3 : X1 X2 X3 [P] -> R1 R2 R3</h3>
+
+<p>Obsolescent. == unary3</p>
+
+<h3>app4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4</h3>
+
+<p>Obsolescent. == unary4</p></div> <!-- #content -->
 
 </body>
 </html>

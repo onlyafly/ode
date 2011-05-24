@@ -47,6 +47,7 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('i', ode.joynatives.i);
   i.addNativeOperation('first', ode.joynatives.first);
   i.addNativeOperation('rest', ode.joynatives.rest);
+  i.addNativeOperation('swons', ode.joynatives.swons);
 
   // Basic Stack Operations
   i.addNativeOperation('id', function(e) {});
@@ -660,6 +661,20 @@ ode.joynatives.cons = function(e) {
     e.stack.push(y.prependNode(x));
   } else {
     e.expectationError('cons', ['element', 'compatible aggregate'], [x, y]);
+  }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.swons = function(e) {
+  var x = e.stack.pop();
+  var y = e.stack.pop();
+
+  if (y.prependNode && y.canPrependNode && y.canPrependNode(x)) {
+    e.stack.push(y.prependNode(x));
+  } else {
+    e.expectationError('swons', ['compatible aggregate', 'element'], [x, y]);
   }
 };
 

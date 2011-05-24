@@ -25,7 +25,7 @@ Directory Structure
 * __root__
   * __bin__ -- compiled JavaScript files, generated from source
   * __build__ -- build scripts
-  * __docs__ -- documentation, generated from source and
+  * __docs__ -- documentation, generated from source
   * __editor__ -- Ode's online development environment
   * __images__
   * __lib__ -- required third-party JavaScript libraries
