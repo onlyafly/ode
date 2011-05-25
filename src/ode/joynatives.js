@@ -23,6 +23,7 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('-', ode.joynatives.makeMathOperator('-', '-'));
   i.addNativeOperation('*', ode.joynatives.makeMathOperator('*', '*'));
   i.addNativeOperation('/', ode.joynatives.makeMathOperator('/', '/'));
+  i.addNativeOperation('rand', ode.joynatives.rand);
 
   // Boolean Operations
   i.addNativeOperation('and', ode.joynatives.and);
@@ -38,6 +39,13 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('!=', ode.joynatives.makeComparisonOp('!==', '!='));
   i.addNativeOperation('null', ode.joynatives.nullPredicate);
   i.addNativeOperation('small', ode.joynatives.small);
+  i.addNativeOperation('integer', ode.joynatives.integer);
+  i.addNativeOperation('float', ode.joynatives.floatPredicate);
+  i.addNativeOperation('string', ode.joynatives.string);
+  i.addNativeOperation('char', ode.joynatives.charPredicate);
+  i.addNativeOperation('list', ode.joynatives.list);
+  i.addNativeOperation('set', ode.joynatives.set);
+  i.addNativeOperation('logical', ode.joynatives.logical);
 
   // Aggregate Operations
   i.addNativeOperation('concat', ode.joynatives.concat);
@@ -152,6 +160,18 @@ ode.joynatives.pred = function(e) {
   } else {
     e.expectationError('pred', 'number', [x]);
   }
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.rand = function(e) {
+
+  var min = -2147483648; // -(2^31)
+  var max = 2147483647; // 2^31 - 1
+  var result = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  e.stack.push(new ode.NumberNode(result));
 };
 
 /**
@@ -358,6 +378,77 @@ ode.joynatives.nullPredicate = function(e) {
       [x]);
   }
 };
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.integer = function(e) {
+  var x = e.stack.pop();
+  var result = false;
+
+  if (x instanceof ode.NumberNode) {
+    var num = x.toNumberValue();
+    result = num === Math.floor(num);
+  }
+
+  e.stack.push(new ode.BooleanNode(result));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.floatPredicate = function(e) {
+  var x = e.stack.pop();
+  var result = false;
+
+  if (x instanceof ode.NumberNode) {
+    var num = x.toNumberValue();
+    result = num !== Math.floor(num);
+  }
+
+  e.stack.push(new ode.BooleanNode(result));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.charPredicate = function(e) {
+  var x = e.stack.pop();
+  e.stack.push(new ode.BooleanNode(x instanceof ode.CharacterNode));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.string = function(e) {
+  var x = e.stack.pop();
+  e.stack.push(new ode.BooleanNode(x instanceof ode.StringNode));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.set = function(e) {
+  var x = e.stack.pop();
+  e.stack.push(new ode.BooleanNode(x instanceof ode.SetNode));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.list = function(e) {
+  var x = e.stack.pop();
+  e.stack.push(new ode.BooleanNode(x instanceof ode.ListNode));
+};
+
+/**
+ * @param {ode.Environment} e Current environment.
+ */
+ode.joynatives.logical = function(e) {
+  var x = e.stack.pop();
+  e.stack.push(new ode.BooleanNode(x instanceof ode.BooleanNode));
+};
+
 
 /**
  * @param {ode.Environment} e Current environment.

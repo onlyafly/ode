@@ -24,7 +24,7 @@
         <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
         with modifications to clarify how certain operators function in the Ode environment.
       </em>
-    </p><h2>Literals</h2><h3>Boolean Literals</h3>
+    </p><h2>Literals</h2><h3>Boolean/Logical Literals</h3>
 
 <p>The logical type, or the type of truth values. It has just two
 literals: true and false.</p>
@@ -123,7 +123,21 @@ supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
 
 <p>Tests for empty aggregate X or zero numeric.</p><h3>small : X -> B</h3>
 
-<p>Tests whether aggregate X has 0 or 1 members, or numeric 0 or 1.</p><h2>Aggregate Operations</h2><h3>concat : S T -> U</h3>
+<p>Tests whether aggregate X has 0 or 1 members, or numeric 0 or 1.</p><h3>integer : X -> B</h3>
+
+<p>Tests whether X is an integer.</p><h3>char : X -> B</h3>
+
+<p>Tests whether X is a character.</p><h3>logical : X -> B</h3>
+
+<p>Tests whether X is a logical.</p><h3>set : X -> B</h3>
+
+<p>Tests whether X is a set.</p><h3>string : X -> B</h3>
+
+<p>Tests whether X is a string.</p><h3>list : X -> B</h3>
+
+<p>Tests whether X is a list.</p><h3>float : R -> B</h3>
+
+<p>Tests whether R is a float.</p><h2>Aggregate Operations</h2><h3>concat : S T -> U</h3>
 
 <p>Sequence U is the concatenation of sequences S and T.</p><h3>size : A -> I</h3>
 
@@ -243,9 +257,7 @@ The four parts are here aligned to make comparisons easier.</p><h2>Input/Output<
 <p>I is a random integer.</p><h2>Control Flow</h2><h3>ifte : [B] [T] [F] -> ...</h3>
 
 <p>Preserves the stack state, then executes B. The stack state is then
-restored. If B yielded true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>undefs : -> [...]</h3>
-
-<p>Push a list of all undefined symbols in the current symbol table.</p><h3>body : U -> [P]</h3>
+restored. If B yielded true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>body : U -> [P]</h3>
 
 <p>Quotation [P] is the body of user-defined symbol U.</p>
 
@@ -306,6 +318,10 @@ two values R1 and R2.</p><h3>unary3 : X1 X2 X3 [P] -> R1 R2 R3</h3>
 <p>Executes P four times, with Xi, returns Ri (i = 1..4).</p><h2>Not Yet Implemented</h2>
 
 <p><em>These operators are part of Joy, but have not yet been implemented.</em></p>
+
+<h3>undefs : -> [...]</h3>
+
+<p>Push a list of all undefined symbols in the current symbol table.</p>
 
 <h3>strtol : S I -> J</h3>
 
@@ -391,30 +407,6 @@ between S and T (== swapd cons concat)</p>
 
 <p>Tests whether X is a member of aggregate A.</p>
 
-<h3>integer : X -> B</h3>
-
-<p>Tests whether X is an integer.</p>
-
-<h3>char : X -> B</h3>
-
-<p>Tests whether X is a character.</p>
-
-<h3>logical : X -> B</h3>
-
-<p>Tests whether X is a logical.</p>
-
-<h3>set : X -> B</h3>
-
-<p>Tests whether X is a set.</p>
-
-<h3>string : X -> B</h3>
-
-<p>Tests whether X is a string.</p>
-
-<h3>list : X -> B</h3>
-
-<p>Tests whether X is a list.</p>
-
 <h3>leaf : X -> B</h3>
 
 <p>Tests whether X is not a list.</p>
@@ -422,10 +414,6 @@ between S and T (== swapd cons concat)</p>
 <h3>user : X -> B</h3>
 
 <p>Tests whether X is a user-defined symbol.</p>
-
-<h3>float : R -> B</h3>
-
-<p>Tests whether R is a float.</p>
 
 <h3>file : F -> B</h3>
 

@@ -8,14 +8,14 @@ $(function() {
   module("Joy - Literals");
   
   /***
-   * ### Boolean Literals
+   * ### Boolean/Logical Literals
    * 
    * The logical type, or the type of truth values. It has just two
    * literals: true and false.
    * 
    * `false` => false
    */
-  test("Boolean Literals", function() {
+  test("Boolean/Logical Literals", function() {
     Is.stack("true", "true");
     Is.stack("false", "false");
   });
@@ -135,7 +135,7 @@ $(function() {
     Is.stack("[+ / example map] [name] map", '["+" "/" "example" "map"]');
     
     // TODO: not sure if this is real Joy
-    Is.stack('[1 \'A [] "a" {} true false] [name] map', '["number" "character" "list" "string" "set" "boolean" "boolean"]');
+    Is.stack('[1 \'A [] "a" {} true false] [name] map', '["number" "char" "list" "string" "set" "logical" "logical"]');
   });
   
   /***
@@ -389,6 +389,76 @@ $(function() {
     Is.stack("[] small", "true");
     Is.stack("[x] small", "true");
     Is.stack("[x x] small", "false");
+  });
+  
+  /***
+   * ### integer : X -> B
+   * 
+   * Tests whether X is an integer.
+   */
+  test("integer", function() {
+    Is.stack("1 integer", "true");
+    Is.stack("1.1 integer", "false");
+  });
+  
+  /*** 
+   * ### char : X -> B
+   * 
+   * Tests whether X is a character.
+   */
+  test("char", function() {
+    Is.stack("'A char", "true");
+    Is.stack("1.0 char", "false");
+  });
+  
+  /*** 
+   * ### logical : X -> B
+   * 
+   * Tests whether X is a logical.
+   */
+  test("logical", function() {
+    Is.stack("true logical", "true");
+    Is.stack("1.0 logical", "false");
+  });
+  
+  /*** 
+   * ### set : X -> B
+   * 
+   * Tests whether X is a set.
+   */
+  test("set", function() {
+    Is.stack("{0 1 5} set", "true");
+    Is.stack("[0 1 5] set", "false");
+  });
+  
+  /*** 
+   * ### string : X -> B
+   * 
+   * Tests whether X is a string.
+   */
+  test("string", function() {
+    Is.stack("'A string", "false");
+    Is.stack('"1.0" string', "true");
+  });
+  
+  /*** 
+   * ### list : X -> B
+   * 
+   * Tests whether X is a list.
+   */
+  test("list", function() {
+    Is.stack("['A] list", "true");
+    Is.stack('"1.0" list', "false");
+  });
+  
+  /***
+   * ### float : R -> B
+   * 
+   * Tests whether R is a float.
+   */
+  test("float", function() {
+    Is.stack("1 float", "false");
+    Is.stack('1.1 float', "true");
   });
   
   /////////////////////////////////////////////////////////////////////////////
@@ -704,7 +774,7 @@ $(function() {
    * I is a random integer.
    */
   test("rand", function() {
-    // TODO Is.output("rand", "");
+    Is.stack("rand integer", "true");
   });
 
   /////////////////////////////////////////////////////////////////////////////
@@ -731,15 +801,6 @@ $(function() {
    * ## Definitions and Symbols
    */
   module("Joy - Definitions and Symbols");
-
-  /***
-   * ### undefs : -> [...]
-   * 
-   * Push a list of all undefined symbols in the current symbol table.
-   */
-  test("undefs", function() {
-    // TODO Is.output("undefs", "[]"); 
-  });
   
   /***
    * ### body : U -> [P]
@@ -1008,6 +1069,10 @@ $(function() {
    *
    * *These operators are part of Joy, but have not yet been implemented.*
    *
+   * ### undefs : -> [...]
+   * 
+   * Push a list of all undefined symbols in the current symbol table.
+   *
    * ### strtol : S I -> J
    * 
    * String S is converted to the integer J using base I. If I = 0, assumes
@@ -1092,30 +1157,6 @@ $(function() {
    * 
    * Tests whether X is a member of aggregate A.
    * 
-   * ### integer : X -> B
-   * 
-   * Tests whether X is an integer.
-   * 
-   * ### char : X -> B
-   * 
-   * Tests whether X is a character.
-   * 
-   * ### logical : X -> B
-   * 
-   * Tests whether X is a logical.
-   * 
-   * ### set : X -> B
-   * 
-   * Tests whether X is a set.
-   * 
-   * ### string : X -> B
-   * 
-   * Tests whether X is a string.
-   * 
-   * ### list : X -> B
-   * 
-   * Tests whether X is a list.
-   * 
    * ### leaf : X -> B
    * 
    * Tests whether X is not a list.
@@ -1123,10 +1164,6 @@ $(function() {
    * ### user : X -> B
    * 
    * Tests whether X is a user-defined symbol.
-   * 
-   * ### float : R -> B
-   * 
-   * Tests whether R is a float.
    * 
    * ### file : F -> B
    * 

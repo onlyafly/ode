@@ -70,7 +70,7 @@ ode.SymbolNode.prototype.getName = function() {
  * @param {!boolean} val Value for this node.
  */
 ode.BooleanNode = function(val) {
-  extras.base(this, val, 'boolean');
+  extras.base(this, val, 'logical');
 };
 extras.inherits(ode.BooleanNode, ode.AtomicNode);
 
@@ -94,7 +94,7 @@ ode.BooleanNode.prototype.toBooleanValue = function() {
  * @param {!string} val Value for this node.
  */
 ode.CharacterNode = function(val) {
-  extras.base(this, val, 'character');
+  extras.base(this, val, 'char');
 };
 extras.inherits(ode.CharacterNode, ode.AtomicNode);
 
