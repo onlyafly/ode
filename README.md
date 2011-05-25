@@ -22,7 +22,8 @@ the Joy language, originally created by Dr. Manfred von Thun.
 Directory Structure
 -------------------
 
-* __root__
+* __ode__
+  * __about__ -- Ode website pages
   * __bin__ -- compiled JavaScript files, generated from source
   * __build__ -- build scripts
   * __docs__ -- documentation, generated from source
@@ -81,11 +82,12 @@ structure:
   * distillery
   * ode (this folder)
     * build
-      * distillery-odelang.sh
+      * distillery-all.sh
       * docs
         * odelang.html (will be created)
+        * changelog.html (will be created)
 
-In a bash shell which can run Node, change directory to the build-
+In a bash shell which can run Node, change directory to the build
 directory. Then run this command:
 
-    > . distillery-odelang.sh
+    > . distillery-all.sh

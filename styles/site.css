@@ -61,6 +61,11 @@ em {
   font-style: italic;
 }
 
+dd {
+  margin-left: 1em;
+  margin-bottom: 1em;
+}
+
 .content {
   background-color: #fff;
   max-width: 800px;

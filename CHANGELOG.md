@@ -1,5 +1,5 @@
-Ode Changelog
-=============
+Ode Version History
+===================
 
 v0.4.0 (in development)
 -----------------------

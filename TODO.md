@@ -3,17 +3,18 @@ Ode Todo
 
 General Rules
 -------------
+
 * Test for ability to be converted to a type, not for node type.
 
-Phase 1
--------
-* Get all basic Joy language tests to pass.
+Work for Joy Compatibility
+--------------------------
 
-Phase 2
--------
+* Get all basic Joy language tests to pass.
 * Ensure that all tests match the requirements of the documentation.
 * Clean up wording in test documentation.
 
-Project
--------
-* Convert everything to HTML 5.
+Known Issues
+------------
+
+* Numbers can reach values of "1.157920892373162e+77" or "Infinity",
+  but the parser does not recognize them.
