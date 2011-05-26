@@ -65,7 +65,7 @@ ode.joynatives.initialize = function(i) {
   i.addNativeOperation('rollup', ode.joynatives.makeRotationOp([2, 2]));
   i.addNativeOperation('rolldown', ode.joynatives.makeRotationOp([2]));
   i.addNativeOperation('rotate', ode.joynatives.makeRotationOp([1, 2]));
-  i.addNativeOperation('popd', function(e) { e.stack.drop(1); });
+  i.addNativeOperation('popd', function(e) { e.drop(1); });
   i.addNativeOperation('swapd', ode.joynatives.makeRotationOp([2, 1]));
   i.addNativeOperation('rollupd', ode.joynatives.makeRotationOp([3, 3, 2]));
   i.addNativeOperation('rolldownd', ode.joynatives.makeRotationOp([3, 1]));
@@ -125,12 +125,12 @@ ode.joynatives.initialize = function(i) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.name = function(e) {
-  var node = e.stack.pop();
+  var node = e.pop();
 
   if (node.getName) {
-    e.stack.push(new ode.StringNode(node.getName()));
+    e.push(new ode.StringNode(node.getName()));
   } else if (node.getTypeName) {
-    e.stack.push(new ode.StringNode(node.getTypeName()));
+    e.push(new ode.StringNode(node.getTypeName()));
   } else {
     e.expectationError('name', 'symbol or literal', [node]);
   }
@@ -140,10 +140,10 @@ ode.joynatives.name = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.intern = function(e) {
-  var node = e.stack.pop();
+  var node = e.pop();
 
   if (node instanceof ode.StringNode) {
-    e.stack.push(new ode.SymbolNode(node.val));
+    e.push(new ode.SymbolNode(node.val));
   } else {
     e.expectationError('intern', 'string', [node]);
   }
@@ -153,10 +153,10 @@ ode.joynatives.intern = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.pred = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) {
-    e.stack.push(new ode.NumberNode(x.toNumberValue() - 1));
+    e.push(new ode.NumberNode(x.toNumberValue() - 1));
   } else {
     e.expectationError('pred', 'number', [x]);
   }
@@ -171,15 +171,15 @@ ode.joynatives.rand = function(e) {
   var max = 2147483647; // 2^31 - 1
   var result = Math.floor(Math.random() * (max - min + 1)) + min;
 
-  e.stack.push(new ode.NumberNode(result));
+  e.push(new ode.NumberNode(result));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.split = function(e) {
-  var test = e.stack.pop();
-  var list = e.stack.pop();
+  var test = e.pop();
+  var list = e.pop();
 
   if (test.getNodes && list.getNodes) {
 
@@ -190,11 +190,11 @@ ode.joynatives.split = function(e) {
 
       var preservedStack = ode.joynatives.getPreservedStack_(e);
 
-      e.stack.push(node);
+      e.push(node);
 
-      e.stack.push(test);
+      e.push(test);
       ode.joynatives.i(e);
-      var result = e.stack.pop();
+      var result = e.pop();
 
       ode.joynatives.restorePreservedStack_(e, preservedStack);
 
@@ -209,8 +209,8 @@ ode.joynatives.split = function(e) {
       }
     });
 
-    e.stack.push(new ode.ListNode(first));
-    e.stack.push(new ode.ListNode(second));
+    e.push(new ode.ListNode(first));
+    e.push(new ode.ListNode(second));
   } else {
     e.expectationError('split', 'list, quote', [list, test]);
   }
@@ -220,10 +220,10 @@ ode.joynatives.split = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.succ = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) {
-    e.stack.push(new ode.NumberNode(x.toNumberValue() + 1));
+    e.push(new ode.NumberNode(x.toNumberValue() + 1));
   } else {
     e.expectationError('succ', 'number', [x]);
   }
@@ -233,16 +233,16 @@ ode.joynatives.succ = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.div = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.toNumberValue && y.toNumberValue) {
 
     var quotient = parseInt(x.toNumberValue() / y.toNumberValue(), 10);
     var remainder = x.toNumberValue() % y.toNumberValue();
 
-    e.stack.push(new ode.NumberNode(quotient));
-    e.stack.push(new ode.NumberNode(remainder));
+    e.push(new ode.NumberNode(quotient));
+    e.push(new ode.NumberNode(remainder));
 
   } else {
     e.expectationError('div', 'number, number', [x, y]);
@@ -253,12 +253,12 @@ ode.joynatives.div = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.rem = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.toNumberValue && y.toNumberValue) {
     var remainder = x.toNumberValue() % y.toNumberValue();
-    e.stack.push(new ode.NumberNode(remainder));
+    e.push(new ode.NumberNode(remainder));
   } else {
     e.expectationError('div', 'number, number', [x, y]);
   }
@@ -268,15 +268,15 @@ ode.joynatives.rem = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.choice = function(e) {
-  var pelse = e.stack.pop();
-  var pthen = e.stack.pop();
-  var pif = e.stack.pop();
+  var pelse = e.pop();
+  var pthen = e.pop();
+  var pif = e.pop();
 
   if (pif.toBooleanValue) {
     if (pif.toBooleanValue()) {
-      e.stack.push(pthen);
+      e.push(pthen);
     } else {
-      e.stack.push(pelse);
+      e.push(pelse);
     }
   } else {
     e.expectationError(
@@ -290,13 +290,13 @@ ode.joynatives.choice = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.and = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.toBooleanValue && y.toBooleanValue) {
     var xb = x.toBooleanValue();
     var yb = y.toBooleanValue();
-    e.stack.push(new ode.BooleanNode(xb && yb));
+    e.push(new ode.BooleanNode(xb && yb));
   } else {
     e.expectationError(
       'and',
@@ -309,13 +309,13 @@ ode.joynatives.and = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.or = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.toBooleanValue && y.toBooleanValue) {
     var xb = x.toBooleanValue();
     var yb = y.toBooleanValue();
-    e.stack.push(new ode.BooleanNode(xb || yb));
+    e.push(new ode.BooleanNode(xb || yb));
   } else {
     e.expectationError(
       'or',
@@ -328,13 +328,13 @@ ode.joynatives.or = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.xor = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.toBooleanValue && y.toBooleanValue) {
     var xb = x.toBooleanValue();
     var yb = y.toBooleanValue();
-    e.stack.push(new ode.BooleanNode(xb ? !yb : yb));
+    e.push(new ode.BooleanNode(xb ? !yb : yb));
   } else {
     e.expectationError(
       'xor',
@@ -347,11 +347,11 @@ ode.joynatives.xor = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.not = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toBooleanValue) {
     var xb = x.toBooleanValue();
-    e.stack.push(new ode.BooleanNode(!xb));
+    e.push(new ode.BooleanNode(!xb));
   } else {
     e.expectationError(
       'not',
@@ -364,13 +364,13 @@ ode.joynatives.not = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.nullPredicate = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) {
     var xn = x.toNumberValue();
-    e.stack.push(new ode.BooleanNode(xn === 0));
+    e.push(new ode.BooleanNode(xn === 0));
   } else if (x.getSize) {
-    e.stack.push(new ode.BooleanNode(x.getSize() === 0));
+    e.push(new ode.BooleanNode(x.getSize() === 0));
   } else {
     e.expectationError(
       'null',
@@ -383,7 +383,7 @@ ode.joynatives.nullPredicate = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.integer = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
   var result = false;
 
   if (x instanceof ode.NumberNode) {
@@ -391,14 +391,14 @@ ode.joynatives.integer = function(e) {
     result = num === Math.floor(num);
   }
 
-  e.stack.push(new ode.BooleanNode(result));
+  e.push(new ode.BooleanNode(result));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.floatPredicate = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
   var result = false;
 
   if (x instanceof ode.NumberNode) {
@@ -406,47 +406,47 @@ ode.joynatives.floatPredicate = function(e) {
     result = num !== Math.floor(num);
   }
 
-  e.stack.push(new ode.BooleanNode(result));
+  e.push(new ode.BooleanNode(result));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.charPredicate = function(e) {
-  var x = e.stack.pop();
-  e.stack.push(new ode.BooleanNode(x instanceof ode.CharacterNode));
+  var x = e.pop();
+  e.push(new ode.BooleanNode(x instanceof ode.CharacterNode));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.string = function(e) {
-  var x = e.stack.pop();
-  e.stack.push(new ode.BooleanNode(x instanceof ode.StringNode));
+  var x = e.pop();
+  e.push(new ode.BooleanNode(x instanceof ode.StringNode));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.set = function(e) {
-  var x = e.stack.pop();
-  e.stack.push(new ode.BooleanNode(x instanceof ode.SetNode));
+  var x = e.pop();
+  e.push(new ode.BooleanNode(x instanceof ode.SetNode));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.list = function(e) {
-  var x = e.stack.pop();
-  e.stack.push(new ode.BooleanNode(x instanceof ode.ListNode));
+  var x = e.pop();
+  e.push(new ode.BooleanNode(x instanceof ode.ListNode));
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.logical = function(e) {
-  var x = e.stack.pop();
-  e.stack.push(new ode.BooleanNode(x instanceof ode.BooleanNode));
+  var x = e.pop();
+  e.push(new ode.BooleanNode(x instanceof ode.BooleanNode));
 };
 
 
@@ -454,14 +454,14 @@ ode.joynatives.logical = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.small = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) {
     var xn = x.toNumberValue();
-    e.stack.push(new ode.BooleanNode(xn === 0 || xn === 1));
+    e.push(new ode.BooleanNode(xn === 0 || xn === 1));
   } else if (x.getSize) {
     var xl = x.getSize();
-    e.stack.push(new ode.BooleanNode(xl === 0 || xl === 1));
+    e.push(new ode.BooleanNode(xl === 0 || xl === 1));
   } else {
     e.expectationError(
       'null',
@@ -482,8 +482,8 @@ ode.joynatives.makeComparisonOp = function(javaScriptOperatorString,
    * @param {ode.Environment} e Current environment.
    */
   return function(e) {
-    var y = e.stack.pop();
-    var x = e.stack.pop();
+    var y = e.pop();
+    var x = e.pop();
 
     if (x.toNumberValue && y.toNumberValue) {
 
@@ -491,9 +491,9 @@ ode.joynatives.makeComparisonOp = function(javaScriptOperatorString,
         javaScriptOperatorString + y.toNumberValue().toString());
 
       if (result) {
-        e.stack.push(new ode.BooleanNode(true));
+        e.push(new ode.BooleanNode(true));
       } else {
-        e.stack.push(new ode.BooleanNode(false));
+        e.push(new ode.BooleanNode(false));
       }
     } else {
       e.expectationError(operationName, 'number, number', [x, y]);
@@ -512,8 +512,8 @@ ode.joynatives.makeMathOperator = function(javaScriptOperatorString,
    * @param {ode.Environment} e Current environment.
    */
   return function(e) {
-    var y = e.stack.pop();
-    var x = e.stack.pop();
+    var y = e.pop();
+    var x = e.pop();
 
     if (x.toNumberValue && y.toNumberValue) {
 
@@ -521,7 +521,7 @@ ode.joynatives.makeMathOperator = function(javaScriptOperatorString,
       var result = eval(x.toNumberValue().toString() + ' ' +
         javaScriptOperatorString + ' ' + y.toNumberValue().toString());
 
-      e.stack.push(new ode.NumberNode(result));
+      e.push(new ode.NumberNode(result));
 
     } else {
       e.expectationError(operationName, 'number, number', [x, y]);
@@ -533,7 +533,7 @@ ode.joynatives.makeMathOperator = function(javaScriptOperatorString,
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.print = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.NumberNode) {
     e.print(x.toString());
@@ -550,26 +550,26 @@ ode.joynatives.print = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.dup = function(e) {
-  e.stack.duplicate(0);
+  e.duplicate(0);
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.dupd = function(e) {
-  e.stack.duplicate(1);
-  e.stack.moveToTop(1);
+  e.duplicate(1);
+  e.moveToTop(1);
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.dupLocation = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) { // Can x be converted to a number value?
     var position = x.toNumberValue();
-    e.stack.duplicate(position);
+    e.duplicate(position);
   } else {
     e.expectationError('dup#', 'number', [x]);
   }
@@ -579,17 +579,17 @@ ode.joynatives.dupLocation = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.swap = function(e) {
-  var x = e.stack.pop();
-  var y = e.stack.pop();
-  e.stack.push(x);
-  e.stack.push(y);
+  var x = e.pop();
+  var y = e.pop();
+  e.push(x);
+  e.push(y);
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.i = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.ListNode) {
     e.runNestableNodes(x.getNodes());
@@ -602,9 +602,9 @@ ode.joynatives.i = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.ifte = function(e) {
-  var pelse = e.stack.pop();
-  var pthen = e.stack.pop();
-  var pif = e.stack.pop();
+  var pelse = e.pop();
+  var pthen = e.pop();
+  var pif = e.pop();
 
   if (extras.hasInstances(ode.ListNode, pif, pthen, pelse)) {
 
@@ -613,9 +613,9 @@ ode.joynatives.ifte = function(e) {
     // Can predicateResult be converted to a boolean value?
     if (predicateResult.toBooleanValue) {
       if (predicateResult.toBooleanValue()) {
-        e.stack.push(pthen);
+        e.push(pthen);
       } else {
-        e.stack.push(pelse);
+        e.push(pelse);
       }
       ode.joynatives.i(e);
     } else {
@@ -633,13 +633,13 @@ ode.joynatives.ifte = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.dropLocation = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) { // Can x be converted to a number value?
     var position = x.toNumberValue();
 
     if (extras.isInteger(position) && (position >= 0)) {
-      e.stack.drop(position);
+      e.drop(position);
     } else {
       e.expectationError('drop#', 'non-negative integer', [x]);
     }
@@ -652,35 +652,35 @@ ode.joynatives.dropLocation = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.pop = function(e) {
-  e.stack.pop();
+  e.pop();
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.dip = function(e) {
-  var computation = e.stack.pop();
+  var computation = e.pop();
 
   if (!(computation instanceof ode.ListNode)) {
     e.expectationError('dip', 'list', [computation]);
   }
 
-  var saved = e.stack.pop();
-  e.stack.push(computation);
+  var saved = e.pop();
+  e.push(computation);
   ode.joynatives.i(e);
-  e.stack.push(saved);
+  e.push(saved);
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.numberPredicate = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.NumberNode(1));
+    e.push(new ode.NumberNode(1));
   } else {
-    e.stack.push(new ode.NumberNode(0));
+    e.push(new ode.NumberNode(0));
   }
 };
 
@@ -688,12 +688,12 @@ ode.joynatives.numberPredicate = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.blockPredicate = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.ListNode) {
-    e.stack.push(new ode.NumberNode(1));
+    e.push(new ode.NumberNode(1));
   } else {
-    e.stack.push(new ode.NumberNode(0));
+    e.push(new ode.NumberNode(0));
   }
 };
 
@@ -701,13 +701,13 @@ ode.joynatives.blockPredicate = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.emptyPredicate = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.ListNode) {
     if (x.getSize() === 0) {
-      e.stack.push(new ode.NumberNode(1));
+      e.push(new ode.NumberNode(1));
     } else {
-      e.stack.push(new ode.NumberNode(0));
+      e.push(new ode.NumberNode(0));
     }
   } else {
     e.expectationError('empty?', 'list', [x]);
@@ -718,11 +718,11 @@ ode.joynatives.emptyPredicate = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.concat = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (x.concatenate && x.canConcatenateWith && x.canConcatenateWith(y)) {
-    e.stack.push(x.concatenate(y));
+    e.push(x.concatenate(y));
   } else {
     e.expectationError('concat', 'two compatible aggregates', [x, y]);
   }
@@ -732,10 +732,10 @@ ode.joynatives.concat = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.size = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.getSize) {
-    e.stack.push(new ode.NumberNode(x.getSize()));
+    e.push(new ode.NumberNode(x.getSize()));
   } else {
     e.expectationError('size', 'aggregate', [x]);
   }
@@ -745,11 +745,11 @@ ode.joynatives.size = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.cons = function(e) {
-  var y = e.stack.pop();
-  var x = e.stack.pop();
+  var y = e.pop();
+  var x = e.pop();
 
   if (y.prependNode && y.canPrependNode && y.canPrependNode(x)) {
-    e.stack.push(y.prependNode(x));
+    e.push(y.prependNode(x));
   } else {
     e.expectationError('cons', ['element', 'compatible aggregate'], [x, y]);
   }
@@ -759,11 +759,11 @@ ode.joynatives.cons = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.swons = function(e) {
-  var x = e.stack.pop();
-  var y = e.stack.pop();
+  var x = e.pop();
+  var y = e.pop();
 
   if (y.prependNode && y.canPrependNode && y.canPrependNode(x)) {
-    e.stack.push(y.prependNode(x));
+    e.push(y.prependNode(x));
   } else {
     e.expectationError('swons', ['compatible aggregate', 'element'], [x, y]);
   }
@@ -773,7 +773,7 @@ ode.joynatives.swons = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.uncons = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.getFirst && x.getRest && x.getSize) {
 
@@ -781,8 +781,8 @@ ode.joynatives.uncons = function(e) {
       e.expectationError('uncons', ['non-empty aggregate'], [x]);
     }
 
-    e.stack.push(x.getFirst());
-    e.stack.push(x.getRest());
+    e.push(x.getFirst());
+    e.push(x.getRest());
 
   } else {
     e.expectationError('uncons', ['aggregate'], [x]);
@@ -793,7 +793,7 @@ ode.joynatives.uncons = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.first = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.getFirst && x.getSize) {
 
@@ -801,7 +801,7 @@ ode.joynatives.first = function(e) {
       e.expectationError('first', ['non-empty aggregate'], [x]);
     }
 
-    e.stack.push(x.getFirst());
+    e.push(x.getFirst());
 
   } else {
     e.expectationError('first', ['aggregate'], [x]);
@@ -812,7 +812,7 @@ ode.joynatives.first = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.rest = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.getRest && x.getSize) {
 
@@ -820,7 +820,7 @@ ode.joynatives.rest = function(e) {
       e.expectationError('rest', ['non-empty aggregate'], [x]);
     }
 
-    e.stack.push(x.getRest());
+    e.push(x.getRest());
 
   } else {
     e.expectationError('rest', ['aggregate'], [x]);
@@ -838,7 +838,7 @@ ode.joynatives.block = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.blockLocation = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x.toNumberValue) { // Can x be converted to a number value?
     var length = x.toNumberValue();
@@ -864,7 +864,7 @@ ode.joynatives.makeRotationOp = function(movements) {
    */
   return function(e) {
     extras.each(movements, function(n) {
-      e.stack.moveToTop(n);
+      e.moveToTop(n);
     });
   };
 };
@@ -873,8 +873,8 @@ ode.joynatives.makeRotationOp = function(movements) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.infra = function(e) {
-  var quote = e.stack.pop();
-  var list = e.stack.pop();
+  var quote = e.pop();
+  var list = e.pop();
 
   if (extras.hasInstances(ode.ListNode, quote, list)) {
 
@@ -883,18 +883,18 @@ ode.joynatives.infra = function(e) {
     // Push the list as the new stack.
     var listNodes = extras.reverseArray(list.getNodes());
     extras.each(listNodes, function(node) {
-      e.stack.push(node);
+      e.push(node);
     });
 
     // Execute the quote in the new stack.
-    e.stack.push(quote);
+    e.push(quote);
     ode.joynatives.i(e);
 
     var stackNodes = extras.reverseArray(e.getStackNodes());
 
     e.exitFrame();
 
-    e.stack.push(new ode.ListNode(stackNodes));
+    e.push(new ode.ListNode(stackNodes));
   } else {
     e.expectationError('infra', 'list, quote', [list, quote]);
   }
@@ -904,16 +904,16 @@ ode.joynatives.infra = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.type = function(e) {
-  var x = e.stack.pop();
+  var x = e.pop();
 
   if (x instanceof ode.SymbolNode) {
-    e.stack.push(new ode.ListNode([new ode.SymbolNode('name')]));
+    e.push(new ode.ListNode([new ode.SymbolNode('name')]));
   } else if (x instanceof ode.NumberNode) {
-    e.stack.push(new ode.ListNode([new ode.SymbolNode('number')]));
+    e.push(new ode.ListNode([new ode.SymbolNode('number')]));
   } else if (x instanceof ode.ListNode) {
-    e.stack.push(new ode.ListNode([new ode.SymbolNode('list')]));
+    e.push(new ode.ListNode([new ode.SymbolNode('list')]));
   } else {
-    e.stack.push(new ode.ListNode([new ode.SymbolNode('?')]));
+    e.push(new ode.ListNode([new ode.SymbolNode('?')]));
   }
 };
 
@@ -922,7 +922,7 @@ ode.joynatives.type = function(e) {
  */
 ode.joynatives.body = function(e) {
 
-  var node = e.stack.pop();
+  var node = e.pop();
   var name;
 
   if (extras.hasInstances(ode.ListNode, node)) {
@@ -952,32 +952,32 @@ ode.joynatives.body = function(e) {
     result = new ode.ListNode([new ode.SymbolNode('unknown')]);
   }
 
-  e.stack.push(result);
+  e.push(result);
 };
 
 /**
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.primrec = function(e) {
-  var computation = e.stack.pop();
-  var initialList = e.stack.pop();
+  var computation = e.pop();
+  var initialList = e.pop();
 
   if (extras.hasInstances(ode.ListNode, computation, initialList)) {
 
-    var data = e.stack.pop();
+    var data = e.pop();
 
     if (data.toNumberValue) {
 
       var endingNumber = data.toNumberValue();
 
       // Execute initial list to calculate the starting value
-      e.stack.push(initialList);
+      e.push(initialList);
       ode.joynatives.i(e);
 
       for (var i = endingNumber; i > 0; i--) {
-        e.stack.push(new ode.NumberNode(i));
+        e.push(new ode.NumberNode(i));
         ode.joynatives.swap(e);
-        e.stack.push(computation);
+        e.push(computation);
         ode.joynatives.i(e);
       }
 
@@ -986,13 +986,13 @@ ode.joynatives.primrec = function(e) {
       var reversedNodes = extras.reverseArray(data.getNodes());
 
       // Execute initial list to calculate the starting value
-      e.stack.push(initialList);
+      e.push(initialList);
       ode.joynatives.i(e);
 
       extras.each(reversedNodes, function(node, i) {
-        e.stack.push(node);
+        e.push(node);
         ode.joynatives.swap(e);
-        e.stack.push(computation);
+        e.push(computation);
         ode.joynatives.i(e);
       });
 
@@ -1014,22 +1014,22 @@ ode.joynatives.primrec = function(e) {
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @param {ode.ListNode} list List to execute.
+ * @param {ode.ListNode|ode.NestableNode} list List to execute.
  * @return {ode.NestableNode} The top node after executing the list.
  */
 ode.joynatives.executeListAndPreserveStack_ = function(e, list) {
 
   // Preserve stack.
   ode.joynatives.stack(e);
-  var preservedStack = e.stack.pop();
+  var preservedStack = e.pop();
 
   // Eval if.
-  e.stack.push(list);
+  e.push(list);
   ode.joynatives.i(e);
-  var result = e.stack.pop();
+  var result = e.pop();
 
   // Restore stack.
-  e.stack.push(preservedStack);
+  e.push(preservedStack);
   ode.joynatives.unstack(e);
 
   return result;
@@ -1038,23 +1038,24 @@ ode.joynatives.executeListAndPreserveStack_ = function(e, list) {
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @param {ode.ListNode} preservedStack List to restore as the stack.
+ * @param {ode.ListNode|ode.NestableNode} preservedStack List to restore
+ * as the stack.
  */
 ode.joynatives.restorePreservedStack_ = function(e, preservedStack) {
   // Restore stack.
-  e.stack.push(preservedStack);
+  e.push(preservedStack);
   ode.joynatives.unstack(e);
 };
 
 /**
  * @private
  * @param {ode.Environment} e Current environment.
- * @return {ode.ListNode} The stack preserved as a list.
+ * @return {ode.ListNode|ode.NestableNode} The stack preserved as a list.
  */
 ode.joynatives.getPreservedStack_ = function(e) {
   // Preserve stack.
   ode.joynatives.stack(e);
-  var preservedStack = e.stack.pop();
+  var preservedStack = e.pop();
   return preservedStack;
 };
 
@@ -1062,10 +1063,10 @@ ode.joynatives.getPreservedStack_ = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.genrec = function(e) {
-  var belse2 = e.stack.pop();
-  var belse1 = e.stack.pop();
-  var bthen = e.stack.pop();
-  var bif = e.stack.pop();
+  var belse2 = e.pop();
+  var belse1 = e.pop();
+  var bthen = e.pop();
+  var bif = e.pop();
 
   if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
@@ -1074,15 +1075,15 @@ ode.joynatives.genrec = function(e) {
     if (result.toBooleanValue) {
 
       if (result.toBooleanValue()) {
-        e.stack.push(bthen);
+        e.push(bthen);
         ode.joynatives.i(e);
       } else {
-        e.stack.push(belse1);
+        e.push(belse1);
         ode.joynatives.i(e);
-        e.stack.push(
+        e.push(
           new ode.ListNode(
             [bif, bthen, belse1, belse2, new ode.SymbolNode('genrec')]));
-        e.stack.push(belse2);
+        e.push(belse2);
         ode.joynatives.i(e);
       }
 
@@ -1105,10 +1106,10 @@ ode.joynatives.genrec = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.linrec = function(e) {
-  var belse2 = e.stack.pop();
-  var belse1 = e.stack.pop();
-  var bthen = e.stack.pop();
-  var bif = e.stack.pop();
+  var belse2 = e.pop();
+  var belse1 = e.pop();
+  var bthen = e.pop();
+  var bif = e.pop();
 
   if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
@@ -1117,16 +1118,16 @@ ode.joynatives.linrec = function(e) {
     if (result.toBooleanValue) {
 
       if (result.toBooleanValue()) {
-        e.stack.push(bthen);
+        e.push(bthen);
         ode.joynatives.i(e);
       } else {
-        e.stack.push(belse1);
+        e.push(belse1);
         ode.joynatives.i(e);
-        e.stack.push(
+        e.push(
           new ode.ListNode(
             [bif, bthen, belse1, belse2, new ode.SymbolNode('linrec')]));
         ode.joynatives.i(e);
-        e.stack.push(belse2);
+        e.push(belse2);
         ode.joynatives.i(e);
       }
 
@@ -1149,10 +1150,10 @@ ode.joynatives.linrec = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.binrec = function(e) {
-  var belse2 = e.stack.pop();
-  var belse1 = e.stack.pop();
-  var bthen = e.stack.pop();
-  var bif = e.stack.pop();
+  var belse2 = e.pop();
+  var belse1 = e.pop();
+  var bthen = e.pop();
+  var bif = e.pop();
 
   if (extras.hasInstances(ode.ListNode, bif, bthen, belse1, belse2)) {
 
@@ -1161,26 +1162,26 @@ ode.joynatives.binrec = function(e) {
     if (result.toBooleanValue) {
 
       if (result.toBooleanValue()) {
-        e.stack.push(bthen);
+        e.push(bthen);
         ode.joynatives.i(e);
       } else {
-        e.stack.push(belse1);
+        e.push(belse1);
         ode.joynatives.i(e);
 
         var recursiveQuote = new ode.ListNode(
           [bif, bthen, belse1, belse2, new ode.SymbolNode('binrec')]);
-        var second = e.stack.pop(e);
-        var first = e.stack.pop(e);
+        var second = e.pop();
+        var first = e.pop();
 
-        e.stack.push(first);
-        e.stack.push(recursiveQuote);
+        e.push(first);
+        e.push(recursiveQuote);
         ode.joynatives.i(e);
 
-        e.stack.push(second);
-        e.stack.push(recursiveQuote);
+        e.push(second);
+        e.push(recursiveQuote);
         ode.joynatives.i(e);
 
-        e.stack.push(belse2);
+        e.push(belse2);
         ode.joynatives.i(e);
       }
 
@@ -1203,8 +1204,8 @@ ode.joynatives.binrec = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.map = function(e) {
-  var f = e.stack.pop();
-  var v = e.stack.pop();
+  var f = e.pop();
+  var v = e.pop();
 
   if (extras.hasInstances(ode.ListNode, f, v)) {
     var resultArray = [];
@@ -1213,21 +1214,21 @@ ode.joynatives.map = function(e) {
 
     extras.each(v.getNodes(), function(originalNode) {
 
-      e.stack.push(originalNode);
-      e.stack.push(f);
+      e.push(originalNode);
+      e.push(f);
       ode.joynatives.i(e);
 
       extras.each(e.getStackNodes(), function(resultNode) {
         resultArray.push(resultNode);
       });
 
-      e.stack.empty(); // clear stack for next iteration of the map
+      e.emptyStack(); // clear stack for next iteration of the map
 
     });
 
     e.exitFrame();
 
-    e.stack.push(new ode.ListNode(resultArray));
+    e.push(new ode.ListNode(resultArray));
   } else {
     e.expectationError('map', 'two lists', [f, v]);
   }
@@ -1244,7 +1245,7 @@ ode.joynatives.makeUnary = function(name, n) {
    */
   return function(e) {
 
-    var computation = e.stack.pop();
+    var computation = e.pop();
 
     if (!(computation instanceof ode.ListNode)) {
       e.expectationError(name, 'list', [computation]);
@@ -1255,21 +1256,21 @@ ode.joynatives.makeUnary = function(name, n) {
     var i;
 
     for (i = 0; i < n; i++) {
-      args.unshift(e.stack.pop());
+      args.unshift(e.pop());
     }
 
     var preservedStack = ode.joynatives.getPreservedStack_(e);
 
     for (i = 0; i < n; i++) {
-      e.stack.push(args[i]);
-      e.stack.push(computation);
+      e.push(args[i]);
+      e.push(computation);
       ode.joynatives.i(e);
-      results.push(e.stack.pop());
+      results.push(e.pop());
       ode.joynatives.restorePreservedStack_(e, preservedStack);
     }
 
     extras.each(results, function(node) {
-      e.stack.push(node);
+      e.push(node);
     });
   };
 };
@@ -1278,9 +1279,9 @@ ode.joynatives.makeUnary = function(name, n) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.fold = function(e) {
-  var func = e.stack.pop();
-  var init = e.stack.pop();
-  var list = e.stack.pop();
+  var func = e.pop();
+  var init = e.pop();
+  var list = e.pop();
 
   if (!extras.hasInstances(ode.ListNode, func, list)) {
     e.expectationError('map', 'list,value,list', [list, init, func]);
@@ -1288,11 +1289,11 @@ ode.joynatives.fold = function(e) {
 
     e.enterFrame();
 
-    e.stack.push(init);
+    e.push(init);
 
     extras.each(list.getNodes(), function(node) {
-      e.stack.push(node);
-      e.stack.push(func);
+      e.push(node);
+      e.push(func);
       ode.joynatives.i(e);
     });
 
@@ -1300,7 +1301,7 @@ ode.joynatives.fold = function(e) {
     e.exitFrame();
 
     extras.each(stackNodes, function(node) {
-      e.stack.push(node);
+      e.push(node);
     });
   }
 };
@@ -1310,10 +1311,8 @@ ode.joynatives.fold = function(e) {
  */
 ode.joynatives.def = function(e) {
 
-  /** @type {ode.ListNode} */
-  var nameList = e.stack.pop();
-  /** @type {ode.ListNode} */
-  var definitionList = e.stack.pop();
+  var nameList = e.pop();
+  var definitionList = e.pop();
 
   if (!extras.hasInstances(ode.ListNode, nameList, definitionList)) {
     e.expectationError(
@@ -1342,8 +1341,7 @@ ode.joynatives.def = function(e) {
  */
 ode.joynatives.undef = function(e) {
 
-  /** @type {ode.ListNode} */
-  var nameList = e.stack.pop();
+  var nameList = e.pop();
 
   if (!extras.hasInstances(ode.ListNode, nameList)) {
     e.expectationError('undef', ['list'], [nameList]);
@@ -1368,8 +1366,8 @@ ode.joynatives.undef = function(e) {
 ode.joynatives.stack = function(e) {
   var list = new ode.ListNode(
     extras.reverseArray(
-      e.stack.getInternalArray()));
-  e.stack.push(list);
+      e.getStackNodes()));
+  e.push(list);
 };
 
 /**
@@ -1377,14 +1375,13 @@ ode.joynatives.stack = function(e) {
  */
 ode.joynatives.unstack = function(e) {
 
-  /** @type {ode.ListNode} */
-  var list = e.stack.pop();
+  var list = e.pop();
 
   if (!extras.hasInstances(ode.ListNode, list)) {
     e.expectationError('unstack', 'list', [list]);
   }
 
-  e.stack.setInternalArray(extras.reverseArray(list.getNodes()));
+  e.setStackNodes(extras.reverseArray(list.getNodes()));
 
 };
 
@@ -1392,7 +1389,7 @@ ode.joynatives.unstack = function(e) {
  * @param {ode.Environment} e Current environment.
  */
 ode.joynatives.newstack = function(e) {
-  e.stack.empty();
+  e.emptyStack();
 };
 
 /**

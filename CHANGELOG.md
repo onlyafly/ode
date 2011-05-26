@@ -1,6 +1,8 @@
 Ode Version History
 ===================
 
+*Note: Ode uses Semantic Versioning: <http://www.semver.org/>*
+
 v0.4.0 (in development)
 -----------------------
 

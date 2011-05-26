@@ -7,6 +7,7 @@ java -jar ../../closure-compiler/compiler.jar ^
 --js ../src/ode/parser.js ^
 --js ../src/ode/symboltable.js ^
 --js ../src/ode/stacks.js ^
+--js ../src/ode/environment.js ^
 --js ../src/ode/interpreter.js ^
 --js ../src/ode/joynatives.js ^
 --js ../src/ode/controller.js ^

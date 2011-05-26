@@ -1,88 +1,4 @@
 /**
- * Represents the current execution environment.
- *
- * @constructor
- * @param {ode.RuntimeStack} stack The current runtime stack.
- * @param {ode.SymbolTable} symbolTable The symbol table.
- * @param {function(string)} print The function to use to display something to
- * the user.
- * @param {function(Array.<ode.NestableNode>,number=)} runNestableNodes
- * Execute an array of nestable nodes.
- * @param {function(number)} runCreateList Create a list out of the top n
- * nodes.
- */
-ode.Environment = function(stack, symbolTable, print, runNestableNodes,
-  runCreateList) {
-  this.stack = stack;
-  this.symbolTable = symbolTable;
-  this.print = print;
-  this.runNestableNodes = runNestableNodes;
-  this.runCreateList = runCreateList;
-
-  /** @private */
-  this.frames_ = new ode.FrameStack();
-
-  // Setup frame stack
-  this.frames_.push(this.stack);
-};
-
-/**
- * Place a new frame on top of the stack.
- */
-ode.Environment.prototype.enterFrame = function() {
-  this.frames_.push(new ode.RuntimeStack());
-  this.stack = this.frames_.top();
-};
-
-/**
- * Drop the frame on top of the stack.
- */
-ode.Environment.prototype.exitFrame = function() {
-  this.frames_.pop();
-  this.stack = this.frames_.top();
-};
-
-/**
- * Drop all frames on top of the stack.
- */
-ode.Environment.prototype.resetFrames = function() {
-  this.frames_.dropAllChildFrames();
-  this.stack = this.frames_.top();
-};
-
-/**
- * Get the array of nodes on the stack.
- *
- * @return {Array.<ode.NestableNode>} The array of nodes on top of the stack.
- */
-ode.Environment.prototype.getStackNodes = function() {
-  return this.stack.getInternalArray();
-};
-
-/**
- * @param {string} operation The name of the operation.
- * @param {Array.<string>|string} expected The expected value on the stack.
- * @param {Array.<ode.Node>} actual The actual value on the stack.
- */
-ode.Environment.prototype.expectationError = function(operation, expected,
-  actual) {
-
-  /** @type {Array.<string>|string} */
-  var expectationString;
-  if (extras.isArray(expected)) {
-    expectationString = expected.join(',');
-  } else {
-    expectationString = expected;
-  }
-
-  var actualStringValues = extras.mapMethod(actual, 'toString');
-  var actualString = actualStringValues.join(',');
-
-  throw new ode.RuntimeException('Operation <' + operation + '> expected <' +
-    expectationString + '> but got <' + actualString + '>');
-};
-
-/**
  * @constructor
  * @param {ode.RuntimeStack} primaryStack The top-level runtime stack.
  * @param {ode.SymbolTable} symbolTable Symbol table.
@@ -186,42 +102,42 @@ ode.Interpreter.prototype.runDefinition = function(definitionNode) {
  * @param {ode.ListNode} listNode List node to execute.
  */
 ode.Interpreter.prototype.runList = function(listNode) {
-  this.e.stack.push(listNode);
+  this.e.push(listNode);
 };
 
 /**
  * @param {ode.SetNode} setNode Set node to execute.
  */
 ode.Interpreter.prototype.runSet = function(setNode) {
-  this.e.stack.push(setNode);
+  this.e.push(setNode);
 };
 
 /**
  * @param {string} stringValue The string to execute.
  */
 ode.Interpreter.prototype.runString = function(stringValue) {
-  this.e.stack.push(new ode.StringNode(stringValue));
+  this.e.push(new ode.StringNode(stringValue));
 };
 
 /**
  * @param {number} numberValue The number to execute.
  */
 ode.Interpreter.prototype.runNumber = function(numberValue) {
-  this.e.stack.push(new ode.NumberNode(numberValue));
+  this.e.push(new ode.NumberNode(numberValue));
 };
 
 /**
  * @param {boolean} booleanValue The value to execute.
  */
 ode.Interpreter.prototype.runBoolean = function(booleanValue) {
-  this.e.stack.push(new ode.BooleanNode(booleanValue));
+  this.e.push(new ode.BooleanNode(booleanValue));
 };
 
 /**
  * @param {string} characterValue The value to execute.
  */
 ode.Interpreter.prototype.runCharacter = function(characterValue) {
-  this.e.stack.push(new ode.CharacterNode(characterValue));
+  this.e.push(new ode.CharacterNode(characterValue));
 };
 
 /**
@@ -267,11 +183,11 @@ ode.Interpreter.prototype.runCreateList = function(length) {
 
   if (length > 0) {
     extras.each(extras.range(length - 1), function() {
-      nodesArray.unshift(that.e.stack.pop());
+      nodesArray.unshift(that.e.pop());
     });
   }
 
-  this.e.stack.push(new ode.ListNode(nodesArray));
+  this.e.push(new ode.ListNode(nodesArray));
 };
 
 /**

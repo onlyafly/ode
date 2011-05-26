@@ -789,6 +789,10 @@ $(function() {
    * 
    * Preserves the stack state, then executes B. The stack state is then
    * restored. If B yielded true, then executes T else executes F.
+   * 
+   * Put another way, it saves the stack before calling the conditional
+   * and restores it before calling the appropriate branch, therefore
+   * hiding any changing of the stack the conditional may have done.
    */
   test("ifte", function() {
     Is.stack("[true] [1] [2] ifte", "1");
