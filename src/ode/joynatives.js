@@ -941,7 +941,7 @@ ode.joynatives.body = function(e) {
     e.expectationError('body', 'name or name in list', [name]);
   }
 
-  var body = e.symbolTable.get(name.toString());
+  var body = e.getSymbol(name.toString());
   var result;
 
   if (body instanceof ode.CustomDefinitionBody) {
@@ -1333,7 +1333,7 @@ ode.joynatives.def = function(e) {
 
   var bodyPhraseNode = new ode.PhraseStatementNode(definitionList.getNodes());
   var bodyCustomDefinition = new ode.CustomDefinitionBody(bodyPhraseNode);
-  e.symbolTable.set(name.val, bodyCustomDefinition);
+  e.setSymbol(name.val, bodyCustomDefinition);
 };
 
 /**
@@ -1357,7 +1357,7 @@ ode.joynatives.undef = function(e) {
     e.expectationError('undef', ['name in a list'], [name]);
   }
 
-  e.symbolTable.drop(name.val);
+  e.dropSymbol(name.val);
 };
 
 /**

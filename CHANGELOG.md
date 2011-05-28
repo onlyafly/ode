@@ -3,10 +3,10 @@ Ode Version History
 
 *Note: Ode uses Semantic Versioning: <http://www.semver.org/>*
 
-v0.4.0 (in development)
------------------------
+v0.4.0 (2011-05-28)
+-------------------
 
-* Implemented the majority of Joy.
+* Implemented approximately half of Joy.
 
 v0.3.0 (2011-05-10)
 -------------------

@@ -94,7 +94,7 @@ ode.Interpreter.prototype.runNestableNodes = function(nestableNodesArray,
  * execute.
  */
 ode.Interpreter.prototype.runDefinition = function(definitionNode) {
-  this.e.symbolTable.set(definitionNode.name, new ode.CustomDefinitionBody(
+  this.e.setSymbol(definitionNode.name, new ode.CustomDefinitionBody(
     definitionNode.body));
 };
 
@@ -145,7 +145,7 @@ ode.Interpreter.prototype.runCharacter = function(characterValue) {
  * @param {number} recursionCount The current recursion count.
  */
 ode.Interpreter.prototype.runSymbol = function(symbolName, recursionCount) {
-  var definition = this.e.symbolTable.get(symbolName);
+  var definition = this.e.getSymbol(symbolName);
 
   if (definition instanceof ode.CustomDefinitionBody) {
     while (true) {
@@ -199,7 +199,7 @@ ode.Interpreter.prototype.addNativeOperation = function(
   symbolName,
   implementation) {
 
-  this.e.symbolTable.set(
+  this.e.setSymbol(
     symbolName,
     new ode.NativeDefinitionBody(implementation));
 };

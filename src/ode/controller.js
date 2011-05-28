@@ -20,7 +20,6 @@ ode.Controller = function(otherOutputFun, otherErrorFun, otherStack,
     new ode.Interpreter(this.stack, this.symbolTable, this.outputFun);
 
   ode.joynatives.initialize(this.interpreter);
-  // FIXME ode.natives.initialize(this.interpreter);
 };
 
 /**
@@ -115,5 +114,5 @@ ode.Controller.prototype.getAuthorInfo = function() {
  * @return {string} The current version information.
  */
 ode.Controller.prototype.getVersionInfo = function() {
-  return 'Ode v0.4.0dev';
+  return 'Ode v0.4.0';
 };

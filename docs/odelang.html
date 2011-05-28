@@ -97,7 +97,12 @@ Also supports float.</p><h3>* : I J -> K</h3>
 <p>Integer K is the product of integers I and J. Also supports float.</p><h3>/ : I J -> K</h3>
 
 <p>Integer K is the (rounded) ratio of integers I and J. Also
-supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
+supports float.</p><h3>maxint : -> N</h3>
+
+<p>Pushes largest integer (platform dependent). Typically it is
+32 bits.</p><h3>sign : N1 -> N2</h3>
+
+<p>Integer N2 is the sign (-1 or 0 or +1) of integer N1, or float N2 is the sign (-1.0 or 0.0 or 1.0) of float N1.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
 
 <p>If B is true, then X = T else X = F.</p><h3>or : X Y -> Z</h3>
 
@@ -257,7 +262,11 @@ The four parts are here aligned to make comparisons easier.</p><h2>Input/Output<
 <p>I is a random integer.</p><h2>Control Flow</h2><h3>ifte : [B] [T] [F] -> ...</h3>
 
 <p>Preserves the stack state, then executes B. The stack state is then
-restored. If B yielded true, then executes T else executes F.</p><h2>Definitions and Symbols</h2><h3>body : U -> [P]</h3>
+restored. If B yielded true, then executes T else executes F.</p>
+
+<p>Put another way, it saves the stack before calling the conditional
+and restores it before calling the appropriate branch, therefore
+hiding any changing of the stack the conditional may have done.</p><h2>Definitions and Symbols</h2><h3>body : U -> [P]</h3>
 
 <p>Quotation [P] is the body of user-defined symbol U.</p>
 
@@ -549,7 +558,107 @@ each member of A.</p>
 <h3>treegenrec : T [O1] [O2] [C] -> ...</h3>
 
 <p>T is a tree. If T is a leaf, executes O1. Else executes O2 and then
-[[O1] [O2] [C] treegenrec] C.</p><h2>Notes on Joy</h2>
+[[O1] [O2] [C] treegenrec] C.</p>
+
+<h3>neg : I -> J</h3>
+
+<p>Integer J is the negative of integer I. Also supports float.</p>
+
+<h3>ord : C -> I</h3>
+
+<p>Integer I is the Ascii value of character C (or logical or integer).</p>
+
+<h3>chr : I -> C</h3>
+
+<p>C is the character whose Ascii value is integer I (or logical or character).</p>
+
+<h3>abs : N1 -> N2</h3>
+
+<p>Integer N2 is the absolute value (0,1,2..) of integer N1, or float N2 is the absolute value (0.0 ..) of float N1</p>
+
+<h3>acos : F -> G</h3>
+
+<p>G is the arc cosine of F.</p>
+
+<h3>asin : F -> G</h3>
+
+<p>G is the arc sine of F.</p>
+
+<h3>atan : F -> G</h3>
+
+<p>G is the arc tangent of F.</p>
+
+<h3>atan2 : F G -> H</h3>
+
+<p>H is the arc tangent of F / G.</p>
+
+<h3>ceil : F -> G</h3>
+
+<p>G is the float ceiling of F.</p>
+
+<h3>cos : F -> G</h3>
+
+<p>G is the cosine of F.</p>
+
+<h3>cosh : F -> G</h3>
+
+<p>G is the hyperbolic cosine of F.</p>
+
+<h3>exp : F -> G</h3>
+
+<p>G is e (2.718281828...) raised to the Fth power.</p>
+
+<h3>floor : F -> G</h3>
+
+<p>G is the floor of F.</p>
+
+<h3>frexp : F -> G I</h3>
+
+<p>G is the mantissa and I is the exponent of F. Unless F = 0, 0.5 &lt;= abs(G) &lt; 1.0.</p>
+
+<h3>ldexp : F I -> G</h3>
+
+<p>G is F times 2 to the Ith power.</p>
+
+<h3>log : F -> G</h3>
+
+<p>G is the natural logarithm of F.</p>
+
+<h3>log10 : F -> G</h3>
+
+<p>G is the common logarithm of F.</p>
+
+<h3>modf : F -> G H</h3>
+
+<p>G is the fractional part and H is the integer part (but expressed as a float) of F.</p>
+
+<h3>pow : F G -> H</h3>
+
+<p>H is F raised to the Gth power.</p>
+
+<h3>sin : F -> G</h3>
+
+<p>G is the sine of F.</p>
+
+<h3>sinh : F -> G</h3>
+
+<p>G is the hyperbolic sine of F.</p>
+
+<h3>sqrt : F -> G</h3>
+
+<p>G is the square root of F.</p>
+
+<h3>tan : F -> G</h3>
+
+<p>G is the tangent of F.</p>
+
+<h3>tanh : F -> G</h3>
+
+<p>G is the hyperbolic tangent of F.</p>
+
+<h3>trunc : F -> I</h3>
+
+<p>I is an integer equal to the float F truncated toward zero.</p><h2>Notes on Joy</h2>
 
 <p><em>These operators are mentioned occassionally in Joy examples, but have been
 replaced by new operations by Manfred von Thun, original author of Joy,
@@ -565,7 +674,181 @@ himself.</em></p>
 
 <h3>app4 : X1 X2 X3 X4 [P] -> R1 R2 R3 R4</h3>
 
-<p>Obsolescent. == unary4</p></div> <!-- .content -->
+<p>Obsolescent. == unary4</p><h2>Other Operations (Not Implemented)</h2><h3>conts : -> [[P] [Q] ..]</h3>
+
+<p>Pushes current continuations. Buggy, do not use.</p><h3>autoput : -> I</h3>
+
+<p>Pushes current value of flag for automatic output, I = 0..2.</p><h3>undeferror : -> I</h3>
+
+<p>Pushes current value of undefined-is-error flag.</p><h3>echo : -> I</h3>
+
+<p>Pushes value of echo flag, I = 0..3.</p><h3>clock : -> I</h3>
+
+<p>Pushes the integer value of current CPU usage in hundreds
+of a second.</p><h3>time : -> I</h3>
+
+<p>Pushes the current time (in seconds since the Epoch).</p><h3>localtime : I -> T</h3>
+
+<p>Converts a time I into a list T representing local time: [year month day hour minute second isdst yearday weekday]. Month is 1 = January ... 12 = December; isdst is a Boolean flagging daylight savings/summer time; weekday is 0 = Monday ... 7 = Sunday.</p>
+
+<h3>gmtime : I -> T</h3>
+
+<p>Converts a time I into a list T representing universal time: [year month day hour minute second isdst yearday weekday]. Month is 1 = January ... 12 = December; isdst is false; weekday is 0 = Monday ... 7 = Sunday.</p>
+
+<h3>mktime : T -> I</h3>
+
+<p>Converts a list T representing local time into a time I. T is in the format generated by localtime.</p>
+
+<h3>strftime : T S1 -> S2</h3>
+
+<p>Formats a list T in the format of localtime or gmtime using string S1 and pushes the result S2.</p><h2>File I/O (Not Implemented)</h2><h3>File Literals</h3>
+
+<p>The type of references to open I/O streams, typically but not
+necessarily files. The only literals of this type are stdin,
+stdout, and stderr.</p><h3>get : -> F</h3>
+
+<p>Reads a factor from input and pushes it onto stack.</p><h3>put : X -></h3>
+
+<p>Writes X to output, pops X off stack.</p><h3>putch : N -></h3>
+
+<p>N : numeric, writes character whose ASCII is N.</p><h3>putchars : "abc.." -></h3>
+
+<p>Writes abc.. (without quotes)</p><h3>fclose : S -></h3>
+
+<p>Stream S is closed and removed from the stack.</p>
+
+<h3>feof : S -> S B</h3>
+
+<p>B is the end-of-file status of stream S.</p>
+
+<h3>ferror : S -> S B</h3>
+
+<p>B is the error status of stream S.</p>
+
+<h3>fflush : S -> S</h3>
+
+<p>Flush stream S, forcing all buffered output to be written.</p>
+
+<h3>fgetch : S -> S C</h3>
+
+<p>C is the next available character from stream S.</p>
+
+<h3>fgets : S -> S L</h3>
+
+<p>L is the next available line (as a string) from stream S.</p>
+
+<h3>fopen : P M -> S</h3>
+
+<p>The file system object with pathname P is opened with mode M (r, w, a, etc.) and stream object S is pushed; if the open fails, file:NULL is pushed.</p>
+
+<h3>fread : S I -> S L</h3>
+
+<p>I bytes are read from the current position of stream S and returned as a list of I integers.</p>
+
+<h3>fwrite : S L -> S</h3>
+
+<p>A list of integers are written as bytes to the current position of stream S.</p>
+
+<h3>fremove : P -> B</h3>
+
+<p>The file system object with pathname P is removed from the file system. is a boolean indicating success or failure.</p>
+
+<h3>frename : P1 P2 -> B</h3>
+
+<p>The file system object with pathname P1 is renamed to P2. B is a boolean indicating success or failure.</p>
+
+<h3>fput : S X -> S</h3>
+
+<p>Writes X to stream S, pops X off stack.</p>
+
+<h3>fputch : S C -> S</h3>
+
+<p>The character C is written to the current position of stream S.</p>
+
+<h3>fputchars : S "abc.." -> S</h3>
+
+<p>The string abc.. (no quotes) is written to the current position of stream S.</p>
+
+<h3>fputstring : S "abc.." -> S</h3>
+
+<p>== fputchars, as a temporary alternative.</p>
+
+<h3>fseek : S P W -> S</h3>
+
+<p>Stream S is repositioned to position P relative to whence-point W, where W = 0, 1, 2 for beginning, current position, end respectively.</p>
+
+<h3>ftell : S -> S I</h3>
+
+<p>I is the current position of stream S.</p><h2>Sets (Not Implemented)</h2><h3>setsize : -> N</h3>
+
+<p>Pushes the maximum number of elements in a set (platform
+dependent). Typically it is 32, and set members are in the
+range 0..31.</p><h3>or : X Y -> Z</h3>
+
+<p>Z is the union of sets X and Y.</p><h3>xor : X Y -> Z</h3>
+
+<p>Z is the symmetric difference of sets X and Y.</p><h3>and : X Y -> Z</h3>
+
+<p>Z is the intersection of sets X and Y.</p><h3>not : X -> Y</h3>
+
+<p>Y is the complement of set X.</p><h2>System Specific Operations (Not Implemented)</h2>
+
+<p><em>These operations do not make sense in the current web-based environment,
+so are not currently implemented.</em></p><h3>help : -></h3>
+
+<p>Lists all defined symbols, including those from library files. Then lists all primitives of raw Joy (There is a variant: "_help" which lists hidden symbols).</p>
+
+<h3>helpdetail : [ S1 S2 .. ]</h3>
+
+<p>Gives brief help on each symbol S in the list.</p>
+
+<h3>manual : -></h3>
+
+<p>Writes this manual of all Joy primitives to output file.</p>
+
+<h3>setautoput : I -></h3>
+
+<p>Sets value of flag for automatic put to I (if I = 0, none; if I = 1, put; if I = 2, stack.</p>
+
+<h3>setundeferror : I -></h3>
+
+<p>Sets flag that controls behavior of undefined functions (0 = no error, 1 = error).</p>
+
+<h3>setecho : I -></h3>
+
+<p>Sets value of echo flag for listing. I = 0: no echo, 1: echo, 2: with tab, 3: and linenumber.</p>
+
+<h3>gc : -></h3>
+
+<p>Initiates garbage collection.</p>
+
+<h3>system : "command" -></h3>
+
+<p>Escapes to shell, executes string "command". The string may cause execution of another program. When that has finished, the process returns to Joy.</p>
+
+<h3>getenv : "variable" -> "value"</h3>
+
+<p>Retrieves the value of the environment variable "variable".</p>
+
+<h3>argv : -> A</h3>
+
+<p>Creates an aggregate A containing the interpreter's command line arguments.</p>
+
+<h3>argc : -> I</h3>
+
+<p>Pushes the number of command line arguments. This is quivalent to 'argv size'.</p>
+
+<h3>include : "filnam.ext" -></h3>
+
+<p>Transfers input to file whose name is "filnam.ext". On end-of-file returns to previous input file.</p>
+
+<h3>abort : -></h3>
+
+<p>Aborts execution of current Joy program, returns to Joy main cycle.</p>
+
+<h3>quit : -></h3>
+
+<p>Exit from Joy.</p></div> <!-- .content -->
 
 </body>
 </html>

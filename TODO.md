@@ -16,15 +16,13 @@ Goals for Next Release
 ----------------------
 
 * Clean up website.
-* Clean up joy-advanced.js, making it clear what is not currently
-  supported.
-* All FIXME comments.
 
 Future Goals
 ------------
 
 * All TODO comments.
 * Website improvements:
+  * Style the Ode website.
   * Transition Joy tutorials to the website, and integrate them with
     the Ode mini shell.
 * To achieve Joy compatibility:

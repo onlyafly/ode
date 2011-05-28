@@ -23,9 +23,9 @@ ode.Environment = function(
   this.runNestableNodes = runNestableNodes;
   this.runCreateList = runCreateList;
 
-  // TODO make this private and rename to symbolTable_
-  this.symbolTable = symbolTable;
-  
+  /** @private */
+  this.symbolTable_ = symbolTable;
+
   /** @private */
   this.frames_ = new ode.FrameStack();
 
@@ -34,6 +34,29 @@ ode.Environment = function(
 
   // Setup frame stack
   this.frames_.push(stack);
+};
+
+/**
+ * @param {string} name Name of the symbol to set.
+ * @param {ode.AbstractDefinitionBody} def Definition of this symbol.
+ */
+ode.Environment.prototype.setSymbol = function(name, def) {
+  this.symbolTable_.set(name, def);
+};
+
+/**
+ * @param {string} name Name of the symbol to get.
+ * @return {ode.AbstractDefinitionBody} def Definition of this symbol.
+ */
+ode.Environment.prototype.getSymbol = function(name) {
+  return this.symbolTable_.get(name);
+};
+
+/**
+ * @param {string} name Name of the symbol to drop.
+ */
+ode.Environment.prototype.dropSymbol = function(name) {
+  this.symbolTable_.drop(name);
 };
 
 /**
