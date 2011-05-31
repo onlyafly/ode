@@ -1,1 +1,18 @@
 @import "site.css";
+
+code {
+  font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+    "Monaco", monospace;
+  font-size: 14px;
+  background-color: #ccc;
+  padding: 1px 4px 1px 2px;
+  cursor: pointer;
+}
+
+code.hovering {
+    background-color: #ccdddd;
+}
+
+code.not-hovering {
+    background-color: #cccccc;
+}

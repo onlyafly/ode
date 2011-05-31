@@ -6,22 +6,53 @@
 <title>Ode Language Documentation</title>
 
 <link rel="stylesheet" type="text/css" href="../styles/documentation.css">
+<link rel="stylesheet" type="text/css" href="../styles/odeedit.css" />
+<link rel="stylesheet" type="text/css" href="../styles/console-frame.css" />
+
+<script type="text/javascript" src="../bin/ode.js"></script>
+<script type="text/javascript" src="../lib/modernizr.js"></script>
+<script type="text/javascript" src="../lib/jquery.js"></script>
+<script type="text/javascript" src="../src/odeedit/controller.js"></script>
+<script type="text/javascript" src="../src/odeedit/miniview.js"></script>
+<script type="text/javascript" src="../src/odeedit/console-documentation.js"></script>
 
 </head>
 <body>
 
-  <div class="content">
+  <div id="console-frame">
+    <div class="innertube">
+    
+      <div id="shell-area">
+        <textarea id="shell-results" class="textBox" readonly="readonly"></textarea>
+        <input type="text" name="shell-input" id="shell-input" class="textBox" />
+      </div>
 
-    <nav>
-      <a href="../index.html">Ode Programming Language</a>
-    </nav>
+      <div id="button-area">
+        <button type="button" id="traceButton">Tracing On/Off</button>
+        <button type="button" id="printNamesButton">Print All Definitions</button>
+        <button type="button" id="clearButton">Clear Window</button>
+        <button type="button" id="resetButton">Reset Memory</button>
+      </div>
 
-    <h1>Ode Language Documentation</h1>
+      <div id="version"></div>
+      
+    </div>
+  </div>
 
-    <p>
-      <em>
-        This documentation is borrowed from the  
-        <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
-        with modifications to clarify how certain operators function in the Ode environment.
-      </em>
-    </p>
+  <div id="content">
+  
+    <div id="sheet">
+
+      <nav>
+        <a href="../index.html" class="home">Ode Programming Language</a>
+      </nav>
+  
+      <h1>Ode Language Documentation</h1>
+  
+      <p>
+        <em>
+          This documentation is borrowed from the  
+          <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
+          with modifications to clarify how certain operators function in the Ode environment.
+        </em>
+      </p>

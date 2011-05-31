@@ -7,7 +7,7 @@ body {
   max-height: 100%;
 }
 
-#bottom-frame {
+#console-frame {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -25,15 +25,9 @@ body {
   right: 0;
   bottom: 250px; /*Set bottom value to HeightOfFrameDiv*/
   overflow: auto;
-  background: #fff;
 }
 
-#content .innertube {
-    margin: 15px;
-    /*Margins for inner DIV inside each DIV (to provide padding)*/
-}
-
-#bottom-frame .innertube {
+#console-frame .innertube {
     margin: 5px;
     /*Margins for inner DIV inside each DIV (to provide padding)*/
 }

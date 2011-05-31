@@ -6,8 +6,9 @@ body {
     sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #999;
+  border: 0;
   line-height: 1.1em;
+  background-color: #999;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -47,14 +48,6 @@ ul {
 
 li {
   margin-left: 1em;
-  }
-
-code {
-  font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
-    "Monaco", monospace;
-  font-size: 14px;
-  background-color: #ccc;
-  padding: 1px 2px 1px 2px;
 }
 
 em {
@@ -66,7 +59,15 @@ dd {
   margin-bottom: 1em;
 }
 
-.content {
+nav {
+  margin-bottom: 2em;
+}
+
+#content {
+  background-color: #999;
+}
+
+#sheet {
   background-color: #fff;
   max-width: 800px;
   margin-left: auto;
@@ -74,4 +75,11 @@ dd {
   margin-top: 15px;
   margin-bottom: 15px;
   padding: 15px;
+}
+
+a.external {
+  background: transparent url(../images/external.png) no-repeat scroll
+    right center;
+  padding-right: 13px;
+  color: #36B;
 }

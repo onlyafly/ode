@@ -6,25 +6,56 @@
 <title>Ode Language Documentation</title>
 
 <link rel="stylesheet" type="text/css" href="../styles/documentation.css">
+<link rel="stylesheet" type="text/css" href="../styles/odeedit.css" />
+<link rel="stylesheet" type="text/css" href="../styles/console-frame.css" />
+
+<script type="text/javascript" src="../bin/ode.js"></script>
+<script type="text/javascript" src="../lib/modernizr.js"></script>
+<script type="text/javascript" src="../lib/jquery.js"></script>
+<script type="text/javascript" src="../src/odeedit/controller.js"></script>
+<script type="text/javascript" src="../src/odeedit/miniview.js"></script>
+<script type="text/javascript" src="../src/odeedit/console-documentation.js"></script>
 
 </head>
 <body>
 
-  <div class="content">
+  <div id="console-frame">
+    <div class="innertube">
+    
+      <div id="shell-area">
+        <textarea id="shell-results" class="textBox" readonly="readonly"></textarea>
+        <input type="text" name="shell-input" id="shell-input" class="textBox" />
+      </div>
 
-    <nav>
-      <a href="../index.html">Ode Programming Language</a>
-    </nav>
+      <div id="button-area">
+        <button type="button" id="traceButton">Tracing On/Off</button>
+        <button type="button" id="printNamesButton">Print All Definitions</button>
+        <button type="button" id="clearButton">Clear Window</button>
+        <button type="button" id="resetButton">Reset Memory</button>
+      </div>
 
-    <h1>Ode Language Documentation</h1>
+      <div id="version"></div>
+      
+    </div>
+  </div>
 
-    <p>
-      <em>
-        This documentation is borrowed from the  
-        <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
-        with modifications to clarify how certain operators function in the Ode environment.
-      </em>
-    </p><h2>Literals</h2><h3>Boolean/Logical Literals</h3>
+  <div id="content">
+  
+    <div id="sheet">
+
+      <nav>
+        <a href="../index.html" class="home">Ode Programming Language</a>
+      </nav>
+  
+      <h1>Ode Language Documentation</h1>
+  
+      <p>
+        <em>
+          This documentation is borrowed from the  
+          <a href="http://www.kevinalbrecht.com/code/joy-mirror/">original Joy language documentation</a>,
+          with modifications to clarify how certain operators function in the Ode environment.
+        </em>
+      </p><h2>Literals</h2><h3>Boolean/Logical Literals</h3>
 
 <p>The logical type, or the type of truth values. It has just two
 literals: true and false.</p>
@@ -97,12 +128,7 @@ Also supports float.</p><h3>* : I J -> K</h3>
 <p>Integer K is the product of integers I and J. Also supports float.</p><h3>/ : I J -> K</h3>
 
 <p>Integer K is the (rounded) ratio of integers I and J. Also
-supports float.</p><h3>maxint : -> N</h3>
-
-<p>Pushes largest integer (platform dependent). Typically it is
-32 bits.</p><h3>sign : N1 -> N2</h3>
-
-<p>Integer N2 is the sign (-1 or 0 or +1) of integer N1, or float N2 is the sign (-1.0 or 0.0 or 1.0) of float N1.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
+supports float.</p><h2>Boolean Operations</h2><h3>choice : B T F -> X</h3>
 
 <p>If B is true, then X = T else X = F.</p><h3>or : X Y -> Z</h3>
 
@@ -687,7 +713,12 @@ himself.</em></p>
 <p>Pushes the integer value of current CPU usage in hundreds
 of a second.</p><h3>time : -> I</h3>
 
-<p>Pushes the current time (in seconds since the Epoch).</p><h3>localtime : I -> T</h3>
+<p>Pushes the current time (in seconds since the Epoch).</p><h3>maxint : -> N</h3>
+
+<p>Pushes largest integer (platform dependent). Typically it is
+32 bits.</p><h3>sign : N1 -> N2</h3>
+
+<p>Integer N2 is the sign (-1 or 0 or +1) of integer N1, or float N2 is the sign (-1.0 or 0.0 or 1.0) of float N1.</p><h3>localtime : I -> T</h3>
 
 <p>Converts a time I into a list T representing local time: [year month day hour minute second isdst yearday weekday]. Month is 1 = January ... 12 = December; isdst is a Boolean flagging daylight savings/summer time; weekday is 0 = Monday ... 7 = Sunday.</p>
 
@@ -848,7 +879,8 @@ so are not currently implemented.</em></p><h3>help : -></h3>
 
 <h3>quit : -></h3>
 
-<p>Exit from Joy.</p></div> <!-- .content -->
-
+<p>Exit from Joy.</p>
+    </div> <!-- #sheet -->
+  </div> <!-- #content -->
 </body>
 </html>
