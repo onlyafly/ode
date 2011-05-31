@@ -28,13 +28,10 @@ Directory Structure
   * __build__ -- build scripts
   * __docs__ -- documentation, generated from source
   * __editor__ -- Ode's online development environment
-  * __images__
   * __lib__ -- required third-party JavaScript libraries
   * __other__ -- unorganized pages
   * __src__ -- source code
-    * __other__
-    * __ode__ -- the Ode interpreter
-    * __odeedit__ -- the Ode programming environment
+  * __styles__ -- CSS, images, and fonts
   * __tests__ -- unit and other tests
 
 Dependencies

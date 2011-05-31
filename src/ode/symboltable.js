@@ -90,7 +90,7 @@ ode.SymbolTable.prototype.toString = function() {
 
   extras.each([this.natives, this.customs], function(table) {
     extras.each(extras.keys(table), function(name) {
-      output += name + ' = ';
+      output += name + ' == ';
 
       var definition = table[name];
 
@@ -122,7 +122,7 @@ ode.SymbolTable.prototype.stringifyCustomDefinitions = function(separator) {
     var definition = customs[name];
 
     if (definition instanceof ode.CustomDefinitionBody) {
-      defs.push(name + ' = ' + definition.phraseNode.toString() + ';');
+      defs.push(name + ' == ' + definition.phraseNode.toString() + ';');
     }
   });
 

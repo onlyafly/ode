@@ -10,9 +10,14 @@ code {
 }
 
 code.hovering {
-    background-color: #ccdddd;
+  background-color: #ccdddd;
 }
 
 code.not-hovering {
-    background-color: #cccccc;
+  background-color: #cccccc;
+}
+
+h2 {
+  border-top: 2px double gray;
+  margin-top: 20px;
 }

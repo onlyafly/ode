@@ -417,7 +417,7 @@ extras.inherits(ode.DefinitionStatementNode, ode.StatementNode);
 
 /** @inheritDoc */
 ode.DefinitionStatementNode.prototype.toString = function() {
-  return this.name + ' = ' + this.body.toString() + ';';
+  return this.name + ' == ' + this.body.toString() + ';';
 };
 
 /**

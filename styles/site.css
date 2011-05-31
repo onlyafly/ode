@@ -7,32 +7,58 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
-  line-height: 1.1em;
+  line-height: 18px;
   background-color: #999;
 }
 
+@font-face {
+  font-family: 'OstrichSansMedium';
+  src: url('fonts/ostrich-regular-webfont.eot');
+  src: url('fonts/ostrich-regular-webfont.eot?#iefix')
+    format('embedded-opentype'), url('fonts/ostrich-regular-webfont.woff')
+    format('woff'), url('fonts/ostrich-regular-webfont.ttf')
+    format('truetype'),
+    url('fonts/ostrich-regular-webfont.svg#OstrichSansMedium') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVuSansMonoBook';
+  src: url('fonts/DejaVuSansMono-webfont.eot');
+  src: url('fonts/DejaVuSansMono-webfont.eot?#iefix')
+    format('embedded-opentype'), url('fonts/DejaVuSansMono-webfont.woff')
+    format('woff'), url('fonts/DejaVuSansMono-webfont.ttf') format('truetype'),
+    url('fonts/DejaVuSansMono-webfont.svg#DejaVuSansMonoBook') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 h1,h2,h3,h4,h5,h6 {
+  font-family: 'OstrichSansMedium', "Myriad Pro", "Gill Sans",
+    "Gill Sans MT", Calibri, sans-serif;
   font-weight: bold;
   margin-top: 10px;
   margin-bottom: 10px;
+  text-transform: none;
 }
 
 h1 {
-  font-size: 40px;
+  font-size: 50px;
   margin-bottom: 25px;
   text-align: center;
 }
 
 h2 {
-  font-size: 28px;
-  border-top: 2px black solid;
-  padding-top: 5px;
+  font-size: 32px;
+  padding-top: 10px;
   margin-bottom: 25px;
 }
 
 h3 {
-  font-size: 20px;
-  font-family: Calibri, Consolas, monospace;
+  font-size: 16px;
+  font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+    'DejaVuSansMonoBook', Calibri, Consolas, monospace;
   margin-bottom: 10px;
 }
 
@@ -60,7 +86,17 @@ dd {
 }
 
 nav {
+  background: transparent url('images/logo-small.png')
+    no-repeat 0 0;
+  height: 72px;
+  padding-top: 20px;
+  padding-left: 130px;
   margin-bottom: 2em;
+}
+
+nav a {
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #content {
@@ -77,8 +113,15 @@ nav {
   padding: 15px;
 }
 
+section {
+  background-color: #f8f8f8;
+  padding: 0 15px 15px 15px;
+  border-top: 2px double gray;
+  margin-top: 20px;
+}
+
 a.external {
-  background: transparent url(../images/external.png) no-repeat scroll
+  background: transparent url('images/external.png') no-repeat scroll
     right center;
   padding-right: 13px;
   color: #36B;
