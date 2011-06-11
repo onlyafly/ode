@@ -21,3 +21,8 @@ h2 {
   border-top: 2px double gray;
   margin-top: 20px;
 }
+
+h3 {
+  font-family: 'DejaVuSansMonoBook', "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
+    Calibri, Consolas, monospace;
+}

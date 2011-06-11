@@ -2,7 +2,7 @@ Ode
 ===
 
 __Current Version__:
-v0.4.0 (2011-05-28)
+v0.4.1dev (2011-??-??)
 
 __License__:
 MIT (see included LICENSE file)

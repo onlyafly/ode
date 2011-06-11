@@ -1,11 +1,43 @@
+@import "reset.css";
+
 body {
-  font-family: "Tahoma", "Geneva", "Lucida Sans Unicode", "Lucida Grande",
+  font-size: 18px;
+  font-family: "Myriad Pro", "Gill Sans", "Gill Sans MT", Calibri,
     sans-serif;
   background-color: #FFFFFF;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
-#dev-editor, #dev-results {
+h1 {
+  font-weight: bold;
+  font-size: 40px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+p {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+nav {
+  float: left;
+  margin: 5px;
+  position: absolute;
+}
+
+nav a {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#top-frame a,
+#bottom-frame a {
+  color: #ccf
+}
+
+#dev-editor,
+#dev-results {
   height: 100%;
   width: 100%;
 }

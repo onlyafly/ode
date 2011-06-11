@@ -1,0 +1,13 @@
+@import "site.css";
+
+h1 {
+  display: none;
+}
+
+header {
+  height: 190px;
+}
+
+#sheet {
+  background: #fff url('images/logo.jpg') no-repeat scroll center 0;
+}

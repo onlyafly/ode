@@ -30,7 +30,7 @@ $(function() {
       'foo',
       new ode.PhraseStatementNode([new ode.NumberNode(42)]));
     actual = d.toString();
-    expected = "foo = 42;";
+    expected = "foo == 42;";
     verify();
     
   });

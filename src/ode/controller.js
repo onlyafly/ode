@@ -114,5 +114,5 @@ ode.Controller.prototype.getAuthorInfo = function() {
  * @return {string} The current version information.
  */
 ode.Controller.prototype.getVersionInfo = function() {
-  return 'Ode v0.4.0';
+  return 'Ode v0.4.1dev';
 };

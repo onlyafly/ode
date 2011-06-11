@@ -22,7 +22,6 @@ Future Goals
 
 * All TODO comments.
 * Website improvements:
-  * Style the Ode website.
   * Transition Joy tutorials to the website, and integrate them with
     the Ode mini shell.
 * To achieve Joy compatibility:

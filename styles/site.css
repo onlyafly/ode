@@ -35,7 +35,7 @@ body {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  font-family: 'OstrichSansMedium', "Myriad Pro", "Gill Sans",
+  font-family: "Myriad Pro", "Gill Sans",
     "Gill Sans MT", Calibri, sans-serif;
   font-weight: bold;
   margin-top: 10px;
@@ -44,21 +44,19 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 h1 {
-  font-size: 50px;
+  font-size: 40px;
   margin-bottom: 25px;
   text-align: center;
 }
 
 h2 {
-  font-size: 32px;
+  font-size: 28px;
   padding-top: 10px;
   margin-bottom: 25px;
 }
 
 h3 {
   font-size: 16px;
-  font-family: "Bitstream Vera Sans Mono", "Consolas", "Lucida Console",
-    'DejaVuSansMonoBook', Calibri, Consolas, monospace;
   margin-bottom: 10px;
 }
 
@@ -70,6 +68,7 @@ p {
 ul {
   list-style-type: disc;
   list-style-position: inside;
+  margin-bottom: 1em;
 }
 
 li {

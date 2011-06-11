@@ -3,6 +3,11 @@ Ode Version History
 
 *Note: Ode uses Semantic Versioning: <http://www.semver.org/>*
 
+v0.4.1dev (in development)
+--------------------------
+
+* Fixed bugs related to persisting Ode interpreter objects.
+
 v0.4.0 (2011-05-28)
 -------------------
 

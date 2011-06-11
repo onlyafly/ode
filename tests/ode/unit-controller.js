@@ -57,7 +57,7 @@ test("stringifyCustomDefinitions", function() {
       new ode.NumberNode(7)])));
   
   actual = controller.stringifyCustomDefinitions();
-  expected = "dude = 5 6 7;";
+  expected = "dude == 5 6 7;";
   validate();
   
   symbolTable.set('<', new ode.CustomDefinitionBody(
@@ -67,7 +67,7 @@ test("stringifyCustomDefinitions", function() {
       new ode.NumberNode(9)])));
   
   actual = controller.stringifyCustomDefinitions();
-  expected = "dude = 5 6 7; < = 9 9 9;";
+  expected = "dude == 5 6 7; < == 9 9 9;";
   validate();
   
   reset();
